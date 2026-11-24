@@ -45,7 +45,7 @@ help:
 	heading 'Agent skills - make help'; \
 	printf 'Usage: make <target> [VARIABLE=value ...]\n'; \
 	heading 'Install globally'; \
-	entry 'install' 'Discover assistants and install all skills for your user.'; \
+	entry 'install' 'Install all skills in every supported assistant global directory.'; \
 	entry 'install-global' 'Alias for install; no project-local copies by default.'; \
 	note 'Existing copies are protected. Use FORCE=1 to replace them.'; \
 	heading 'Contributor checks'; \

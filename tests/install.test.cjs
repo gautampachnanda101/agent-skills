@@ -21,13 +21,8 @@ function setup(t) {
   return { home, bin, env, run, skill };
 }
 
-test('default installation discovers assistant footprints and installs globally', t => {
-  const { home, bin, run, skill } = setup(t);
-  fs.mkdirSync(path.join(home, '.kiro'));
-  fs.writeFileSync(path.join(bin, 'claude'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
-  fs.mkdirSync(path.join(home, '.vscode/extensions/saoudrizwan.claude-dev-test'), {
-    recursive: true,
-  });
+test('default installation installs globally in every supported assistant directory', t => {
+  const { run, skill } = setup(t);
   run('install');
   for (const folder of ['.agents', '.kiro', '.claude', '.cline']) {
     assert.equal(
@@ -52,7 +47,7 @@ test('global alias, fallback and explicit destinations retain their behavior', t
   const { home, env, run, skill } = setup(t);
   run('install-global');
   assert.equal(fs.existsSync(path.join(skill('.agents'), 'SKILL.md')), true);
-  assert.equal(fs.existsSync(path.join(home, '.claude')), false);
+  assert.equal(fs.existsSync(path.join(skill('.claude'), 'SKILL.md')), true);
   const override = path.join(home, 'custom destination');
   run('install', `DEST=${override}`);
   assert.equal(fs.existsSync(path.join(override, 'backstage-catalog-builder/SKILL.md')), true);

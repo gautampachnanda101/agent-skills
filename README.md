@@ -52,12 +52,12 @@ user, across every project, without choosing paths:
 make install
 ```
 
-The installer always uses the shared `~/.agents/skills/` directory (GitHub
-Copilot in VS Code and CLI, OpenCode, Codex, Gemini CLI, Cursor, Windsurf).
-It also discovers Kiro, Claude Code, and Cline through their configuration
-directories or CLI commands and installs into their respective global folders.
-Kiro's macOS app and Cline extensions in VS Code, Cursor, and Windsurf are also
-detected. No project-local installation is made by default, and no administrator
+The installer always writes the shared `~/.agents/skills/` directory (GitHub
+Copilot in VS Code and CLI, OpenCode, Codex, Gemini CLI, Cursor, Windsurf)
+and the personal directories of Kiro (`~/.kiro/skills/`), Claude Code
+(`~/.claude/skills/`), and Cline (`~/.cline/skills/`); no assistants are
+discovered first. No project-local installation is made by default, and no
+administrator
 permissions are required. Detection is best-effort: assistants with no known
 installation footprint may need an explicit override.
 
