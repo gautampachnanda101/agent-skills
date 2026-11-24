@@ -107,19 +107,18 @@ becoming an invented local API or Resource.
 
 ## Catalog layout and merging
 
-- Preserve `(kind, namespace, name)` and existing owner/lifecycle values.
-- Prefer descriptors near independently deployed or owned components, with one
-  aggregate Location per repository when needed.
+- Preserve `(kind, namespace, name)` and existing owner/lifecycle values;
+  one aggregate Location per repository when needed.
 - Build a cross-repository identity index before writing an organization
   aggregate. Resolve collisions with the user; never silently rename existing
   entities. Avoid registering both an aggregate and its children.
 - Put organization groups in one approved organizational descriptor rather than
   duplicating them in every repository. Record unresolved external owners.
 - Merge YAML without dropping comments, extensions, documents or unrelated
-  configuration. For file mode, exact inline API definitions avoid unsupported
-  placeholders; do not weaken or replace schemas with illustrative examples.
-- A published repository URL is not a path to local edits. Keep test clones
-  persistent while Backstage references them, and report publication separately.
+  configuration; file-mode API-definition inlining follows
+  [configuration-delivery.md](./configuration-delivery.md).
+- Keep approved test clones persistent while Backstage references them, and
+  report publication separately.
 
 ## GitHub discovery plugin
 
@@ -154,8 +153,7 @@ through approved environment references or secret management. This is not a
 Backstage catalog API token. Repository branch filters are optional; without
 one, verify that the provider uses each repository's default branch.
 
-This provider looks for existing published descriptors. It does not generate
-missing descriptors, infer owners, or perform semantic source inventory.
+This provider ingests only existing published descriptors, as SKILL.md states.
 For a GitHub user account, enumerate user repositories with the supported API,
 inspect approved clones, then use file locations or published URL locations.
 Do not pass a username to an organization-only provider.

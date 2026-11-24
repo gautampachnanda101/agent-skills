@@ -10,9 +10,9 @@ contracts, workflows or owners that have never been modeled.
 1. Reuse the confirmed backend URL, then discover the MCP server through the
    host assistant. Do not edit another assistant's settings as a substitute for
    establishing the current host connection.
-2. Authenticate with the host's secure prompt, secret manager or approved
-   environment reference. Separate Backstage access from GitHub access; no
-   token values in chat, configuration, subprocess arguments or logs.
+2. Authenticate through the host's secure prompt, secret manager, or an
+   approved environment reference; the token rules in SKILL.md apply, including
+   keeping Backstage access separate from GitHub access.
 3. Confirm MCP initialization and successful tool listing. A plain HTTP GET,
    package installation, saved client configuration, or healthy backend is not
    an MCP handshake. Respect network policy and trust prompts.
@@ -69,7 +69,8 @@ does not prove that the repository's full entity model is complete.
 - Stage configuration changes and validate them before replacing existing
   files. Preserve comments, unrelated locations, identities, auth settings and
   the user's custom plugin configuration.
-- File mode remains a persistent app configuration operation. The inspected
+- File mode is an app-configuration operation, not an MCP write; see
+  [configuration-delivery.md](./configuration-delivery.md). The inspected
   `register-entity` action takes `locationUrl` and registers a remote URL;
   it is not a file upload and cannot ingest unpublished edits.
 - For URL mode, confirm publication and backend access, run the available
@@ -84,9 +85,10 @@ does not prove that the repository's full entity model is complete.
 
 ## Verify actual outcomes
 
-Poll the appropriate read tools with a bounded wait after processing starts.
-Use expected entity references from the configuration inventory rather than
-matching a convenient total count. For each repository verify:
+Poll the appropriate read tools with a bounded wait after processing starts,
+then reconcile against the configuration inventory as required by SKILL.md's
+verification rules rather than matching a convenient total count. For each
+repository verify:
 
 - its expected identities are ingested;
 - relevant owner/system/API/dependency relations match the approved model;
@@ -94,9 +96,9 @@ matching a convenient total count. For each repository verify:
 - source/origin points to the intended file or published revision;
 - required CI/docs/insights capabilities are active and their evidence is real.
 
-Use browser tools for entity details, graphs, API definitions, documentation
-and relevant plugin pages when accessible. MCP success is not UI success.
-Run a second configuration generation/restart check to ensure persistence.
+Apply the browser-verification rules in SKILL.md when browser tools can reach
+the instance; MCP success is not UI success. Persistence and second-start
+checks follow [configuration-delivery.md](./configuration-delivery.md).
 
 For CLI compatibility testing, distinguish native skill discovery from manually
 passing skill text. Verify that the CLI uses the configured MCP connection and

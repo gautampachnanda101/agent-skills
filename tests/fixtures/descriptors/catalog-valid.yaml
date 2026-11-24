@@ -1,0 +1,23 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sample-note-service
+  title: Sample Note Service
+  description: Synthetic service for exercising descriptor checks and local catalog ingestion
+  annotations:
+    backstage.io/source-location: url:https://example.com/sample/note-service
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:default/catalog-test
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: sample-note-api
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: group:default/catalog-test
+  definition:
+    $text: ./openapi.yaml

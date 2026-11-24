@@ -35,9 +35,8 @@ Include source links, documentation annotations and dependency relations where
 supported. Do not fabricate catalog entities for external packages, content
 files, third-party APIs, or nonexistent deployments.
 
-Existing descriptors can still be incomplete. Verify independently deployed
-units, provided/consumed APIs, ownership, and infrastructure coverage against
-source. Conversely, a simple library may correctly need just one Component.
+Existing descriptors can still be incomplete, and a simple library may
+correctly need just one Component; apply the inspection rules in SKILL.md.
 
 ## 3. Assemble persistent outputs
 
@@ -46,10 +45,10 @@ Follow existing layout when possible. A new multi-repository bundle can contain:
 ```text
 <confirmed-output>/
   catalog-info.yaml             # aggregate Location: approved org/repo entries
-  org.yaml                     # only approved, evidence-backed organization data
+  org.yaml                      # only approved, evidence-backed organization data
   repos/<repo>/catalog-info.yaml
-  app-config.catalog.yaml      # locations, required rules, approved integrations
-  catalog-inventory.json       # expected identities and evidence per repository
+  app-config.catalog.yaml       # locations, required rules, approved integrations
+  catalog-inventory.json        # expected identities and evidence per repository
 ```
 
 Omit `org.yaml` when there is no approved organizational data. Repository
@@ -92,8 +91,8 @@ For local file mode:
   does not silently drop repositories.
 
 For published-URL mode, ensure the backend can read the actual descriptor
-revision. Publishing edits needs separate approval. A discovery provider cannot
-see uncommitted files and does not generate missing descriptors.
+revision. Publishing edits needs separate approval; as SKILL.md states,
+discovery providers do not see unpublished files or create missing descriptors.
 
 Configure approved GitHub discovery filters for the user's real scope, not a
 hard-coded demonstration organization or one-repository regex. Use the correct
@@ -137,14 +136,14 @@ and authorization.
 3. Validate the merged app config and module registration. Check that required
    dependencies, frontend extensions and backend modules are actually active.
 4. Start/restart only with approval. Wait for asynchronous processing and compare
-   expected identities against the running catalog. Record processing errors
+   expected identities against the running catalog, recording processing errors
    per repository rather than relying on a provider's discovered count.
-5. When browser access is available, show real entity details, ownership/system
-   links, graph relationships, API definitions and applicable plugin pages.
+5. When browser access is available, verify UI rendering for affected entities,
+   systems, graphs, API definitions and plugin pages as required by SKILL.md.
    Record UI/network/credential blockers separately.
 6. Verify persistence on restart or configuration regeneration. Distinguish a
    successful isolated test from the configuration in the user's running app.
 
-Report repository coverage and entity-kind counts separately. Name every
-selected repository missing from the catalog and why. Never describe a partial
-demo, plugin installation, or schema-only pass as the complete outcome.
+Name every selected repository missing from the running catalog and why (counts
+are reported separately per SKILL.md). Never describe a partial demo, plugin
+installation, or schema-only pass as the complete outcome.

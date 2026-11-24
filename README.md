@@ -7,8 +7,9 @@ Reusable [Agent Skills](https://agentskills.io/) for coding assistants.
 - [backstage-catalog-builder](./backstage-catalog-builder/SKILL.md) scans a
   GitHub organization, user account, repository, or selected repository paths
   and creates or updates evidence-based open-source Backstage catalog entries.
-  It discovers available host tools and distinguishes source modeling from
-  automatic ingestion of already-published descriptors.
+  It discovers available host tools, distinguishes source modeling from
+  automatic ingestion of already-published descriptors, and ships a
+  zero-dependency structural checker for generated descriptors.
 
 ## Install a skill
 
@@ -179,6 +180,28 @@ delegation/symlinks; global Git settings and the existing commit-message hook
 are not modified. At commit time pre-commit checks staged files and temporarily
 stashes unstaged tracked changes. Fixers may update files; review and stage those
 changes before retrying. The first run downloads the pinned check environments.
+
+### Descriptor checks
+
+The regression tests exercise the skill's bundled descriptor checker against
+[tests/fixtures/descriptors](./tests/fixtures/descriptors). On any machine with
+Node 18+, validate catalog files structurally (required fields, unique entity
+identities, name syntax, Location targets, `$text`/`$yaml` API placeholders):
+
+```sh
+make skill-smoke
+node backstage-catalog-builder/scripts/check-descriptors.mjs catalog-info.yaml
+```
+
+The checker is intentionally not a full YAML or schema validator; use a real
+parser or the catalog's `validate-entity` for that. Skill installations include
+the checker (`scripts/check-descriptors.mjs` beside the `SKILL.md`), so the
+same command works from any installed copy. To see the fixtures
+ingested by a local Backstage, run:
+
+```sh
+make backstage CATALOG_FILES="$(pwd)/tests/fixtures/descriptors/catalog-valid.yaml"
+```
 
 ## Try the output in a local Backstage
 

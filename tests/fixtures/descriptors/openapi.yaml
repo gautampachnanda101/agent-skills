@@ -1,0 +1,11 @@
+openapi: 3.0.3
+info:
+  title: Sample Note API
+  version: 0.1.0
+paths:
+  /notes:
+    get:
+      operationId: listNotes
+      responses:
+        '200':
+          description: List of notes

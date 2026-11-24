@@ -1,6 +1,6 @@
 ---
 name: backstage-catalog-builder
-description: Discover GitHub organizations or user accounts, scan selected repositories and their files, and create or update evidence-based open-source Backstage catalog entities, file locations, and discovery configuration. Use for organization-wide catalogs, repository onboarding, ownership modeling, and Backstage ingestion validation.
+description: Discover GitHub organizations or user accounts, scan selected repositories and their files, and create or update evidence-based open-source Backstage catalog entities, file locations, and discovery configuration. Use when a request mentions Backstage, the software catalog, catalog-info.yaml or other entity descriptors, onboarding repositories into Backstage, ownership or dependency modeling, discovery providers or plugins, or validating catalog ingestion; covers organization-wide catalogs and single-repository onboarding.
 ---
 
 # Backstage catalog builder
@@ -9,6 +9,19 @@ Produce evidence-based Backstage catalog entries for an organization, a GitHub
 user account, one repository, or selected paths within a repository. Use the
 open-source Backstage catalog model, not a vendor-specific extension. Creating
 descriptors does not itself register them with Backstage.
+
+## Choose supporting guides
+
+This file holds the always-applicable rules. Load a supporting guide only when
+its workflow applies, and report a conflict instead of guessing if a guide
+disagrees with these rules.
+
+| Workflow | Load |
+| --- | --- |
+| Assembling the configuration bundle, file/URL location modes, or app-config changes | [configuration-delivery.md](./configuration-delivery.md) |
+| Inspecting or registering through a Backstage MCP connection | [mcp-workflow.md](./mcp-workflow.md) |
+| Evaluating, installing, or wiring any plugin or capability | [plugin-integration.md](./plugin-integration.md) |
+| Organization/account scope, evidence mapping, or discovery providers | [scope-and-modeling.md](./scope-and-modeling.md) |
 
 ## End-user outcome
 
@@ -104,8 +117,11 @@ for the user. Never send credentials to an unconfirmed endpoint.
   discovery providers. On GitHub, resolve owner type using `/users/{owner}`;
   for organizations enumerate `/orgs/{org}/repos`, for user accounts enumerate
   `/users/{user}/repos`, not the organization endpoint. On any host, follow
-  pagination to completion. Search results may be capped or omit unindexed
-  files; they are not a complete inventory.
+   pagination to completion. Search results may be capped or omit unindexed
+   files; they are not a complete inventory. The detailed guidance in this
+   skill covers GitHub and its discovery provider in depth; for other hosts,
+   apply the same sequence with that host's APIs and report the reduced
+   confidence rather than inventing host-specific behavior.
 - Record repository name, URL, default branch, visibility, archived/fork status,
   and inspected commit. Apply the approved filters and show selected/skipped
   counts before generating catalog files. Never interpret API failure, missing
@@ -129,29 +145,36 @@ for the user. Never send credentials to an unconfirmed endpoint.
    outside the repository. Do not inspect Git internals, dependency/vendor
    directories, generated build outputs, or secret file contents; note these
    exclusions. Do not read unrelated files just because they are present.
-2. Inspect relevant manifests, documentation, ownership information, API
+2. When scope is limited to selected paths within the repository, confirm the
+   path list, verify each path exists in the tree at the inspected revision
+   (report missing ones), and apply the same evidence rules inside that
+   boundary. A selected path may contain one entity, several, or none. When
+   completing a model needs something outside the confirmed paths (a shared
+   owner, deployment config, or API contract), propose expanding scope rather
+   than silently reaching beyond it.
+3. Inspect relevant manifests, documentation, ownership information, API
    specifications, deployment configuration, and existing `catalog-info.yaml`
    or other Backstage entity files. Identify actual deployable services,
    websites, libraries, APIs, and other supported entities from evidence, not
    from every file. Distinguish source evidence from assumptions.
-3. Reuse existing entity identities and descriptor locations. In a monorepo,
+4. Reuse existing entity identities and descriptor locations. In a monorepo,
    model independently owned or deployed units separately when supported by
    evidence; do not create an entity per directory or file. Create API,
    System, Resource, or relationship entries only where evidence supports them.
    Do not invent infrastructure, API definitions, owners, or dependencies.
    Check for duplicate `(kind, namespace, name)` identities and name collisions.
-4. Present a concise proposed entity list with evidence and unresolved choices.
+5. Present a concise proposed entity list with evidence and unresolved choices.
    Resolve material ambiguities before changing files. Preserve unrelated
    existing entities, fields, comments, custom extensions, and registration
    settings. Report empty or malformed existing descriptors and ask before
    replacing or repairing them. If a safe merge is not possible, ask rather
    than overwrite.
-5. Inventory every in-scope path, including hidden files, with exclusions and
+6. Inventory every in-scope path, including hidden files, with exclusions and
    unreadable/truncated paths reported. Read only relevant evidence. File
    coverage is not an entity-per-file requirement: content packs, modules,
    tests, scripts, and deployment manifests may belong to one deployable unit.
    Record file-backed evidence for each proposed entity and relationship.
-6. For each approved repository, handle missing, partial, and already-complete
+7. For each approved repository, handle missing, partial, and already-complete
    descriptors explicitly. Missing descriptors require source modeling, not
    skipping the repository. Existing descriptors require coverage inspection,
    not blind registration. Reconcile documentation, APIs, infrastructure and
@@ -168,6 +191,20 @@ for the user. Never send credentials to an unconfirmed endpoint.
   `spec.owner`. An API also needs `spec.type`, `spec.lifecycle`, `spec.owner`,
   and `spec.definition`. Choose values supported by the evidence and the
   user's Backstage conventions; do not add placeholders as if they were facts.
+  A minimal, well-formed Component descriptor:
+
+  ```yaml
+  apiVersion: backstage.io/v1alpha1
+  kind: Component
+  metadata:
+    name: order-service
+    annotations:
+      github.com/project-slug: acme/order-service
+  spec:
+    type: service
+    lifecycle: production
+    owner: group:payments-team
+  ```
 - Use valid Backstage names and entity references, including namespaces when
   needed. Add `providesApis`, `dependsOn`, `system`, annotations, and links only
   when supported by evidence and applicable to the entity. Preserve explicitly
@@ -221,18 +258,23 @@ for the user. Never send credentials to an unconfirmed endpoint.
   verification. The backstage.io plugin directory is a discovery index, not
   proof of compatibility; track each candidate's lifecycle state and report
   blocked plugins with their blocking evidence.
-- For local file mode, validate the complete relative Location hierarchy and
-  inline exact local API definitions when placeholders are unsupported, only
-  with approval. Preserve the original descriptor where a separate test copy
-  is preferred. Keep configuration changes persistent across runner restarts;
-  note any generated configuration that requires startup arguments.
+- For app-configuration assembly and local file mode, including Location
+  hierarchy validation, API-definition inlining, persistence across restarts,
+  and bundle layout, follow [configuration-delivery.md](./configuration-delivery.md).
 
 ## Verify and report
 
 - Parse every changed YAML document using an available YAML parser. Check
   required fields, unique entity identities, referenced local files, and
-  evidence for relationships. Use existing repository or Backstage validation
-  tooling if available; do not install dependencies without permission.
+  evidence for relationships. When Node.js is available, run the bundled
+  zero-dependency checker as an additional pass:
+  `node scripts/check-descriptors.mjs <changed-descriptor-files...>`.
+  It reports structural findings (missing required fields, duplicate
+  identities or top-level keys, invalid names, missing Location targets,
+  and missing `$text`/`$yaml` API placeholders). It is not a full YAML or
+  schema validator, so keep using the app's parser, `validate-entity`, or
+  dry-run validation where available. Do not install dependencies without
+  permission.
 - If an accessible Backstage instance and approved credentials are available,
   use the location dry run to validate the published descriptor. After actual
   registration, check the response and, where possible, query the catalog for
