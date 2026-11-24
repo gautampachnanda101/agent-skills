@@ -1,0 +1,53 @@
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Pre-commit, tests, and skill smoke
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # The repository test suite requires Node 24.15+; '24' resolves to the
+      # latest 24.x release on the runner.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Cache pre-commit environments
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Install pre-commit
+        run: pipx install pre-commit
+
+      - name: Validate pre-commit configuration
+        run: pre-commit validate-config .pre-commit-config.yaml
+
+      # Includes the YAML/JSON/lint hooks and the Make/installer regression tests
+      # (node scripts/pre-commit-tests.cjs).
+      - name: Run pre-commit checks
+        run: pre-commit run --all-files
+
+      - name: Run skill smoke checks
+        run: make skill-smoke COLOR=never
