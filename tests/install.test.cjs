@@ -1,13 +1,14 @@
 const assert = require('node:assert/strict');
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
 const root = path.resolve(__dirname, '..');
 
 function setup(t) {
-  const home = fs.mkdtempSync(path.join(process.env.TMPDIR, 'skill install test.'));
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'skill install test.'));
   t.after(() => fs.rmSync(home, { recursive: true }));
   const bin = path.join(home, 'bin');
   fs.mkdirSync(bin);
