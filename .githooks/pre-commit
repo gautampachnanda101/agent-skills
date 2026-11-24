@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+if ! command -v pre-commit >/dev/null 2>&1; then
+	echo "pre-commit is required. Install it, then run make hooks-install." >&2
+	exit 1
+fi
+exec pre-commit run --hook-stage pre-commit

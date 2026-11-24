@@ -1,0 +1,61 @@
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: skill-test-domain
+  description: Synthetic domain for local catalog validation
+spec:
+  owner: group:default/catalog-test
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: skill-test-system
+  description: Synthetic system for local catalog validation
+spec:
+  owner: group:default/catalog-test
+  domain: skill-test-domain
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: skill-test-service
+  description: Synthetic service; no application is deployed
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:default/catalog-test
+  system: skill-test-system
+  providesApis: [skill-test-api]
+  dependsOn: [resource:default/skill-test-database]
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: skill-test-api
+  description: Synthetic API definition; no endpoint is running
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: group:default/catalog-test
+  system: skill-test-system
+  definition: |
+    openapi: 3.0.3
+    info:
+      title: Skill Test API
+      version: 1.0.0
+    paths:
+      /health:
+        get:
+          responses:
+            '200':
+              description: Synthetic health response
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: skill-test-database
+  description: Synthetic database; no database is provisioned
+spec:
+  type: database
+  owner: group:default/catalog-test
+  system: skill-test-system

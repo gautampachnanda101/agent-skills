@@ -1,0 +1,22 @@
+# GitHub GraphQL requires authentication even for public repositories.
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_DISCOVERY_TOKEN}
+catalog:
+  providers:
+    github:
+      public-org-test:
+        organization: backstage
+        catalogPath: /catalog-info.yaml
+        validateLocationsExist: true
+        filters:
+          repository: '^backstage$'
+          allowForks: false
+          allowArchived: false
+          visibility: [public]
+        schedule:
+          frequency:
+            minutes: 30
+          timeout:
+            minutes: 3

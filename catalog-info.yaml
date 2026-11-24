@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: agent-skills
+  title: Portable Agent Skills
+  description: Reusable skills for coding assistants, including a Backstage catalog builder
+  annotations:
+    github.com/project-slug: gautampachnanda101/agent-skills
+  tags: [agent-skills, backstage]
+spec:
+  type: library
+  lifecycle: experimental
+  owner: group:default/catalog-test

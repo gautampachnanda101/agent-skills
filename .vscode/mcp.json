@@ -1,0 +1,19 @@
+{
+  "servers": {
+    "backstage": {
+      "type": "http",
+      "url": "http://localhost:7007/api/mcp-actions/v1",
+      "headers": {
+        "Authorization": "Bearer ${input:backstageToken}"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "id": "backstageToken",
+      "type": "promptString",
+      "description": "Backstage token matching BACKSTAGE_TOKEN in the running backend",
+      "password": true
+    }
+  ]
+}

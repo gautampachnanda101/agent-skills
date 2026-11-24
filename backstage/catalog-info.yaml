@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: skill-test-fixtures
+  description: Synthetic local fixtures for testing catalog-building skills
+spec:
+  targets:
+    - ./org.yaml
+    - ./entities.yaml

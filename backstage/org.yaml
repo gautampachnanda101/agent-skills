@@ -1,0 +1,26 @@
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: skill-test-org
+  description: Synthetic organization for local skill tests, not an upstream owner
+spec:
+  type: organization
+  children: [catalog-test]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: catalog-test
+  description: Synthetic team available to own test entities with explicit approval
+spec:
+  type: team
+  parent: skill-test-org
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: skill-test-user
+  description: Synthetic catalog identity, not a real person or login account
+spec:
+  memberOf: [catalog-test]
