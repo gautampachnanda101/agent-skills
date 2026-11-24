@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
@@ -18,7 +19,7 @@ test('cleanup rejects protected paths, normalized aliases, and unmarked director
     `${process.env.HOME}/`, path.dirname(root)]) {
     assert.throws(() => run('clean', home), /non-empty BACKSTAGE_HOME|Refusing protected/);
   }
-  const scratch = fs.mkdtempSync(path.join(process.env.TMPDIR, 'backstage cleanup guard.'));
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'backstage cleanup guard.'));
   t.after(() => fs.rmSync(scratch, { recursive: true }));
   const sentinel = path.join(scratch, 'keep');
   fs.writeFileSync(sentinel, 'unchanged');
@@ -30,7 +31,7 @@ test('cleanup rejects protected paths, normalized aliases, and unmarked director
 });
 
 test('setup marking enables cleanup only for the managed directory', t => {
-  const scratch = fs.mkdtempSync(path.join(process.env.TMPDIR, 'backstage managed test.'));
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'backstage managed test.'));
   t.after(() => fs.rmSync(scratch, { recursive: true }));
   const managed = path.join(scratch, 'managed app');
   fs.mkdirSync(path.join(managed, 'app'), { recursive: true });
@@ -49,7 +50,7 @@ test('setup marking enables cleanup only for the managed directory', t => {
 });
 
 test('Make setup writes a managed marker only after successful dependency installation', t => {
-  const home = fs.mkdtempSync(path.join(process.env.TMPDIR, 'backstage setup marker.'));
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'backstage setup marker.'));
   t.after(() => fs.rmSync(home, { recursive: true }));
   const bin = path.join(home, 'tools/bin');
   fs.mkdirSync(bin, { recursive: true });

@@ -1,13 +1,14 @@
 const assert = require('node:assert/strict');
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
 const script = path.resolve(__dirname, '../scripts/backstage-github.cjs');
 
 test('GitHub registration is idempotent and keeps unrelated backend modules', t => {
-  const app = fs.mkdtempSync(path.join(process.env.TMPDIR, 'github plugin test.'));
+  const app = fs.mkdtempSync(path.join(os.tmpdir(), 'github plugin test.'));
   t.after(() => fs.rmSync(app, { recursive: true }));
   const entry = path.join(app, 'packages/backend/src/index.ts');
   fs.mkdirSync(path.dirname(entry), { recursive: true });
@@ -26,7 +27,7 @@ test('GitHub registration is idempotent and keeps unrelated backend modules', t 
 });
 
 test('existing provider configuration is never replaced by the demonstration template', t => {
-  const app = fs.mkdtempSync(path.join(process.env.TMPDIR, 'github plugin preserve.'));
+  const app = fs.mkdtempSync(path.join(os.tmpdir(), 'github plugin preserve.'));
   t.after(() => fs.rmSync(app, { recursive: true }));
   const entry = path.join(app, 'packages/backend/src/index.ts');
   fs.mkdirSync(path.dirname(entry), { recursive: true });
@@ -39,7 +40,7 @@ test('existing provider configuration is never replaced by the demonstration tem
 });
 
 test('unexpected registration points fail without changing backend source', t => {
-  const app = fs.mkdtempSync(path.join(process.env.TMPDIR, 'github plugin invalid.'));
+  const app = fs.mkdtempSync(path.join(os.tmpdir(), 'github plugin invalid.'));
   t.after(() => fs.rmSync(app, { recursive: true }));
   const entry = path.join(app, 'packages/backend/src/index.ts');
   fs.mkdirSync(path.dirname(entry), { recursive: true });
@@ -54,7 +55,7 @@ test('unexpected registration points fail without changing backend source', t =>
 });
 
 test('backend runner passes absolute plugin config paths and disables discovery without credentials', t => {
-  const home = fs.realpathSync(fs.mkdtempSync(path.join(process.env.TMPDIR, 'github runner test.')));
+  const home = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'github runner test.')));
   t.after(() => fs.rmSync(home, { recursive: true }));
   const app = path.join(home, 'app');
   const bin = path.join(home, 'tools/bin');

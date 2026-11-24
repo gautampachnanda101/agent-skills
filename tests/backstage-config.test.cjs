@@ -1,11 +1,12 @@
 const assert = require('node:assert/strict');
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
 test('default restarts retain local clone root descriptors; explicit files override discovery', t => {
-  const home = fs.mkdtempSync(path.join(process.env.TMPDIR, 'catalog persistence test.'));
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'catalog persistence test.'));
   t.after(() => fs.rmSync(home, { recursive: true }));
   const app = path.join(home, 'app');
   fs.mkdirSync(app);
