@@ -203,6 +203,20 @@ ingested by a local Backstage, run:
 make backstage CATALOG_FILES="$(pwd)/tests/fixtures/descriptors/catalog-valid.yaml"
 ```
 
+### Local model end-to-end check
+
+`make skill-llm-verify` runs a cheap LLM round trip against the skill: it
+downloads a pinned CPU build of llama.cpp (about 23 MB) and a quantized
+Qwen2.5-0.5B-Instruct model (about 400 MB) into a git-ignored `.llm-cache/`,
+starts a local `llama-server`, asks the model to apply the skill to a small
+fictional repository with the real `SKILL.md` as its system prompt, and
+validates that the generated descriptor passes the bundled checker with the
+evidence-backed values. Overrides: `LLAMA_CPP_URL`, `LLM_MODEL_URL`,
+`LLM_ATTEMPTS`, `LLM_CTX`, `LLM_PORT`, `LLM_CACHE`. The CI `Verify` workflow
+runs the same check as a required job; on public repositories the hosted
+runner is free, the cache makes downloads one-time, and each run costs only a
+few minutes of CPU.
+
 ## Try the output in a local Backstage
 
 The Makefile can create and run a local

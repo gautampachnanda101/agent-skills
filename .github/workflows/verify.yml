@@ -51,3 +51,27 @@ jobs:
 
       - name: Run skill smoke checks
         run: make skill-smoke COLOR=never
+
+  skill-llm:
+    name: Local model applies the skill
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # llama.cpp CPU binary (~23 MB) plus the ~400 MB quantized model; the
+      # restore keeps later runs to a few minutes of compute.
+      - name: Cache llama.cpp and model
+        uses: actions/cache@v4
+        with:
+          path: .llm-cache
+          key: skill-llm-b12681-qwen2.5-0.5b-v1
+
+      - name: Verify the skill with a local model
+        run: make skill-llm-verify

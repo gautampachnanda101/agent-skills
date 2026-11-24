@@ -27,7 +27,7 @@ BACKSTAGE_ENV = node_bin=$$(sh "$(CURDIR)/scripts/backstage-node.sh"); \
 BACKSTAGE_HOME_ENV = BACKSTAGE_HOME=$$(node "$(CURDIR)/scripts/backstage-home.cjs" resolve "$$BACKSTAGE_HOME" "$(CURDIR)"); \
 	export BACKSTAGE_HOME
 
-.PHONY: help install install-global _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke hooks-install hooks-check
+.PHONY: help install install-global _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-llm-verify hooks-install hooks-check
 
 help:
 	@set -eu; \
@@ -52,6 +52,7 @@ help:
 	entry 'hooks-install' 'Enable repository pre-commit checks, preserving existing Git hooks.'; \
 	entry 'hooks-check' 'Run pre-commit checks on all tracked files.'; \
 	entry 'skill-smoke' 'Run the bundled descriptor checker over skill fixtures and repo catalogs.'; \
+	entry 'skill-llm-verify' 'Ask a local llama.cpp model to apply the skill and check its descriptor.'; \
 	heading 'Local Backstage'; \
 	entry 'backstage' 'Set up if needed, then start the UI and backend. Ctrl+C stops them.'; \
 	entry 'backstage-backend' 'Start only the backend and catalog API.'; \
@@ -210,6 +211,9 @@ skill-smoke:
 		catalog-info.yaml && \
 	echo 'Structural checks passed. To confirm ingestion in a local catalog, run:' && \
 	echo '  make backstage CATALOG_FILES="$(CURDIR)/tests/fixtures/descriptors/catalog-valid.yaml"'
+
+skill-llm-verify:
+	@sh "$(CURDIR)/scripts/skill-llm-verify.sh"
 
 install:
 	@set -eu; \

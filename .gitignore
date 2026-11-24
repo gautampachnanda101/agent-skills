@@ -1,3 +1,4 @@
 .backstage/
 gcse-revision-assistant/
 gcse-revision-*/
+.llm-cache/
