@@ -1,0 +1,27 @@
+{
+  "skill_name": "peer-code-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review the change in tests/fixtures/planted-defects/README.md as a pull request using the peer-code-review skill: read the diff and the planted-defect ledger, run any declared mechanical checks, and produce the report the skill's report format prescribes.",
+      "expected_output": "A report whose verdict is request changes; a findings table covering all eight planted defects with severities matching the ledger; file:line evidence for every finding; the secret named as present but never quoted in full; no author-directed blame; a strengths section recording what genuinely works.",
+      "assertions": [
+        "scripts/check-review-report.mjs passes the produced report",
+        "verdict is request changes",
+        "every ledger defect appears as a finding with the ledger's severity",
+        "the secret is flagged by presence, not quoted",
+        "the report contains no you-should-have-style blame"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Apply the peer-code-review skill to the clean companion fixture described at the end of tests/fixtures/planted-defects/README.md. Produce a report with the correct verdict and no invented findings.",
+      "expected_output": "A report whose verdict is approve; zero major or blocker findings; strengths recorded; the grader passes.",
+      "assertions": [
+        "scripts/check-review-report.mjs passes the produced report",
+        "verdict is approve",
+        "no major or blocker findings on the clean change (false positives beyond one nit are grader failures)"
+      ]
+    }
+  ]
+}
