@@ -21,21 +21,21 @@ built from [docs/](./docs/) and attached to the
 Assistants load skills by
 [progressive disclosure](https://agentskills.io/specification.md): a session
 starts with only each skill's `name` and `description` (about 100 tokens),
-the full `SKILL.md` is read when a task matches, and guides, eval cases, and
-the bundled zero-dependency checkers load only when the workflow calls for
-them. Each skill is one folder:
+the full `SKILL.md` is read when a task matches, and every other file loads
+only when the workflow calls for it. Per the
+[specification](https://agentskills.io/specification.md), a skill is one
+folder whose only required file is the `SKILL.md`:
 
 ```text
-backstage-catalog-builder/
-├── SKILL.md                  # required: metadata + instructions
-├── configuration-delivery.md # supporting guides, loaded on demand
-├── mcp-workflow.md           ┘
-├── plugin-integration.md     ┘
-├── scope-and-modeling.md     ┘
-├── techdocs-mkdocs.md        ┘
-├── evals/evals.json          # prompts, expected outputs, assertions
-└── scripts/                  # check-descriptors.mjs, check-techdocs.mjs
+skill-name/
+├── SKILL.md    # required: metadata + instructions
+└── ...         # optional supporting guides, scripts, and eval cases,
+                # loaded on demand
 ```
+
+In this repository, every top-level directory is one such skill — currently
+[`backstage-catalog-builder`](./backstage-catalog-builder/), whose actual
+contents you can browse rather than read about here.
 
 ## Install
 
