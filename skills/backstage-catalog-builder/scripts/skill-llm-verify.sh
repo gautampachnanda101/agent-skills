@@ -7,7 +7,8 @@ cache=${LLM_CACHE:-"$(dirname "$skill_dir")/.llm-cache"}
 mkdir -p "$cache"
 
 LLAMA_BUILD=${LLAMA_BUILD:-b12681}
-LLM_MODEL_URL=${LLM_MODEL_URL:-https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf}
+default_model_url=https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf
+LLM_MODEL_URL=${LLM_MODEL_URL:-$default_model_url}
 LLM_ATTEMPTS=${LLM_ATTEMPTS:-3}
 LLM_BASELINE=${LLM_BASELINE:-1}
 BASELINE_ATTEMPTS=${LLM_BASELINE_ATTEMPTS:-1}
@@ -43,8 +44,14 @@ server_usable() {
 	[ -n "$1" ] && [ -x "$1" ] && "$1" --version >/dev/null 2>&1
 }
 
+# Each download records the URL it came from, so pointing a variable at another
+# build or model is never silently answered from the cache.
+came_from() {
+	[ "$(cat "$1" 2>/dev/null)" = "$2" ]
+}
+
 server_bin=$(find_server "$server_dir")
-if server_usable "$server_bin"; then
+if came_from "$server_dir/.source" "$llama_url" && server_usable "$server_bin"; then
 	echo "Using cached llama.cpp: $server_dir" >&2
 else
 	echo "Downloading llama.cpp from $llama_url ..." >&2
@@ -64,17 +71,25 @@ else
 		"$server_bin" --version >&2 || true
 		exit 1
 	}
+	printf '%s\n' "$llama_url" >"$staging/.source"
 	rm -rf "$server_dir"
 	mv "$staging" "$server_dir"
 	server_bin=$(find_server "$server_dir")
 fi
 
 model_file="$cache/model.gguf"
-if [ ! -f "$model_file" ]; then
-	echo "Downloading model from $LLM_MODEL_URL ..." >&2
-	curl -fL --retry 3 --retry-delay 5 -o "$model_file" "$LLM_MODEL_URL"
-else
+model_source="$model_file.source"
+# Caches written before sources were recorded hold the default model.
+if [ -f "$model_file" ] && [ ! -f "$model_source" ]; then
+	printf '%s\n' "$default_model_url" >"$model_source"
+fi
+if [ -f "$model_file" ] && came_from "$model_source" "$LLM_MODEL_URL"; then
 	echo "Using cached model: $model_file" >&2
+else
+	echo "Downloading model from $LLM_MODEL_URL ..." >&2
+	curl -fL --retry 3 --retry-delay 5 -o "$model_file.part" "$LLM_MODEL_URL"
+	mv "$model_file.part" "$model_file"
+	printf '%s\n' "$LLM_MODEL_URL" >"$model_source"
 fi
 
 port=$(node -e '
@@ -245,9 +260,7 @@ run_scenario() {
 			temp=0.7
 			seed=$attempt
 		fi
-		config_label=$config
-		[ "$attempts" -gt 1 ] && config_label="$config (baseline)"
-		echo "[$config_label:$key] Attempt $attempt/$attempts (temperature $temp, seed $seed) ..." >&2
+		echo "[$config:$key] Attempt $attempt/$attempts (temperature $temp, seed $seed) ..." >&2
 
 		LLM_SYSTEM="$system" LLM_USER="$prompt" \
 			LLM_TEMP="$temp" LLM_SEED="$seed" LLM_MAX_TOKENS="$LLM_MAX_TOKENS" \

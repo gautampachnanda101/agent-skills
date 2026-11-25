@@ -125,7 +125,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .llm-cache
-          key: skill-llm-b12681-qwen2.5-0.5b-v2
+          key: skill-llm-b12681-qwen2.5-0.5b-v3
 
       - name: Verify the skill with a local model
         run: make skill-llm-verify

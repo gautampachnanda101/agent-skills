@@ -40,22 +40,35 @@ function setup(t) {
   return { dir, cache };
 }
 
-function archive(dir, binDir, libDir) {
+function archive(dir, binDir, libDir, omit) {
   const build = path.join(dir, 'build');
   writeBuild(path.join(build, 'llama-test'), binDir, libDir);
+  if (omit) fs.rmSync(path.join(build, 'llama-test', omit));
   const file = path.join(dir, 'llama.tar.gz');
   const result = spawnSync('tar', ['-czf', file, '-C', build, 'llama-test']);
   assert.equal(result.status, 0, String(result.stderr));
   return file;
 }
 
-function run(cache, archiveFile) {
+// Ambient LLM_*/LLAMA_* settings must not change what the tests exercise.
+const cleanEnv = Object.fromEntries(
+  Object.entries(process.env).filter(([name]) => !/^(LLM_|LLAMA_|SKILL_DIR$)/.test(name)),
+);
+
+function run(cache, archiveFile, env = {}) {
   const result = spawnSync('sh', [script], {
     encoding: 'utf8',
-    env: { ...process.env, LLM_CACHE: cache, LLAMA_CPP_URL: pathToFileURL(archiveFile).href },
+    timeout: 60_000,
+    env: { ...cleanEnv, LLM_CACHE: cache, LLAMA_CPP_URL: pathToFileURL(archiveFile).href, ...env },
   });
   assert.equal(result.error, undefined);
   return result.stderr;
+}
+
+// A cached build as the script leaves it: the files plus where they came from.
+function writeCache(cache, archiveFile) {
+  writeBuild(path.join(cache, 'tool'), '.', '.');
+  fs.writeFileSync(path.join(cache, 'tool', '.source'), `${pathToFileURL(archiveFile).href}\n`);
 }
 
 const layouts = [
@@ -75,26 +88,81 @@ for (const [name, binDir, libDir] of layouts) {
 
 test('reuses a cached build that runs', t => {
   const { dir, cache } = setup(t);
-  writeBuild(path.join(cache, 'tool'), '.', '.');
-  const stderr = run(cache, path.join(dir, 'missing.tar.gz'));
+  const missing = path.join(dir, 'missing.tar.gz');
+  writeCache(cache, missing);
+  const stderr = run(cache, missing);
   assert.match(stderr, /Using cached llama\.cpp/);
   assert.match(stderr, /fake server started/);
 });
 
-test('replaces a cached build that cannot load its libraries', t => {
+test('a second run reuses what the first run downloaded', t => {
+  const { dir, cache } = setup(t);
+  const file = archive(dir, '.', '.');
+  run(cache, file);
+  assert.match(run(cache, file), /Using cached llama\.cpp/);
+});
+
+test('replaces a cached build that came from another URL', t => {
+  const { dir, cache } = setup(t);
+  writeCache(cache, path.join(dir, 'other.tar.gz'));
+  assert.match(run(cache, archive(dir, '.', '.')), /Downloading llama\.cpp/);
+});
+
+test('replaces a cached build of unknown origin', t => {
   const { dir, cache } = setup(t);
   writeBuild(path.join(cache, 'tool'), '.', '.');
+  assert.match(run(cache, archive(dir, '.', '.')), /Downloading llama\.cpp/);
+});
+
+test('replaces a cached build that cannot load its libraries', t => {
+  const { dir, cache } = setup(t);
+  const file = archive(dir, '.', '.');
+  writeCache(cache, file);
   fs.rmSync(path.join(cache, 'tool', 'libllama.1.dylib'));
-  const stderr = run(cache, archive(dir, '.', '.'));
+  const stderr = run(cache, file);
   assert.match(stderr, /Downloading llama\.cpp/);
   assert.match(stderr, /fake server started/);
 });
 
 test('a failed replacement keeps the existing cache', t => {
   const { dir, cache } = setup(t);
-  writeBuild(path.join(cache, 'tool'), '.', '.');
-  fs.rmSync(path.join(cache, 'tool', 'libllama.1.dylib'));
+  writeCache(cache, path.join(dir, 'other.tar.gz'));
   const stderr = run(cache, path.join(dir, 'missing.tar.gz'));
   assert.doesNotMatch(stderr, /fake server started/);
   assert.equal(fs.existsSync(path.join(cache, 'tool', 'llama-server')), true);
+});
+
+test('rejects a downloaded build that does not run and keeps the cache', t => {
+  const { dir, cache } = setup(t);
+  writeCache(cache, path.join(dir, 'other.tar.gz'));
+  const stderr = run(cache, archive(dir, '.', '.', 'libllama.1.dylib'));
+  assert.match(stderr, /does not run on this machine/);
+  assert.match(stderr, /Library not loaded/);
+  assert.equal(fs.existsSync(path.join(cache, 'tool', 'llama-server')), true);
+});
+
+test('rejects an archive without llama-server and keeps the cache', t => {
+  const { dir, cache } = setup(t);
+  writeCache(cache, path.join(dir, 'other.tar.gz'));
+  const stderr = run(cache, archive(dir, '.', '.', 'llama-server'));
+  assert.match(stderr, /llama-server not found in the archive/);
+  assert.equal(fs.existsSync(path.join(cache, 'tool', 'llama-server')), true);
+});
+
+test('LLM_MODEL_URL replaces a model that came from another URL', t => {
+  const { dir, cache } = setup(t);
+  const file = archive(dir, '.', '.');
+  const model = path.join(dir, 'other.gguf');
+  fs.writeFileSync(model, 'other model');
+  const env = { LLM_MODEL_URL: pathToFileURL(model).href };
+  assert.match(run(cache, file, env), /Downloading model/);
+  assert.equal(fs.readFileSync(path.join(cache, 'model.gguf'), 'utf8'), 'other model');
+  assert.match(run(cache, file, env), /Using cached model/);
+});
+
+test('a failed model download keeps the existing model', t => {
+  const { dir, cache } = setup(t);
+  fs.writeFileSync(path.join(cache, 'model.gguf'), 'kept');
+  run(cache, archive(dir, '.', '.'), { LLM_MODEL_URL: pathToFileURL(path.join(dir, 'none.gguf')).href });
+  assert.equal(fs.readFileSync(path.join(cache, 'model.gguf'), 'utf8'), 'kept');
 });
