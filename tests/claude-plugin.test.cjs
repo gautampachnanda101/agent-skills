@@ -43,10 +43,20 @@ test('marketplace entry matches the manifest it lists', () => {
   const manifest = readJson('.claude-plugin/plugin.json');
 
   assert.ok(marketplace.name && NAME_PATTERN.test(marketplace.name), 'marketplace name must be kebab-case');
+  assert.ok(marketplace.description, 'marketplace description is required (validate --strict warns otherwise)');
   assert.ok(marketplace.owner?.name, 'owner.name is required');
   assert.ok(Array.isArray(marketplace.plugins) && marketplace.plugins.length, 'plugins array is required');
 
   const entry = marketplace.plugins.find(item => item.name === manifest.name);
   assert.ok(entry, 'entry name must equal the manifest name');
   assert.equal(entry.source, './', 'source must reference the marketplace root');
+});
+
+test('plugin ships a directory listing icon', () => {
+  const icon = path.join(root, '.claude-plugin', 'icon.png');
+  assert.ok(fs.existsSync(icon), '.claude-plugin/icon.png must exist (validator warns otherwise)');
+  const png = fs.readFileSync(icon);
+  assert.ok(png.length < 2 * 1024 * 1024, 'icon must be under 2 MB');
+  assert.equal(png.readUInt32BE(16), 512, 'icon width must be between 512 and 2048 px');
+  assert.equal(png.readUInt32BE(20), 512, 'icon height must be between 512 and 2048 px');
 });

@@ -1,5 +1,6 @@
 {
   "name": "gautampachnanda101-agent-skills",
+  "description": "Skills that build open-source Backstage catalogs: entity modeling, discovery, TechDocs generation, and structural validation",
   "owner": {
     "name": "Gautam Pachnanda",
     "url": "https://github.com/gautampachnanda101"
