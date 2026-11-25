@@ -16,6 +16,7 @@ nav:
       - Installing the skills: installation.md
       - Using the skills: usage.md
   - Verification: verification.md
+  - Local Backstage: local-backstage.md
   - Contributing a skill: contributing.md
 
 theme:

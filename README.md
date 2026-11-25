@@ -5,8 +5,9 @@
 
 Reusable [Agent Skills](https://agentskills.io/) for coding assistants. Each
 [skills/](./skills/) subdirectory is one independent skill — a `SKILL.md`,
-guides, scripts, and tests — portable across assistants, editors, models, and
-operating systems. The skills today:
+guides, scripts, and tests — designed to be portable across assistants,
+editors, models, and operating systems. Not every client has been tested. The
+skills today:
 
 - [`backstage-catalog-builder`](./skills/backstage-catalog-builder/SKILL.md) —
   scans GitHub repositories and builds evidence-based open-source Backstage
@@ -50,8 +51,8 @@ skill-name/
 In this repository, each [skills/](./skills/) subdirectory is one such skill.
 The folder is the source of truth — browse the skill directories to see what
 any skill actually contains — and the
-[documentation home](https://gautampachnanda101.github.io/agent-skills/)
-keeps the maintained inventory with each skill's purpose.
+[Skills section](https://gautampachnanda101.github.io/agent-skills/skills/)
+of the site describes each one.
 
 ## Install
 
@@ -76,12 +77,13 @@ notes: [Installing the skills](https://gautampachnanda101.github.io/agent-skills
 
 ## Use
 
-Open the repository you want to catalog and ask for the skill by name, for
-example: *"Use the backstage-catalog-builder skill to create a Backstage
-catalog for this repository."*
+Open a repository and ask for a skill by name, for example: *"Use the
+backstage-catalog-builder skill to create a Backstage catalog for this
+repository"* or *"Review this pull request using the peer-code-review
+skill."*
 
-Prompt examples, an account-wide run, and a fast path that skips the
-interactive questions: [Using the skills](https://gautampachnanda101.github.io/agent-skills/usage/).
+Prompts for every skill, an account-wide catalog run, and a fast path that
+skips the interactive questions: [Using the skills](https://gautampachnanda101.github.io/agent-skills/usage/).
 
 ## Documentation
 

@@ -27,7 +27,6 @@ the Claude plugin route.
 - [doc-author](doc-author.md) — authors new pages and rewrites existing
   ones with the same rules the review skill enforces.
 
-Every skill is validated in CI: spec conformance, bundled structural
-checkers, an eval-driven local-model check, and — where the skill ships its
-own suite — the skill's tests. A skill that fails a check does not ship a
-release.
+CI checks every skill against the specification and runs the tests a skill
+ships. `backstage-catalog-builder` also gets structural checks and a
+local-model check. See [Verification](../verification.md).

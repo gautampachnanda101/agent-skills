@@ -7,6 +7,7 @@ one assistant, editor, model, or operating system.
 In this page:
 
 - [Layout and naming](#layout-and-naming) — directory and frontmatter rules
+- [The repeatable skill template](#the-repeatable-skill-template)
 - [Register the skill everywhere it is discovered](#register-the-skill-everywhere-it-is-discovered)
 - [Checks before pushing](#checks-before-pushing)
 - [CI expectations](#ci-expectations)
@@ -43,7 +44,7 @@ shape follows the
 [specification](https://agentskills.io/specification.md)'s optional
 directories, plus this repository's convention of naming the optional bits:
 
-```
+```text
 <skill>/
 ├── SKILL.md             # required: metadata + instructions, under 500 lines
 ├── *.md                 # optional supporting guides, loaded on demand
@@ -74,14 +75,17 @@ automatically.
 Adding a skill directory is not enough for it to ship. Update each place that
 enumerates skills:
 
-1. The **Available skills** table in the documentation
-   [home page](index.md).
-2. The `make install` installer copies every directory under `skills/` that
-   contains a
-   `SKILL.md`, so no change is needed there; verify with
-   `make skill-smoke` that new fixture descriptors still pass.
-3. If the skill bundles verification assets, extend `make skill-llm-verify`
+1. Add the skill to the list in the repository `README.md`.
+2. Add a page for it under `docs/skills/`, including its version.
+3. Add it to the inventory in [Skills](skills/index.md).
+4. Add its page to `nav` in `mkdocs.yml`.
+5. Add an example prompt to [Using the skills](usage.md#a-prompt-for-each-skill).
+6. If the skill bundles verification assets, extend `make skill-llm-verify`
    or add a task-specific check rather than assuming generic coverage.
+
+`make install` copies every directory under `skills/` that contains a
+`SKILL.md`, so the installer needs no change. If the skill adds descriptor
+fixtures, add them to `make skill-smoke`.
 
 ## Checks before pushing
 
@@ -95,9 +99,9 @@ make hooks-check
 ```
 
 The hook checks YAML (including multi-document catalog files), JSON, merge
-conflicts, large added files, whitespace and final newlines. Make/script/test
-changes also run the repository regression tests. Hooks never install Node or
-start Backstage. Installation sets a repository-local hooks path, preserving
+conflicts, large added files, whitespace and final newlines. Changes to the Makefile,
+scripts, tests, skills, hooks or plugin manifests also run the regression
+tests. Hooks never install Node or start Backstage. Installation sets a repository-local hooks path, preserving
 existing hooks by delegation/symlinks; global Git settings and the existing
 commit-message hook are not modified. At commit time pre-commit checks staged
 files and temporarily stashes unstaged tracked changes. Fixers may update
@@ -106,11 +110,13 @@ the pinned check environments.
 
 ## CI expectations
 
-The `Verify` GitHub Action runs pre-commit checks, `make skill-smoke`, and the
-local-model end-to-end check (`make skill-llm-verify`) as required jobs on
-every push to `main` and on pull requests. Model verification downloads are
-cached; a run stays within a few minutes of hosted-runner CPU. Fix failures
-before merge; the jobs are meant to block. The `Docs` Action builds this
+The `Verify` GitHub Action runs on every push to `main` and on pull requests.
+Its jobs run pre-commit checks and `make skill-smoke`, the TechDocs checker on
+public repositories, `make skill-llm-verify`, and plugin manifest validation.
+Downloads for the model check are cached, so a run takes a few minutes.
+
+`main` has no branch protection, so a failing job does not block a push or a
+merge. Check the result yourself, and fix failures before you release. The `Docs` Action builds this
 MkDocs site and publishes it to
 [GitHub Pages](https://gautampachnanda101.github.io/agent-skills/).
 
@@ -121,8 +127,10 @@ User-visible repository changes follow a versioned release:
 1. Bump `version` in `.claude-plugin/plugin.json` using
    [Semantic Versioning](https://semver.org/); the git tag follows this
    version. Bump `metadata.version` in the `SKILL.md` of every skill whose
-   content changed in the same release.
+   content changed in the same release, and the version at the top of that
+   skill's page under `docs/skills/`.
 2. Add a CHANGELOG.md entry describing the change.
-3. Push, wait for a green `Verify` run (it validates the plugin manifests
+3. Check that `v<version>` is not already a tag or a release.
+4. Push, wait for a green `Verify` run (it validates the plugin manifests
    with `claude plugin validate --strict .`), then tag `v<version>` and
    create the GitHub Release for it.

@@ -1,11 +1,12 @@
-# Home
+# Agent skills
 
 Reusable [Agent Skills](https://agentskills.io/) for coding assistants. Each
 directory under [`skills/`](https://github.com/gautampachnanda101/agent-skills/tree/main/skills)
 ships one skill with its own `SKILL.md` entry point, so
 assistants such as GitHub Copilot, Claude Code, OpenCode, Kiro, Codex, Gemini
 CLI, Cursor, Windsurf, and Cline can load it without depending on a particular
-editor, model, or operating system.
+editor, model, or operating system. Not every client has been tested; see
+[Boundaries to expect](usage.md#boundaries-to-expect).
 
 ## At a glance
 
@@ -26,16 +27,8 @@ editor, model, or operating system.
 
 ## Available skills
 
-The long-form inventory lives in the [Skills section](skills/index.md); each
-page covers what the skill does, its grounding, what ships with it, and how
-to verify it.
-
-| Skill | Purpose | Page |
-| --- | --- | --- |
-| [backstage-catalog-builder](skills/backstage-catalog-builder.md) | Evidence-based Backstage catalog entities, discovery configuration, and TechDocs sites, built from GitHub scans and existing configuration | [page](skills/backstage-catalog-builder.md) |
-| [peer-code-review](skills/peer-code-review.md) | Diff and pull-request reviews with checklists, severity-tagged evidence, and UI accessibility checks | [page](skills/peer-code-review.md) |
-| [documentation-review](skills/documentation-review.md) | Documentation reviews grounded in Diátaxis, style guides, and GOV.UK accessibility | [page](skills/documentation-review.md) |
-| [doc-author](skills/doc-author.md) | Writes and rewrites pages with the same rules the review skill enforces: user need, Diátaxis form, plain English, verified commands | [page](skills/doc-author.md) |
+The [Skills section](skills/index.md) lists every skill, what it does, what
+ships with it, and how to check it.
 
 ## In this site
 
@@ -44,13 +37,14 @@ to verify it.
 | [Skills](skills/index.md) | Browse every published skill and what ships inside each |
 | [Installing the skills](installation.md) | Copy skills into every supported assistant, install the Claude plugin, or pick project-local destinations |
 | [Using the skills](usage.md) | Prompt patterns, a fast path that skips the questions, and what a complete run delivers |
-| [Verification](verification.md) | Validate descriptors and TechDocs yourself, or try output in a local Backstage |
+| [Verification](verification.md) | Run the bundled checkers and the local-model check |
+| [Local Backstage](local-backstage.md) | Try generated descriptors in a local Backstage, or connect through MCP |
 | [Contributing a skill](contributing.md) | Add the next skill, follow the release process, and pass the required checks |
 
 This documentation is the companion to the
 [repository README](https://github.com/gautampachnanda101/agent-skills#readme),
-which carries the CI badges and the two quick-install commands; every detail
-beyond those lives in the pages above.
+which carries the CI badges, a summary, and the quick-install commands. The
+pages above hold the detail.
 
 The entity registered for this repository is `component:default/agent-skills`
 in [catalog-info.yaml](https://github.com/gautampachnanda101/agent-skills/blob/main/catalog-info.yaml);

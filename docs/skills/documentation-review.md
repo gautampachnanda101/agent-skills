@@ -1,6 +1,6 @@
 # documentation-review
 
-**Version 1.3.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/SKILL.md) · plugin name `agent-skills:documentation-review`**
+**Version 1.3.2 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/SKILL.md) · plugin name `agent-skills:documentation-review`**
 
 Reviews documentation the way leading documentation engineers define
 quality: classify each page's type and audience first, check structure and
@@ -29,6 +29,20 @@ reviewed as part of content quality, at WCAG 2.2 AA as GOV.UK applies it.
 | --- | --- |
 | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/SKILL.md) | Review flow, style rules, accessibility checks, report format |
 | [`review-checklists.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/review-checklists.md) | Type/audience, structure, voice, accuracy, code and links, accessibility, freshness |
+| [`scripts/check-review-report.mjs`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/scripts/check-review-report.mjs) | Zero-dependency report grader with `--json` (Node.js 20+) |
+| [`evals/evals.json`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/evals/evals.json) | Eval prompts and grader-backed assertions |
+| [`tests/`](https://github.com/gautampachnanda101/agent-skills/tree/main/skills/documentation-review/tests) | Planted-defect fixtures, expected reports, and grader tests |
+
+## Check a report
+
+Save the review as Markdown, then run the grader:
+
+```sh
+node skills/documentation-review/scripts/check-review-report.mjs report.md
+```
+
+It exits 0 when the report follows the skill's format, or lists each problem
+and exits 1. It checks structure, not whether the findings are right.
 
 ## Use it
 

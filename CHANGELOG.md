@@ -4,7 +4,7 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
-## [1.1.2] - 2026-11-25
+## [1.1.3] - 2026-11-25
 
 ### Added
 
@@ -23,6 +23,35 @@ skill's `metadata.version` field.
   (official releases) or in a sibling `lib/`. A cached binary that cannot run
   triggers a fresh download, and a failed download no longer destroys the
   existing cache. Regression tests cover both layouts and the fallback.
+- `LLAMA_CPP_URL`, `LLAMA_BUILD`, and `LLM_MODEL_URL` are no longer ignored
+  when a cache exists: each download records its source URL, and a different
+  URL triggers a fresh download. An interrupted model download no longer
+  leaves a partial file in use, and with-skill runs are no longer logged as
+  `(baseline)`.
+- `peer-code-review` 1.2.1 and `documentation-review` 1.3.2: the report
+  graders read the Severity and Location/Evidence columns instead of matching
+  words anywhere in a row. They now reject unknown severities, rows without
+  evidence, and any finding listed before a more severe one, and the code
+  grader rejects verdicts that contradict the findings. Full Git SHAs and
+  wording inside quoted code no longer fail a report, possible secrets are
+  reported by line and never echoed, `--json` prints only JSON, and running
+  without arguments prints usage.
+- The bundled checkers are documented as needing Node.js 20+; the skill said
+  24+ and the site said 18+.
+
+### Changed
+
+- Documentation review fixes: CI claims match the workflow, the contributor
+  checklists list every place to update, all four skills have usage prompts,
+  the graders are documented, and the local Backstage guide has its own page.
+
+## [1.1.2] - 2026-11-25
+
+### Added
+
+- `peer-code-review` and `documentation-review` ship report graders
+  (`scripts/check-review-report.mjs`), planted-defect fixtures, expected
+  reports, tests, and `evals/evals.json`.
 
 ## [1.1.1] - 2026-11-25
 

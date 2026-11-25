@@ -1,6 +1,6 @@
 # peer-code-review
 
-**Version 1.2.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/SKILL.md) · plugin name `agent-skills:peer-code-review`**
+**Version 1.2.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/SKILL.md) · plugin name `agent-skills:peer-code-review`**
 
 Runs an evidence-based peer code review of a diff, commit series, or pull
 request: focused passes at review-research-informed pacing, findings graded
@@ -28,6 +28,20 @@ WCAG 2.2 AA accessibility check.
 | --- | --- |
 | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/SKILL.md) | Process, pacing, findings, tone, report format |
 | [`checklists.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/checklists.md) | Correctness/design, tests, maintainability, documentation, UI accessibility |
+| [`scripts/check-review-report.mjs`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/scripts/check-review-report.mjs) | Zero-dependency report grader with `--json` (Node.js 20+) |
+| [`evals/evals.json`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/evals/evals.json) | Eval prompts and grader-backed assertions |
+| [`tests/`](https://github.com/gautampachnanda101/agent-skills/tree/main/skills/peer-code-review/tests) | Planted-defect fixtures, expected reports, and grader tests |
+
+## Check a report
+
+Save the review as Markdown, then run the grader:
+
+```sh
+node skills/peer-code-review/scripts/check-review-report.mjs report.md
+```
+
+It exits 0 when the report follows the skill's format, or lists each problem
+and exits 1. It checks structure, not whether the findings are right.
 
 ## Use it
 

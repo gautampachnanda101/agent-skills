@@ -1,11 +1,11 @@
 # Using the skills
 
-Open the repository you want to catalog in your assistant and ask for the
-skill by name. The examples below grow from a single repository to a fully
-specified run.
+Open the repository in your assistant and ask for a skill by name. Start with
+the prompts for each skill, then see the longer catalog examples.
 
 In this page:
 
+- [A prompt for each skill](#a-prompt-for-each-skill)
 - [Catalog a single repository](#catalog-a-single-repository)
 - [Account-wide configuration](#account-wide-configuration)
 - [Extend an existing catalog](#extend-an-existing-catalog)
@@ -13,6 +13,18 @@ In this page:
 - [What a complete result looks like](#what-a-complete-result-looks-like)
 - [Boundaries to expect](#boundaries-to-expect)
 - [Assistant skill documentation](#assistant-skill-documentation)
+
+## A prompt for each skill
+
+| Skill | Ask |
+| --- | --- |
+| [backstage-catalog-builder](skills/backstage-catalog-builder.md) | "Use the backstage-catalog-builder skill to create a Backstage catalog for this repository." |
+| [peer-code-review](skills/peer-code-review.md) | "Review this pull request using the peer-code-review skill." |
+| [documentation-review](skills/documentation-review.md) | "Review this README with the documentation-review skill." |
+| [doc-author](skills/doc-author.md) | "Write the getting-started guide for this repository using the doc-author skill." |
+
+The two review skills report findings and change nothing unless you ask. The
+rest of this page covers `backstage-catalog-builder`.
 
 ## Catalog a single repository
 
