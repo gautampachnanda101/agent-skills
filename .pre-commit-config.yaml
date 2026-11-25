@@ -16,4 +16,4 @@ repos:
         entry: node scripts/pre-commit-tests.cjs
         language: system
         pass_filenames: false
-        files: '^(Makefile|scripts/|tests/|\.githooks/|\.pre-commit-config\.yaml)'
+        files: '^(Makefile|scripts/|tests/|skills/|\.claude-plugin/|\.githooks/|\.pre-commit-config\.yaml)'
