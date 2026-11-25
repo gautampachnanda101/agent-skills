@@ -8,13 +8,18 @@ skill's `metadata.version` field.
 
 ### Changed
 
+- Humanised and research-accuracy pass over both review skills: each named
+  study now states what it found and the practical takeaway (Cohen's
+  attention-decay data, Bacchelli & Bird's review-comment findings,
+  Weinberg's egoless culture, Nielsen's 79%-scan result, Pirolli & Card's
+  foraging model), with short sentences and plain words throughout — no
+  rules were removed; `doc-author` 1.1.1, `documentation-review` 1.3.1,
+  `peer-code-review` 1.2.0.
 - Completed the doc-architect draft integration with its remaining three
   rules, found by a rule-by-rule audit: the three-part page order (steps or
   parameters directly after the summary, deep context and edge cases last),
   code examples adjacent to the definitions they illustrate, and error
   strings permitted to headline troubleshooting/reference sections.
-  `doc-author` 1.1.1, `documentation-review` 1.3.1; both SKILL bodies,
-  checklists, and the site pages updated.
 
 ## [1.1.0] - 2026-11-25
 

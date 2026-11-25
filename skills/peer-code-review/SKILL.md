@@ -10,126 +10,136 @@ metadata:
 
 # Peer code review
 
-Review changes the way the evidence says software review works best: focused
-passes against a checklist, defects kept technical rather than personal, and
-a verdict the author can act on immediately. Grounded in Google's
-[eng-practices code review guide](https://google.github.io/eng-practices/review/),
-Fagan's inspection method, Karl Wiegers' [*Peer Reviews in Software*](https://processimpact.com/),
-Gerald Weinberg's egoless review principles, Steve McConnell's *Code
-Complete*, the peer-review research of Cohen (SmartBear) and Bacchelli &
-Bird, and the UK Government Digital Service's accessibility standard —
-[WCAG 2.2 AA as GOV.UK](https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/plan-manage-content/understand-accessibility/)
-applies it to content, for user-interface changes.
+Review a change so the author gets two things: a verdict they can act on
+today, and findings that point at real defects, not opinions. The rules in
+this skill come from people who studied review in practice — Google's
+[eng-practices review guide](https://google.github.io/eng-practices/review/),
+Michael Fagan's IBM inspections, Karl Wiegers' [*Peer Reviews in Software*](https://processimpact.com/),
+Gerald Weinberg's "egoless" review culture from *The Psychology of Computer
+Programming*, Steve McConnell's *Code Complete*, and the research of Jason
+Cohen (SmartBear) and Bacchelli & Bird. For user-interface changes it also
+applies the UK Government Digital Service's
+[WCAG 2.2 AA](https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/plan-manage-content/understand-accessibility/)
+accessibility standard.
+
+Three findings from that research shape everything below:
+
+1. Attention decays: Cohen's review data shows defect-finding rates fall
+   sharply after roughly 400 reviewed lines in a sitting. So review in
+   small passes.
+2. Reviewers add the most value on design, maintainability, and
+   evolution — Bacchelli & Bird's study of real reviews found most
+   comments there, even though reviewers expect functional defects. So
+   spend human attention where machines cannot.
+3. Reviews work when the author is not attacked — Weinberg's "egoless"
+   teams. So talk about the code, never the person.
 
 ## Gather context first
 
-- Establish what the change claims to do: read its description, linked issue
-  or ticket, and base branch before judging code. A finding without intent
-  context is speculation.
-- Fetch the diff with the host assistant's Git or Bash tools. If the scope is
-  unclear, ask one batched question set: which diff or pull request, which
-  base branch, and whether the review should block or advise.
-- Prepare like a Fagan inspection: when tests, linters, or builds are
-  available and authorized, run them before reading line by line. Mechanical
-  failures explain most findings for free; do not spend review attention on
-  what a compiler already reports.
+- Read what the change claims to do first: the description, the linked
+  ticket, the base branch. A finding made without this context is
+  speculation about intent.
+- Fetch the diff with the host's Git or Bash tools. If the scope is
+  unclear, ask once, in a single batch: which diff or pull request, which
+  base branch, and whether this review should block or only advise.
+- Fagan's inspections call this "preparation": run whatever is available
+  and authorized — tests, linters, builds — before reading line by line.
+  The compiler and the test suite find the mechanical failures for free.
 
 ## Pace the review in passes
 
-- Review in sessions of roughly 200-400 changed lines and cap continuous
-  attention near an hour: defect-finding rates fall sharply beyond that in
-  the peer-review literature (Cohen, *Best Kept Secrets of Peer Code*).
-  A 1,000-line change deserves follow-up passes, split by concern.
-- Plan each pass with one question: which dimension is this pass checking?
-  Suggested order: correctness and tests first, then design and
-  maintainability, then documentation and release impact. Re-reading the same
-  lines for different concerns wastes attention; one pass per concern does
-  not.
-- Respond within one business day (Google's rule) and keep the author
-  unblocked: if a full review is not possible now, send the broad design
-  comments immediately and the rest later.
+- Keep each sitting to roughly 200-400 changed lines and about an hour of
+  attention. Defect-finding rates fall sharply past that in Cohen's
+  review data. A 1,000-line change is a follow-up-passes change: split it.
+- Give each pass one question to answer — this pass checks correctness
+  and tests, the next design and maintainability, the last documentation
+  and release impact. Reading the same lines repeatedly for different
+  concerns wastes attention; one pass per concern does not.
+- Reply within one business day (Google's rule), even if the full review
+  is not done: send the broad comments now, the rest later. The author
+  must stay unblocked.
 
 ## Run the mechanical passes before reading lines
 
-Linters, formatters, and type-checkers are the deterministic first pass —
-Wiegers' and Google's shared principle is that review attention belongs to
-judgment questions machines cannot answer. When the project declares a
-linter (ESLint, Ruff, mypy, golangci-lint, cargo clippy, or equivalent),
-run it via the host's Git or Bash tools before reading line by line, and
-run it again after fixes; re-review only files that changed since the last
-check.
+Machines should check what machines are good at: formatting, types,
+declared lint rules. Both Google's guide and Wiegers' book agree — review
+attention belongs with the judgment questions no linter can answer. When
+the project declares a linter (ESLint, Ruff, mypy, golangci-lint, cargo
+clippy, or an equivalent), run it before reading, and again after fixes;
+re-review only what changed since the last run.
 
-- Record what ran and what could not run: an unavailable linter is reported
-  as unevaluated, never assumed clean.
-- Machine findings are context, not findings: do not re-report linter
-  output; use it to focus attention on the code around flagged lines.
-- Quality signals deserve findings even when the linter is green:
-  newly added lint suppressions (`noqa`, `eslint-disable`, `#[allow]`) need
-  a reason in the change; a coverage drop on changed paths is a `major`;
-  new `any` escapes or widened exceptions in typed code are `minor`;
-  duplicated logic the linter cannot see goes through the checklists.
+- Record what ran, and what could not: a configured linter you could not
+  run is reported as unevaluated, never silently skipped.
+- Do not re-report linter output as review findings. Use it as a map:
+  flagged lines and hot files tell you where the human pass matters most.
+- Some signals deserve findings even when the linter is green:
+  - new suppressions (`noqa`, `eslint-disable`, `#[allow]`) without a
+    reason in the change — at least `minor`, blanket ones `major`;
+  - test coverage dropped on changed paths, or coverage never ran on them —
+    `major` until justified;
+  - type discipline loosened (new `any`/`Any` escapes, widened exceptions) —
+    `minor` unless it crosses a security boundary;
+  - duplicated logic a linter cannot see — walk the checklists.
 
 ## Apply the checklist
 
-Load [checklists.md](./checklists.md) and walk the four checklists that fit
-the change. The dimensions come from Google's review guide: design,
-functionality, complexity, tests, naming, comments, style, and
-documentation. Style rules a formatter or linter can enforce are not reviewer
-material; mention tooling gaps once, not per line (Bacchelli & Bird found
-reviewer attention is better spent on maintainability and evolution, which is
-where human review adds value machines do not).
+Load [checklists.md](./checklists.md) and walk the checklists that fit this
+change. They follow Google's eight review dimensions — design,
+functionality, complexity, tests, naming, comments, style, documentation —
+plus accessibility and linting sections. Style rules a formatter can
+enforce are not reviewer material: mention a missing tool once, not a
+missing semicolon per line.
 
 ## Findings a reviewer reports
 
-- Severity: `blocker` (merge must wait), `major` (fix before merge unless
-  explicitly deferred), `minor`, `nit`, `question`, `defer`.
-- Every finding cites evidence: `file:line` plus a short quote of the code.
-  A finding without location or quote is an opinion, not a finding.
-- Explain why: "This retry swallows all exceptions, so a bad state reaches
-  the queue silently" beats "Handle exceptions properly". Say what you would
-  do differently only as direction or an optional suggested fix, never as a
-  demand (Google's comments guidance).
-- Questions are questions: label them `question` and do not let them block.
-- Approval semantics: `approve` when no blockers or majors remain (Google's
-  LGTM-with-comments covers minors the author may defer);
-  `request changes` for blockers/majors; if a change is too large to review
-  thoroughly, the finding is procedural: ask for a split.
+- Severity ladder: `blocker` (merge must wait), `major` (fix before merge
+  unless explicitly deferred), `minor`, `nit`, `question`, `defer`.
+- Every finding shows its evidence: `file:line` plus a short code quote.
+  Without a location it is an opinion, not a finding.
+- Explain the why: "This retry swallows all exceptions, so a bad state
+  reaches the queue silently" teaches something; "handle exceptions
+  properly" does not. A suggestion is welcome as direction or an optional
+  fix — not a demand (Google's comment guidance).
+- A `question` stays a question: ask it, do not block on it.
+- Approvals follow Google's rules: `approve` once no blockers or majors
+  remain; minors may ride along as comments; `request changes` when a
+  blocker or major is open. A change too large to review is itself a
+  finding — ask for a split.
 
 ## Tone rules
 
-- The code is the artifact under review, never the author (Weinberg's egoless
-  framing). Write "this function re-reads the file per call", never
-  "you should have cached".
-- Gratitude and praise are welcome but not owed (Google's explicit guidance).
-  Record what genuinely works: a clean test seed strategy or a good API
-  boundary goes in the report. Empty filler praise corrupts the signal.
-- Never speculate about intent without reading the ticket, and never quote a
-  secret that appears in a diff; flag its presence and let the author rotate
-  it.
+- The code is on trial, the author is not. Weinberg's "egoless" teams made
+  this their culture; every reviewer must too. Say "this function re-reads
+  the file on every call" — never "you should have cached this".
+- Praise is welcome but never owed (Google says so explicitly). Record what
+  genuinely works — a clean test-seed strategy, a good API boundary. Filler
+  praise destroys the signal for real praise.
+- Never guess at intent you did not read, and never quote a secret that
+  appears in a diff: name its presence so the author can rotate it.
 
 ## The report
 
-End with a structured verdict the author can act on:
+End with a verdict the author can act on in one read:
 
 1. Verdict: `approve`, `approve with comments`, `request changes`, or
    `split before review`.
 2. Findings table: severity, location, evidence, suggested direction.
-3. Strengths worth keeping (genuine ones only).
-4. Deferred items and follow-ups: what should become a ticket rather than
-   block this change.
+3. Strengths worth keeping — genuine ones only.
+4. Deferred items: what should become a ticket instead of blocking this
+   change.
 
 ## Follow up and close
 
-Fagan's last phase is follow-up: after the author pushes fixes, re-run the
-failed checks and confirm each finding is either resolved or moved to the
-deferred list. A review closes only when the exit criteria are met: checks
-pass, blockers and majors resolved or deferred, and the verdict updated.
+Fagan's final phase is follow-up, and a review is not over until it has
+happened. After the author pushes fixes: re-run the checks that failed,
+confirm every finding is resolved or moved to the deferred list, and update
+the verdict. The exit criteria are the same as the entry rules: checks
+pass, blockers and majors are resolved or deferred, and the author knows
+exactly where they stand.
 
 ## Boundaries
 
-- Never push, merge, or modify the author's branch; reviews comment, the
-  author commits.
-- Never approve unverified claims: if a check could not run, say so and mark
-  it rather than assuming.
-- Do not request secrets, and do not paste token values into reviews if the
-  diff contains them.
+- Never push, merge, or modify the author's branch; the review comments,
+  the author commits.
+- Never approve what you could not verify — say the check did not run.
+- Never request secrets, and never paste a token value into a review.
