@@ -44,13 +44,24 @@ fixtures live in
 
 ## Local model end-to-end check
 
-`make skill-llm-verify` runs a cheap LLM round trip against the skill: it
+`make skill-llm-verify` runs cheap LLM round trips against the skill: it
 downloads a pinned CPU build of llama.cpp (about 23 MB) and a quantized
 Qwen2.5-0.5B-Instruct model (about 400 MB) into a git-ignored `.llm-cache/`,
-starts a local `llama-server`, asks the model to apply the skill to a small
-fictional repository with the real `SKILL.md` as its system prompt, and
-validates that the generated descriptor passes the bundled checker with the
-evidence-backed values.
+starts a local `llama-server`, and has the model apply the real `SKILL.md` in
+two scenarios validated by the bundled checkers:
+
+1. **Descriptor scenario** — generate a catalog descriptor from source
+   evidence; the output must pass `check-descriptors.mjs` with the
+   evidence-backed values.
+2. **MkDocs scenario** — generate a `mkdocs.yml` for an existing `docs/` tree
+   while the TechDocs guide is loaded; the generated file is written beside a
+   real entity and pages, and must pass both `check-descriptors.mjs` and
+   `check-techdocs.mjs` (site_name match, `techdocs-core` plugin, valid nav).
+
+TechDocs wiring that the tiny model cannot apply reliably (annotation
+modeling, monorepo layouts) is validated deterministically by the checker
+tests and the public-repository CI job instead; set `LLM_MODEL_URL` to a
+larger model to exercise those skills through the same scenarios.
 
 Overrides: `LLAMA_CPP_URL`, `LLM_MODEL_URL`, `LLM_ATTEMPTS`, `LLM_CTX`,
 `LLM_PORT`, `LLM_CACHE`. The CI `Verify` workflow runs the same check as a

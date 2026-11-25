@@ -9,7 +9,7 @@ mkdir -p "$cache"
 LLAMA_BUILD=${LLAMA_BUILD:-b12681}
 LLM_MODEL_URL=${LLM_MODEL_URL:-https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf}
 LLM_ATTEMPTS=${LLM_ATTEMPTS:-3}
-LLM_CTX=${LLM_CTX:-6144}
+LLM_CTX=${LLM_CTX:-8192}
 LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-300}
 LLM_PORT=${LLM_PORT:-8751}
 
@@ -90,7 +90,14 @@ if [ "$ready" -ne 1 ]; then
 fi
 
 LLM_SYSTEM=$(cat "$skill/SKILL.md")
-LLM_USER='Create the catalog descriptor for this repository:
+
+# The authentic workflow loads the TechDocs guide from SKILL.md before
+# documentation work; the mkdocs scenario applies that combined instruction set.
+LLM_SYSTEM_TECHDOCS="$LLM_SYSTEM
+
+$(cat "$skill/techdocs-mkdocs.md")"
+
+DESCRIPTOR_PROMPT='Create the catalog descriptor for this repository:
 
 - Repository: acme/ledger-sync (https://github.com/acme/ledger-sync)
 - Evidence found in the source: a Python FastAPI HTTP service that reads files
@@ -99,22 +106,80 @@ LLM_USER='Create the catalog descriptor for this repository:
   group.
 - The repository contains no API specification files.
 
-Apply the descriptor rules the skill defines and answer with only one fenced
-yaml block containing the final catalog-info.yaml.'
+The entity must be named ledger-sync with type service, lifecycle production,
+and owner referencing the platform-team group. Ground every field in the
+evidence only; omit any field the evidence does not support (no system, tags,
+links, or dependencies). Answer with only one fenced yaml block containing the
+final catalog-info.yaml.'
 
-attempt=1
-while [ "$attempt" -le "$LLM_ATTEMPTS" ]; do
-	temp=0
-	seed=0
-	if [ "$attempt" -gt 1 ]; then
-		temp=0.7
-		seed=$attempt
-	fi
-	echo "Attempt $attempt/$LLM_ATTEMPTS (temperature $temp, seed $seed) ..." >&2
+MKDOCS_PROMPT='Generate the mkdocs.yml for this documented repository:
 
-	LLM_SYSTEM="$LLM_SYSTEM" LLM_USER="$LLM_USER" \
-		LLM_TEMP="$temp" LLM_SEED="$seed" LLM_MAX_TOKENS="$LLM_MAX_TOKENS" \
-		node -e '
+- Entity name: inventory-notifier (the mkdocs site_name must be exactly this).
+- The docs/ directory contains these pages: index.md, usage.md.
+- TechDocs builds this site, so plugins must include techdocs-core.
+- Set repo_url to https://github.com/acme/inventory-notifier.
+
+Answer with only one fenced yaml block containing the final mkdocs.yml.'
+
+validate_descriptor() {
+	candidate=$1
+	checker="$skill/scripts/check-descriptors.mjs"
+	{ node "$checker" "$candidate" 2>&1; } >"$cache/checker-descriptor.log" || return 1
+	grep -Fq 'name: ledger-sync' "$candidate" &&
+		grep -Fq 'type: service' "$candidate" &&
+		grep -Fq 'lifecycle: production' "$candidate" &&
+		grep -Fq 'platform-team' "$candidate"
+}
+
+# Validates the model-generated mkdocs.yml by placing the real skill fixture
+# entity and documentation pages beside it, then running both bundled checkers:
+# the generated site must carry the techdocs-core plugin, match the entity
+# name, and resolve every nav entry against the actual docs/ tree.
+validate_mkdocs() {
+	generated=$1
+	site_dir="$cache/mkdocs-scenario-site"
+	rm -rf "$site_dir"
+	mkdir -p "$site_dir/docs"
+	cp "$root/tests/fixtures/techdocs/single/docs/index.md" \
+		"$root/tests/fixtures/techdocs/single/docs/usage.md" "$site_dir/docs/"
+	sed 's/sample-doc-service/inventory-notifier/g' \
+		"$root/tests/fixtures/techdocs/single/catalog-info.yaml" >"$site_dir/catalog-info.yaml"
+	mv "$generated" "$site_dir/mkdocs.yml"
+	{
+		echo '--- check-descriptors ---'
+		node "$skill/scripts/check-descriptors.mjs" "$site_dir/catalog-info.yaml"
+		echo '--- check-techdocs ---'
+		node "$skill/scripts/check-techdocs.mjs" "$site_dir/catalog-info.yaml"
+	} >"$cache/checker-mkdocs.log" || return 1
+	grep -Fq 'techdocs-core' "$site_dir/mkdocs.yml" ||
+		{
+			echo "missing techdocs-core plugin" >&2
+			return 1
+		}
+	grep -Fq 'site_name: inventory-notifier' "$site_dir/mkdocs.yml" ||
+		{
+			echo "site_name does not match the entity" >&2
+			return 1
+		}
+}
+
+run_scenario() {
+	key=$1
+	system=$2
+	prompt=$3
+	attempt=1
+	while [ "$attempt" -le "$LLM_ATTEMPTS" ]; do
+		temp=0
+		seed=0
+		if [ "$attempt" -gt 1 ]; then
+			temp=0.7
+			seed=$attempt
+		fi
+		echo "[$key] Attempt $attempt/$LLM_ATTEMPTS (temperature $temp, seed $seed) ..." >&2
+
+		LLM_SYSTEM="$system" LLM_USER="$prompt" \
+			LLM_TEMP="$temp" LLM_SEED="$seed" LLM_MAX_TOKENS="$LLM_MAX_TOKENS" \
+			node -e '
 const fs = require("node:fs");
 const payload = {
   messages: [
@@ -126,19 +191,19 @@ const payload = {
 };
 if (Number(process.env.LLM_SEED) > 0) payload.seed = Number(process.env.LLM_SEED);
 fs.writeFileSync(process.argv[1], JSON.stringify(payload));
-' "$cache/payload.json"
+' "$cache/payload-$key.json"
 
-	if ! curl -sS -m 240 -X POST \
-		-H 'Content-Type: application/json' \
-		--data-binary @"$cache/payload.json" \
-		"http://127.0.0.1:$port/v1/chat/completions" -o "$cache/response.json"; then
-		echo "Completion request failed; server log tail:" >&2
-		tail -n 20 "$cache/server.log" >&2
-		attempt=$((attempt + 1))
-		continue
-	fi
+		if ! curl -sS -m 240 -X POST \
+			-H 'Content-Type: application/json' \
+			--data-binary @"$cache/payload-$key.json" \
+			"http://127.0.0.1:$port/v1/chat/completions" -o "$cache/response-$key.json"; then
+			echo "Completion request failed; server log tail:" >&2
+			tail -n 20 "$cache/server.log" >&2
+			attempt=$((attempt + 1))
+			continue
+		fi
 
-	if ! node -e '
+		if ! node -e '
 const chunks = [];
 process.stdin.on("data", c => chunks.push(c));
 process.stdin.on("end", () => {
@@ -159,29 +224,35 @@ process.stdin.on("end", () => {
   const yaml = (fence ? fence[1] : content).trim();
   process.stdout.write(yaml + "\n");
 });
-' <"$cache/response.json" >"$cache/candidate.yaml"; then
-		echo "Extraction failed; see response at $cache/response.json" >&2
+' <"$cache/response-$key.json" >"$cache/candidate-$key.yaml"; then
+			echo "Extraction failed; see response at $cache/response-$key.json" >&2
+			attempt=$((attempt + 1))
+			continue
+		fi
+
+		if "validate_$key" "$cache/candidate-$key.yaml"; then
+			case "$key" in
+			descriptor) outcome="generated descriptor passed structural checks" ;;
+			mkdocs) outcome="generated MkDocs site passed structural checks" ;;
+			*) outcome="output passed structural checks" ;;
+			esac
+			echo "PASS [$key]: the model applied the skill; $outcome." >&2
+			printf 'File for %s scenario:\n%s\n' "$key" "$(cat "$cache/candidate-$key.yaml")"
+			return 0
+		fi
+
+		echo "[$key] Attempt $attempt failed; checker findings:" >&2
+		cat "$cache/checker-$key.log" 2>/dev/null || true
 		attempt=$((attempt + 1))
-		continue
-	fi
+		sleep 2
+	done
 
-	checker="$skill/scripts/check-descriptors.mjs"
-	if node "$checker" "$cache/candidate.yaml" >"$cache/checker.log" 2>&1 &&
-		grep -Fq 'name: ledger-sync' "$cache/candidate.yaml" &&
-		grep -Fq 'type: service' "$cache/candidate.yaml" &&
-		grep -Fq 'lifecycle: production' "$cache/candidate.yaml" &&
-		grep -Fq 'platform-team' "$cache/candidate.yaml"; then
-		echo "PASS: the model applied the skill; the descriptor passed structural checks." >&2
-		printf 'Generated descriptor:\n%s\n' "$(cat "$cache/candidate.yaml")"
-		exit 0
-	fi
+	echo "FAIL [$key]: the model did not produce a valid descriptor in $LLM_ATTEMPTS attempts." >&2
+	return 1
+}
 
-	echo "Attempt $attempt failed; checker findings:" >&2
-	cat "$cache/checker.log" >&2
-	attempt=$((attempt + 1))
-	sleep 2
-done
+run_scenario descriptor "$LLM_SYSTEM" "$DESCRIPTOR_PROMPT" || exit 1
+run_scenario mkdocs "$LLM_SYSTEM_TECHDOCS" "$MKDOCS_PROMPT" || exit 1
 
-echo "FAIL: the model did not produce a valid descriptor in $LLM_ATTEMPTS attempts." >&2
-echo "Checker: $cache/checker.log; candidate: $cache/candidate.yaml; response: $cache/response.json; server: $cache/server.log" >&2
-exit 1
+echo "PASS: the model applied the skill in every scenario." >&2
+exit 0
