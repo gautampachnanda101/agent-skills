@@ -230,6 +230,9 @@ process.stdin.on("end", () => {
 			continue
 		fi
 
+		# Snapshot the candidate first: some validators consume it (the
+		# mkdocs validator moves it into the assembled site directory).
+		cp "$cache/candidate-$key.yaml" "$cache/result-$key.yaml"
 		if "validate_$key" "$cache/candidate-$key.yaml"; then
 			case "$key" in
 			descriptor) outcome="generated descriptor passed structural checks" ;;
@@ -237,7 +240,7 @@ process.stdin.on("end", () => {
 			*) outcome="output passed structural checks" ;;
 			esac
 			echo "PASS [$key]: the model applied the skill; $outcome." >&2
-			printf 'File for %s scenario:\n%s\n' "$key" "$(cat "$cache/candidate-$key.yaml")"
+			printf 'File for %s scenario:\n%s\n' "$key" "$(cat "$cache/result-$key.yaml")"
 			return 0
 		fi
 
