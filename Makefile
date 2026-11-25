@@ -54,7 +54,7 @@ help:
 	entry 'hooks-check' 'Run pre-commit checks on all tracked files.'; \
 	entry 'skill-smoke' 'Run the bundled descriptor and TechDocs checkers over fixtures and this repository.'; \
 	entry 'skill-techdocs' 'Run the bundled TechDocs/MkDocs checker over fixtures and this repository.'; \
-	entry 'skill-llm-verify' 'Ask a local llama.cpp model to apply the skill and check its descriptor.'; \
+	entry 'skill-llm-verify' 'Run the skill evals with a local llama.cpp model and a without-skill baseline benchmark.'; \
 	heading 'Local Backstage'; \
 	entry 'backstage' 'Set up if needed, then start the UI and backend. Ctrl+C stops them.'; \
 	entry 'backstage-backend' 'Start only the backend and catalog API.'; \

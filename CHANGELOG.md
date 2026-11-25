@@ -4,6 +4,19 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.2] - 2026-11-25
+
+### Added
+
+- Eval-driven verification following
+  [agentskills.io/skill-creation/evaluating-skills](https://agentskills.io/skill-creation/evaluating-skills):
+  test prompts and assertions live in the skill-local
+  `backstage-catalog-builder/evals/evals.json`, and `make skill-llm-verify`
+  replays every scenario without the skill as a baseline, aggregating pass
+  rates, tokens, and durations into `.llm-cache/benchmark.json`. The current
+  benchmark shows a 100-percentage-point pass-rate delta for the skill at a
+  few thousand tokens per run.
+
 ## [1.0.1] - 2026-11-25
 
 ### Added

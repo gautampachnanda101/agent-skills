@@ -9,6 +9,8 @@ mkdir -p "$cache"
 LLAMA_BUILD=${LLAMA_BUILD:-b12681}
 LLM_MODEL_URL=${LLM_MODEL_URL:-https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf}
 LLM_ATTEMPTS=${LLM_ATTEMPTS:-3}
+LLM_BASELINE=${LLM_BASELINE:-1}
+BASELINE_ATTEMPTS=${LLM_BASELINE_ATTEMPTS:-1}
 LLM_CTX=${LLM_CTX:-8192}
 LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-300}
 LLM_PORT=${LLM_PORT:-8751}
@@ -97,7 +99,22 @@ LLM_SYSTEM_TECHDOCS="$LLM_SYSTEM
 
 $(cat "$skill/techdocs-mkdocs.md")"
 
-DESCRIPTOR_PROMPT='Create the catalog descriptor for this repository:
+BASELINE_SYSTEM="You are a helpful coding assistant. Answer with only one fenced yaml block."
+
+# Test cases live in the skill-local evals/evals.json (the format documented at
+# agentskills.io/skill-creation/evaluating-skills); these built-in prompts are
+# the fallback when that file is absent from older copies.
+DESCRIPTOR_PROMPT=$(node -e '
+const path = require("node:path"), fs = require("node:fs");
+const file = process.argv[1];
+try {
+  const evals = JSON.parse(fs.readFileSync(file, "utf8")).evals;
+  process.stdout.write(evals.find(e => e.id === 1).prompt);
+} catch {
+  fs.createReadStream("/dev/null").pipe(process.stdout);
+}
+' "$skill/evals/evals.json")
+[ -n "$DESCRIPTOR_PROMPT" ] || DESCRIPTOR_PROMPT='Create the catalog descriptor for this repository:
 
 - Repository: acme/ledger-sync (https://github.com/acme/ledger-sync)
 - Evidence found in the source: a Python FastAPI HTTP service that reads files
@@ -112,7 +129,17 @@ evidence only; omit any field the evidence does not support (no system, tags,
 links, or dependencies). Answer with only one fenced yaml block containing the
 final catalog-info.yaml.'
 
-MKDOCS_PROMPT='Generate the mkdocs.yml for this documented repository:
+MKDOCS_PROMPT=$(node -e '
+const fs = require("node:fs");
+const file = process.argv[1];
+try {
+  const evals = JSON.parse(fs.readFileSync(file, "utf8")).evals;
+  process.stdout.write(evals.find(e => e.id === 2).prompt);
+} catch {
+  fs.createReadStream("/dev/null").pipe(process.stdout);
+}
+' "$skill/evals/evals.json")
+[ -n "$MKDOCS_PROMPT" ] || MKDOCS_PROMPT='Generate the mkdocs.yml for this documented repository:
 
 - Entity name: inventory-notifier (the mkdocs site_name must be exactly this).
 - The docs/ directory contains these pages: index.md, usage.md.
@@ -163,19 +190,42 @@ validate_mkdocs() {
 		}
 }
 
+results_file="$cache/eval-results.ndjson"
+: >"$results_file"
+export RESULTS_FILE="$results_file"
+
+# Appends one attempt result as JSON; tokens and duration come from the run.
+record() {
+	node -e '
+const fs = require("node:fs");
+fs.appendFileSync(process.env.RESULTS_FILE, JSON.stringify({
+  eval: process.argv[1], config: process.argv[2], passed: process.argv[3] === "true",
+  attempts: Number(process.argv[4]), tokens: Number(process.argv[5]), duration_ms: Number(process.argv[6]),
+}) + "\n");
+' "$1" "$2" "$3" "$4" "$5" "$6"
+}
+
+now_ms() {
+	node -e 'process.stdout.write(String(Date.now()))'
+}
+
 run_scenario() {
 	key=$1
 	system=$2
 	prompt=$3
+	config=$4
+	attempts=$5
 	attempt=1
-	while [ "$attempt" -le "$LLM_ATTEMPTS" ]; do
+	while [ "$attempt" -le "$attempts" ]; do
 		temp=0
 		seed=0
 		if [ "$attempt" -gt 1 ]; then
 			temp=0.7
 			seed=$attempt
 		fi
-		echo "[$key] Attempt $attempt/$LLM_ATTEMPTS (temperature $temp, seed $seed) ..." >&2
+		config_label=$config
+		[ "$attempts" -gt 1 ] && config_label="$config (baseline)"
+		echo "[$config_label:$key] Attempt $attempt/$attempts (temperature $temp, seed $seed) ..." >&2
 
 		LLM_SYSTEM="$system" LLM_USER="$prompt" \
 			LLM_TEMP="$temp" LLM_SEED="$seed" LLM_MAX_TOKENS="$LLM_MAX_TOKENS" \
@@ -191,17 +241,21 @@ const payload = {
 };
 if (Number(process.env.LLM_SEED) > 0) payload.seed = Number(process.env.LLM_SEED);
 fs.writeFileSync(process.argv[1], JSON.stringify(payload));
-' "$cache/payload-$key.json"
+' "$cache/payload-$key-$config.json"
 
+		start_ms=$(now_ms)
 		if ! curl -sS -m 240 -X POST \
 			-H 'Content-Type: application/json' \
-			--data-binary @"$cache/payload-$key.json" \
-			"http://127.0.0.1:$port/v1/chat/completions" -o "$cache/response-$key.json"; then
+			--data-binary @"$cache/payload-$key-$config.json" \
+			"http://127.0.0.1:$port/v1/chat/completions" -o "$cache/response-$key-$config.json"; then
 			echo "Completion request failed; server log tail:" >&2
 			tail -n 20 "$cache/server.log" >&2
 			attempt=$((attempt + 1))
 			continue
 		fi
+
+		tokens=$(node -e 'let u=0;try{const r=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"));u=(r.usage&&r.usage.total_tokens)||0}catch{}process.stdout.write(String(u))' "$cache/response-$key-$config.json" 2>/dev/null || echo 0)
+		[ -n "$tokens" ] || tokens=0
 
 		if ! node -e '
 const chunks = [];
@@ -224,38 +278,81 @@ process.stdin.on("end", () => {
   const yaml = (fence ? fence[1] : content).trim();
   process.stdout.write(yaml + "\n");
 });
-' <"$cache/response-$key.json" >"$cache/candidate-$key.yaml"; then
-			echo "Extraction failed; see response at $cache/response-$key.json" >&2
+' <"$cache/response-$key-$config.json" >"$cache/candidate-$key-$config.yaml"; then
+			echo "Extraction failed; see response at $cache/response-$key-$config.json" >&2
 			attempt=$((attempt + 1))
 			continue
 		fi
+		duration_ms=$(($(now_ms) - start_ms))
 
 		# Snapshot the candidate first: some validators consume it (the
 		# mkdocs validator moves it into the assembled site directory).
-		cp "$cache/candidate-$key.yaml" "$cache/result-$key.yaml"
-		if "validate_$key" "$cache/candidate-$key.yaml"; then
+		cp "$cache/candidate-$key-$config.yaml" "$cache/result-$key-$config.yaml"
+		if "validate_$key" "$cache/candidate-$key-$config.yaml"; then
 			case "$key" in
 			descriptor) outcome="generated descriptor passed structural checks" ;;
 			mkdocs) outcome="generated MkDocs site passed structural checks" ;;
 			*) outcome="output passed structural checks" ;;
 			esac
-			echo "PASS [$key]: the model applied the skill; $outcome." >&2
-			printf 'File for %s scenario:\n%s\n' "$key" "$(cat "$cache/result-$key.yaml")"
+			echo "PASS [$config:$key]: $outcome." >&2
+			if [ "$config" = "with_skill" ]; then
+				printf 'File for %s scenario:\n%s\n' "$key" "$(cat "$cache/result-$key-$config.yaml")"
+			fi
+			record "$key" "$config" true "$attempt" "$tokens" "$duration_ms"
 			return 0
 		fi
 
-		echo "[$key] Attempt $attempt failed; checker findings:" >&2
+		echo "[$config:$key] Attempt $attempt failed; checker findings:" >&2
 		cat "$cache/checker-$key.log" 2>/dev/null || true
 		attempt=$((attempt + 1))
 		sleep 2
 	done
 
-	echo "FAIL [$key]: the model did not produce a valid descriptor in $LLM_ATTEMPTS attempts." >&2
+	echo "FAIL [$config:$key]: no valid output in $attempts attempts." >&2
+	record "$key" "$config" false "$attempts" "$tokens" "$duration_ms"
 	return 1
 }
 
-run_scenario descriptor "$LLM_SYSTEM" "$DESCRIPTOR_PROMPT" || exit 1
-run_scenario mkdocs "$LLM_SYSTEM_TECHDOCS" "$MKDOCS_PROMPT" || exit 1
+run_scenario descriptor "$LLM_SYSTEM" "$DESCRIPTOR_PROMPT" with_skill "$LLM_ATTEMPTS" || exit 1
+run_scenario mkdocs "$LLM_SYSTEM_TECHDOCS" "$MKDOCS_PROMPT" with_skill "$LLM_ATTEMPTS" || exit 1
 
+# Without-skill baseline: the same prompts with no skill instructions. The
+# delta against this configuration shows what the skill actually adds; a
+# baseline failure is a result, not a blocking error.
+if [ "$LLM_BASELINE" = 1 ]; then
+	run_scenario descriptor "$BASELINE_SYSTEM" "$DESCRIPTOR_PROMPT" without_skill "$BASELINE_ATTEMPTS" || true
+	run_scenario mkdocs "$BASELINE_SYSTEM" "$MKDOCS_PROMPT" without_skill "$BASELINE_ATTEMPTS" || true
+fi
+
+node -e '
+const fs = require("node:fs");
+const lines = fs.readFileSync(process.argv[1], "utf8").trim().split("\n").filter(Boolean).map(JSON.parse);
+const best = new Map();
+for (const rec of lines) {
+  const key = rec.config + ":" + rec.eval;
+  if (!best.has(key) || rec.passed) best.set(key, rec);
+}
+const summary = {};
+for (const config of ["with_skill", "without_skill"]) {
+  const recs = [...best.values()].filter(rec => rec.config === config);
+  if (!recs.length) continue;
+  const passed = recs.filter(rec => rec.passed).length;
+  const mean = field => Math.round(recs.reduce((sum, rec) => sum + rec[field], 0) / recs.length);
+  summary[config] = {
+    evals_passed: passed,
+    evals_total: recs.length,
+    pass_rate: passed / recs.length,
+    tokens_mean: mean("tokens"),
+    time_seconds_mean: mean("duration_ms") / 1000,
+  };
+}
+let delta = null;
+if (summary.with_skill && summary.without_skill) {
+  delta = { pass_rate: summary.with_skill.pass_rate - summary.without_skill.pass_rate };
+}
+fs.writeFileSync(process.argv[2], JSON.stringify({ run_summary: summary, ...(delta ? { delta } : {}) }, null, 2) + "\n");
+' "$results_file" "$cache/benchmark.json"
+
+echo "Eval benchmark: $cache/benchmark.json" >&2
 echo "PASS: the model applied the skill in every scenario." >&2
 exit 0

@@ -1,0 +1,31 @@
+{
+  "skill_name": "backstage-catalog-builder",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create the catalog descriptor for this repository:\n\n- Repository: acme/ledger-sync (https://github.com/acme/ledger-sync)\n- Evidence found in the source: a Python FastAPI HTTP service that reads files from one storage bucket and writes JSON lines to another; it is deployed to production; the project documentation assigns ownership to the platform-team group.\n- The repository contains no API specification files.\n\nThe entity must be named ledger-sync with type service, lifecycle production, and owner referencing the platform-team group. Ground every field in the evidence only; omit any field the evidence does not support (no system, tags, links, or dependencies). Answer with only one fenced yaml block containing the final catalog-info.yaml.",
+      "expected_output": "One catalog-info.yaml document: a Component named ledger-sync with spec.type service, spec.lifecycle production, and spec.owner referencing the platform-team group, and no fields beyond the supplied evidence.",
+      "assertions": [
+        "The bundled check-descriptors.mjs passes the generated descriptor",
+        "metadata.name is ledger-sync",
+        "spec.type is service",
+        "spec.lifecycle is production",
+        "spec.owner references the platform-team group",
+        "No unsupported fields appear: system, tags, links, dependencies, providesApis"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Generate the mkdocs.yml for this documented repository:\n\n- Entity name: inventory-notifier (the mkdocs site_name must be exactly this).\n- The docs/ directory contains these pages: index.md, usage.md.\n- TechDocs builds this site, so plugins must include techdocs-core.\n- Set repo_url to https://github.com/acme/inventory-notifier.\n\nAnswer with only one fenced yaml block containing the final mkdocs.yml.",
+      "expected_output": "One mkdocs.yml for inventory-notifier: site_name inventory-notifier, the techdocs-core plugin, a nav that resolves against the real docs/ tree, and repo_url set to https://github.com/acme/inventory-notifier.",
+      "assertions": [
+        "The bundled check-descriptors.mjs passes the assembled entity",
+        "The bundled check-techdocs.mjs passes the assembled site",
+        "site_name matches the entity name inventory-notifier",
+        "plugins include techdocs-core",
+        "every nav page resolves against the actual docs/ directory",
+        "repo_url is https://github.com/acme/inventory-notifier"
+      ]
+    }
+  ]
+}

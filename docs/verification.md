@@ -71,6 +71,30 @@ TechDocs wiring the tiny model cannot apply reliably (annotation modeling,
 monorepo layouts) is validated deterministically by the checker tests and the
 public-repository CI job instead.
 
+The prompts live in the skill-local
+[evals/evals.json](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/evals/evals.json)
+in the format from
+[agentskills.io/skill-creation/evaluating-skills](https://agentskills.io/skill-creation/evaluating-skills),
+with the bundled checkers serving as the assertions. Each run also replays the
+same prompts **without** the skill instructions (baseline; skip with
+`LLM_BASELINE=0`, tune attempts with `LLM_BASELINE_ATTEMPTS`) and aggregates
+pass rates, token usage, and durations into `.llm-cache/benchmark.json`:
+
+```json
+{
+  "run_summary": {
+    "with_skill": { "evals_passed": 2, "evals_total": 2, "pass_rate": 1.0, "tokens_mean": 6249 },
+    "without_skill": { "evals_passed": 0, "evals_total": 2, "pass_rate": 0.0, "tokens_mean": 201 }
+  },
+  "delta": { "pass_rate": 1.0 }
+}
+```
+
+The delta is the skill's value against its token cost: with the skill the
+small model produces evidence-grounded, structurally valid output; without it,
+the same model fails both scenarios. A baseline failure is a result, never a
+blocking error — only with-skill runs gate CI.
+
 | Variable | Purpose |
 | --- | --- |
 | `LLAMA_CPP_URL` | Use a different llama.cpp build |
