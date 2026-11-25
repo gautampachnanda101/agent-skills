@@ -20,8 +20,15 @@ decision, not a silent omission.
   `backstage/backstage` repository; each records fields such as `title`,
   `author`, `authorUrl`, `category`, `description`, `npmPackageName`, and
   `addedDate`. Use `npmPackageName` as the canonical package identity.
-- Also check the `backstage/community-plugins` repository and the npm registry:
-  the directory can lag behind renames, deprecations, and new releases.
+- Also check the
+  [`backstage/community-plugins`](https://github.com/backstage/community-plugins)
+  repository and the npm registry: the directory can lag behind renames,
+  deprecations, and new releases. That repository organizes plugins as
+  workspaces with isolated changesets and releases, indexes each plugin's
+  ownership and npm package in its `docs/README.md`, and hosts many plugins
+  migrated from the core `backstage/backstage` monorepo (for example `adr`,
+  `github-actions`, `jenkins`, `tech-insights`); treat each workspace's
+  `CHANGELOG` as the release record.
 - If network policy blocks the directory or registry, report the blocked
   domains and continue with locally available evidence; do not bypass policy
   or guess package names.

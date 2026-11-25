@@ -7,10 +7,24 @@ or learn provider configuration just to finish the task.
 
 ## 1. Establish the desired result
 
-Use existing context first. Discover the repository/account type, actual
-repository list, local app, release version, existing descriptors, catalog
-rules and plugins. Present one concise proposal:
+Use existing context first, from every source confirmed while gathering context:
+entity-descriptor paths or repositories the user supplied, the app
+configuration, and — when authorized — the running catalog endpoint. Read
+supplied descriptor and `catalog.locations` files before proposing anything,
+then discover the repository/account type, actual repository list, local app,
+release version, catalog rules and plugins. With endpoint access, also
+inventory registered locations and ingested identities through the authorized
+read API (`GET /locations`, entity queries), and reconcile them with the file
+sources: a running catalog reports current ingestion state, while file sources
+hold the authoritative descriptors to extend. Statically configured
+`catalog.locations` entries can be merged only by editing the app
+configuration; the catalog API cannot remove them.
+Present one concise proposal, stating which sources it builds on:
 
+- existing entity configuration the request extends: supplied descriptor
+  paths/repos and confirmed `catalog.locations`, plus — with endpoint access —
+  registered locations and ingested identities to reconcile against source
+  evidence;
 - repositories and exclusions;
 - persistent clone/output location and file or published-URL mode;
 - existing ownership to preserve and missing mappings to resolve;

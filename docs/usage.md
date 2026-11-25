@@ -13,6 +13,15 @@ For a complete account-wide configuration, ask:
 > supported APIs, infrastructure, ownership and documentation. Confirm scope
 > and missing decisions once, then verify catalog coverage and persistence.
 
+To keep an existing catalog instead of starting from scratch, point the skill
+at what you already have:
+
+> Use backstage-catalog-builder against my existing entity configuration at
+> ./platform-catalog (descriptors plus the app-config catalog.locations), then
+> onboard repo https://github.com/OWNER/NEW-SERVICE and register the new
+> descriptors with my Backstage at https://backstage.example.com, reading the
+> token from the BACKSTAGE_TOKEN environment variable.
+
 ## What a complete result looks like
 
 The intended result is a usable configuration bundle, not just a repository
@@ -29,8 +38,11 @@ not guessed annotations or scores. See the
 
 ## Boundaries to expect
 
-- The assistant should ask about the Backstage configuration and token without
-  requesting the token value.
+- The assistant should ask whether existing entity configuration can be
+  supplied as paths or a repository holding descriptors, or as a catalog
+  endpoint for the running instance; a token is requested only through an
+  environment-variable name, credential-file path, or secret mechanism, never
+  as its value.
 - Creating local descriptors and registering them with Backstage are separate
   steps.
 - If the skill is not found, check the destination, the active assistant or

@@ -15,7 +15,7 @@ checks). Local preview: `pip install -r docs/requirements.txt && mkdocs serve`.
 
 | Skill | Description | Docs |
 | --- | --- | --- |
-| [backstage-catalog-builder](./backstage-catalog-builder/SKILL.md) | Scans a GitHub organization, user account, repository, or selected repository paths and creates or updates evidence-based open-source Backstage catalog entities, locations, and discovery configuration. Distinguishes source modeling from automatic ingestion of published descriptors and ships a zero-dependency structural checker. Also generates or updates evidence-based MkDocs documentation (TechDocs), including monorepo layouts. | [usage](./docs/usage.md) · [verification](./docs/verification.md) |
+| [backstage-catalog-builder](./backstage-catalog-builder/SKILL.md) | Scans a GitHub organization, user account, repository, or selected repository paths and creates or updates evidence-based open-source Backstage catalog entities, locations, and discovery configuration. Asks for existing entity-configuration sources — descriptor or app-config paths/repositories, or a running catalog API endpoint with a securely supplied token — and builds on them. Distinguishes source modeling from automatic ingestion of published descriptors and ships a zero-dependency structural checker. Also generates or updates evidence-based MkDocs documentation (TechDocs), including monorepo layouts. | [usage](./docs/usage.md) · [verification](./docs/verification.md) |
 
 ## Quick start
 

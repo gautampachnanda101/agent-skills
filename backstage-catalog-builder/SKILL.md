@@ -1,6 +1,6 @@
 ---
 name: backstage-catalog-builder
-description: Discover GitHub organizations or user accounts, scan selected repositories and their files, and create or update evidence-based open-source Backstage catalog entities, file locations, and discovery configuration. Use when a request mentions Backstage, the software catalog, catalog-info.yaml or other entity descriptors, onboarding repositories into Backstage, ownership or dependency modeling, discovery providers or plugins, or validating catalog ingestion; covers organization-wide catalogs and single-repository onboarding. Also use it to generate or update MkDocs documentation and TechDocs annotations for modeled entities, including monorepo documentation layouts.
+description: Discover GitHub organizations or user accounts, scan selected repositories and their files, and create or update evidence-based open-source Backstage catalog entities, file locations, and discovery configuration, building on existing entity-configuration sources the user can supply such as descriptor or app-config paths/repositories, or a running catalog API endpoint with a securely held token. Use when a request mentions Backstage, the software catalog, catalog-info.yaml or other entity descriptors, onboarding repositories into Backstage, ownership or dependency modeling, discovery providers or plugins, or validating catalog ingestion; covers organization-wide catalogs and single-repository onboarding. Also use it to generate or update MkDocs documentation and TechDocs annotations for modeled entities, including monorepo documentation layouts.
 ---
 
 # Backstage catalog builder
@@ -52,17 +52,35 @@ points and the approved Backstage configuration.
 
 ## Gather context
 
-1. Ask the user for the repository path if it is not already clear. Ask whether
-   they have a Backstage app configuration path and a Backstage token available;
-   accept "none" for either. For a token, ask for an environment-variable name
-   or a local file path, **not the token value**. A token is only needed if the
-   chosen operation requires one; do not read it merely because it was offered.
+1. Ask the user for the repository path if it is not already clear. In the same
+   batch, ask what existing Backstage entity configuration they can already
+   point the skill at, and accept "none" for any answer. Each answer determines
+   what the skill can build on:
+   - Entity-configuration paths or repository: local path(s) or repo URL(s)
+     that already hold entity descriptors (`catalog-info.yaml`, other entity
+     YAML, aggregate `Location` descriptors) and/or the Backstage app's
+     configuration file containing `catalog.locations`. These are the
+     authoritative source to extend and merge into; they reveal existing
+     identities, owners, and conventions, and show whether entries are
+     statically configured or API-registered.
+   - A running Backstage instance: the backend base URL (the catalog API
+     conventionally sits at `<backend.baseUrl>/api/catalog`) plus a Backstage
+     token supplied securely — an environment-variable name, a local
+     credential-file path, or the host's secret mechanism — **never the token
+     value** in chat, files, logs, or command arguments. Endpoint access also
+     enables read-only inventory of registered locations and ingested entities,
+     validation and dry-run registration, and post-ingestion verification.
+     Note that an installation configured with `catalog.readonly: true`
+     rejects location registration entirely.
+   A token is only needed if the chosen operation requires one; do not read it
+   merely because it was offered.
 2. Ask whether to create/update descriptors only, also update a supplied
    Backstage app configuration, or register a location through a Backstage
-   catalog API. For API registration, ask for the catalog API base URL, a
-   reachable source-control URL for the descriptor, and permission to send the
-   request. For app configuration, confirm the file to modify and the location
-   target and type. Do not assume the Backstage app is in the scanned repository.
+   catalog API. For API registration, obtain a reachable source-control URL
+   for the descriptor and permission to send the request; the base URL is only
+   asked for if endpoint access was not already confirmed in the previous step.
+   For app configuration, confirm the file to modify and the location target
+   and type. Do not assume the Backstage app is in the scanned repository.
 3. Ask for the owning Backstage entity and lifecycle if they cannot be established
    from existing descriptors or other reliable project evidence. Confirm other
    ambiguous component boundaries, names, namespaces, or relationships before
@@ -85,7 +103,11 @@ The Backstage token is distinct from a Git provider token. Never print, quote,
 commit, or place tokens in generated files, command arguments, or logs. Use a
 secret-aware mechanism supported by the host environment for any authorized
 request; if none is available, explain the limitation and leave registration
-for the user. Never send credentials to an unconfirmed endpoint.
+for the user. Never send credentials to an unconfirmed endpoint. Supplied file
+paths and a supplied endpoint describe different things: descriptor files state
+the intended configuration, while the endpoint reports only what the running
+catalog has currently ingested; reconcile them rather than treating either as
+the complete truth.
 
 ## Discover tools and repositories
 
@@ -103,8 +125,19 @@ for the user. Never send credentials to an unconfirmed endpoint.
 - Confirm MCP initialization and tool listing before claiming connectivity.
   Distinguish connection configuration, connected server, successful tool call,
   and verified ingestion. Never bypass network policy to reach the endpoint.
-  Follow [mcp-workflow.md](./mcp-workflow.md) for capability mapping, per-document
-  validation, safe registration, pagination and expected-entity reconciliation.
+   Follow [mcp-workflow.md](./mcp-workflow.md) for capability mapping, per-document
+   validation, safe registration, pagination and expected-entity reconciliation.
+- When no MCP connection exists but a confirmed endpoint and securely held
+  token are available, use the catalog REST API directly for the same
+  read-first purpose: inventory registered locations with `GET /locations`,
+  query ingested identities with `GET /entities/by-query` (or
+  `POST /entities/by-query` when filters exceed URL length), validate a draft
+  entity with `POST /validate-entity`, and analyze a proposed location with
+  `POST /analyze-location`. Send requests only to the confirmed backend URL and
+  authenticate with the approved secret mechanism only if the installation
+  requires it. Statically configured `catalog.locations` entries never appear
+  in this API's deletable locations; they change only through app
+  configuration.
 - Discover the host assistant's available Git/source-control, repository search,
   file/tree reading, YAML validation, shell, and browser tools before using them.
   Follow the host's tool discovery mechanism; do not assume MCP server names or

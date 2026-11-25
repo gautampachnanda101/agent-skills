@@ -7,9 +7,11 @@ contracts, workflows or owners that have never been modeled.
 
 ## Connection and capability preflight
 
-1. Reuse the confirmed backend URL, then discover the MCP server through the
-   host assistant. Do not edit another assistant's settings as a substitute for
-   establishing the current host connection.
+1. Reuse the confirmed backend URL — normally from the gather-context answers
+   or the supplied app configuration — then discover the MCP server through the
+   host assistant. When only a catalog API base URL was provided, derive the
+   backend URL from it instead of asking again. Do not edit another assistant's
+   settings as a substitute for establishing the current host connection.
 2. Authenticate through the host's secure prompt, secret manager, or an
    approved environment reference; the token rules in SKILL.md apply, including
    keeping Backstage access separate from GitHub access.
