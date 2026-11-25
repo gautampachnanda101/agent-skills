@@ -145,7 +145,9 @@ Other behaviors worth knowing:
 
 ### Base catalog for skill tests
 
-Every run loads `backstage/catalog-info.yaml`, which links a synthetic
+Every run loads the skill-local test fixture (moved under
+`skills/backstage-catalog-builder/tests/fixtures/backstage-instance/` in
+v1.0.7), `catalog-info.yaml`, which links a synthetic
 organization, the `catalog-test` team, a synthetic user, and example Domain,
 System, Component, API, and Resource entities. They need no external services
 or credentials; the user entity is not a login account, and none of the

@@ -1,7 +1,7 @@
 {
   "name": "agent-skills",
   "displayName": "Agent Skills",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Evidence-based Agent Skills: Backstage catalog building (entities, discovery, TechDocs, structural validation) plus peer code review and documentation review grounded in established engineering practice.",
   "author": {
     "name": "Gautam Pachnanda",

@@ -22,7 +22,7 @@ test('GitHub registration is idempotent and keeps unrelated backend modules', t 
   assert.equal(fs.readFileSync(entry, 'utf8'), result);
   assert.equal(
     fs.readFileSync(path.join(app, 'app-config.github.yaml'), 'utf8'),
-    fs.readFileSync(path.resolve(__dirname, '../backstage/github-discovery.yaml'), 'utf8'),
+    fs.readFileSync(path.resolve(__dirname, '../skills/backstage-catalog-builder/tests/fixtures/backstage-instance/github-discovery.yaml'), 'utf8'),
   );
 });
 

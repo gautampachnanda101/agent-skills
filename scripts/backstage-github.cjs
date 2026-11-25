@@ -20,6 +20,6 @@ const config = path.join(app, 'app-config.github.yaml');
 if (fs.existsSync(config)) {
   console.log('Registered the GitHub catalog module; preserved the existing app-config.github.yaml provider configuration.');
 } else {
-  fs.copyFileSync(path.resolve(__dirname, '../backstage/github-discovery.yaml'), config);
+  fs.copyFileSync(path.resolve(__dirname, '../skills/backstage-catalog-builder/tests/fixtures/backstage-instance/github-discovery.yaml'), config);
   console.log('Registered GitHub catalog discovery and created the demonstration backstage/backstage provider configuration.');
 }

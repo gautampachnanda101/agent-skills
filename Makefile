@@ -165,7 +165,7 @@ backstage-config:
 		echo '  rules:'; \
 		echo '    - allow: [Component, System, API, Resource, Location, Domain, Group, User, Template]'; \
 		echo '  locations:'; \
-		files="$(CURDIR)/backstage/catalog-info.yaml"; \
+		files="$(CURDIR)/skills/backstage-catalog-builder/tests/fixtures/backstage-instance/catalog-info.yaml"; \
 		if [ "$(CATALOG_FILES_ORIGIN)" = undefined ]; then \
 			for descriptor in "$(CURDIR)/catalog-info.yaml" "$$BACKSTAGE_HOME"/repos/*/catalog-info.yaml; do \
 				[ -f "$$descriptor" ] || continue; \
@@ -213,7 +213,7 @@ skill-smoke: skill-techdocs
 		skills/backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
 		skills/backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
 		skills/backstage-catalog-builder/tests/fixtures/techdocs/aggregate/catalog-info.yaml \
-		backstage/catalog-info.yaml \
+		skills/backstage-catalog-builder/tests/fixtures/backstage-instance/catalog-info.yaml \
 		catalog-info.yaml && \
 	echo 'Structural checks passed. To confirm ingestion in a local catalog, run:' && \
 	echo '  make backstage CATALOG_FILES="$(CURDIR)/skills/backstage-catalog-builder/tests/fixtures/descriptors/catalog-valid.yaml"'

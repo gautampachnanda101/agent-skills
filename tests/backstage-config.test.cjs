@@ -32,6 +32,6 @@ test('default restarts retain local clone root descriptors; explicit files overr
   assert.equal(run(), first);
   const explicit = run(`CATALOG_FILES=${path.join(root, 'catalog-info.yaml')}`);
   assert.ok(!explicit.includes(descriptor.replaceAll("'", "''")));
-  assert.ok(explicit.includes(path.join(root, 'backstage/catalog-info.yaml')));
+  assert.ok(explicit.includes(path.join(root, 'skills/backstage-catalog-builder/tests/fixtures/backstage-instance/catalog-info.yaml')));
   assert.ok(!run('CATALOG_FILES=').includes(path.join(root, 'catalog-info.yaml')));
 });

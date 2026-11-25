@@ -4,6 +4,18 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.7] - 2026-11-25
+
+### Changed
+
+- The local Backstage test-instance fixtures (`catalog-info.yaml`,
+  `entities.yaml`, `org.yaml`, `github-discovery.yaml`) moved from the
+  repository root into the skill they serve:
+  `skills/backstage-catalog-builder/tests/fixtures/backstage-instance/`.
+  The repository root now holds infrastructure only; `make backstage*`
+  targets, the discovery-config generator, their tests, and the docs all
+  resolve the new location.
+
 ## [1.0.6] - 2026-11-25
 
 ### Changed

@@ -47,7 +47,7 @@ function withTempDir(contents, name = 'catalog.yaml') {
 test('shipped fixtures and repository descriptors pass the checker', () => {
   const result = run([
     path.join(fixtures, 'catalog-valid.yaml'),
-    path.join(repo, 'backstage/catalog-info.yaml'),
+    path.join(skill, 'tests/fixtures/backstage-instance/catalog-info.yaml'),
     path.join(repo, 'catalog-info.yaml'),
   ]);
   assert.equal(result.status, 0, result.stdout);
