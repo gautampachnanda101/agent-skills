@@ -4,6 +4,23 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.3] - 2026-11-25
+
+### Added
+
+- Two new skills, both at version 1.0.0 and packaged in the plugin:
+  - `peer-code-review`: evidence-based code review grounded in Google's
+    eng-practices review guide, Fagan inspections, Karl Wiegers, Gerald
+    Weinberg, Steve McConnell, and the peer-review research of Cohen and
+    Bacchelli & Bird; paced small passes, four checklists, severity-tagged
+    findings with file:line evidence, and a structured verdict.
+  - `documentation-review`: documentation reviews grounded in the Diátaxis
+    framework plus the Google Developers and Microsoft Writing style guides;
+    page-type classification first, verified commands/links, style findings,
+    and freshness evidence from commit history.
+- The repository now holds three independent skills; the installer, spec
+  conformance tests, and plugin manifest pick all three up automatically.
+
 ## [1.0.2] - 2026-11-25
 
 ### Added

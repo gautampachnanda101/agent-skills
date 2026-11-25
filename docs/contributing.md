@@ -80,12 +80,12 @@ MkDocs site and publishes it to
 
 ## Releases
 
-User-visible skill changes follow a versioned release:
+User-visible repository changes follow a versioned release:
 
-1. Bump `metadata.version` in the skill's `SKILL.md` frontmatter and
-   `version` in `.claude-plugin/plugin.json` using
-   [Semantic Versioning](https://semver.org/) — all three must match per
-   release.
+1. Bump `version` in `.claude-plugin/plugin.json` using
+   [Semantic Versioning](https://semver.org/); the git tag follows this
+   version. Bump `metadata.version` in the `SKILL.md` of every skill whose
+   content changed in the same release.
 2. Add a CHANGELOG.md entry describing the change.
 3. Push, wait for a green `Verify` run (it validates the plugin manifests
    with `claude plugin validate --strict .`), then tag `v<version>` and

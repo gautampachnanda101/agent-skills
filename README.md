@@ -6,9 +6,17 @@
 Reusable [Agent Skills](https://agentskills.io/) for coding assistants. Every
 top-level directory is one independent skill — a `SKILL.md`, guides, scripts,
 and fixtures — portable across assistants, editors, models, and operating
-systems. The first skill is `backstage-catalog-builder`: it scans GitHub
-repositories and builds evidence-based open-source Backstage catalogs,
-including TechDocs generation and structural validation.
+systems. The skills today:
+
+- [`backstage-catalog-builder`](./backstage-catalog-builder/SKILL.md) —
+  scans GitHub repositories and builds evidence-based open-source Backstage
+  catalogs, including TechDocs generation and structural validation.
+- [`peer-code-review`](./peer-code-review/SKILL.md) — evidence-based peer
+  code review grounded in Google's review guide, Fagan inspections, and the
+  peer-review literature.
+- [`documentation-review`](./documentation-review/SKILL.md) — documentation
+  quality reviews grounded in Diátaxis and the Google/Microsoft style
+  guides.
 
 This README is the landing page; the complete documentation lives in
 [the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),

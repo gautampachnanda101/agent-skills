@@ -28,6 +28,8 @@ editor, model, or operating system.
 | Skill | Purpose | Entry point |
 | --- | --- | --- |
 | [backstage-catalog-builder](https://github.com/gautampachnanda101/agent-skills/tree/main/backstage-catalog-builder) | Scans a GitHub organization, user account, repository, or selected paths, then creates or updates evidence-based open-source Backstage catalog entities, locations, discovery configuration, and an expected-entity inventory. Builds on existing entity-configuration sources, generates or updates MkDocs documentation (TechDocs), including monorepo layouts, and ships a zero-dependency descriptor checker. | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/SKILL.md) |
+| [peer-code-review](https://github.com/gautampachnanda101/agent-skills/tree/main/peer-code-review) | Runs evidence-based peer code reviews of diffs, commits, or pull requests in small paced passes against checklists derived from Google's eng-practices, Fagan inspections, Wiegers, Weinberg, and McConnell; reports prioritized findings with file:line evidence, severity, and kind-but-technical tone. | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/peer-code-review/SKILL.md) |
+| [documentation-review](https://github.com/gautampachnanda101/agent-skills/tree/main/documentation-review) | Reviews documentation against Diátaxis type and audience, structure and navigation, Google/Microsoft style rules, and verified commands, code samples, and links; reports prioritized evidence-backed findings and uses commit history for freshness. | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/documentation-review/SKILL.md) |
 
 ## In this site
 

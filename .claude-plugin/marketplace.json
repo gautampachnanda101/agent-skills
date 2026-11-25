@@ -9,7 +9,7 @@
     {
       "name": "agent-skills",
       "source": "./",
-      "description": "Backstage catalog building as an Agent Skill, with bundled structural checkers and TechDocs generation"
+      "description": "Evidence-based Agent Skills: Backstage catalog building, peer code review, and documentation review"
     }
   ]
 }
