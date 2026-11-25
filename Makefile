@@ -27,7 +27,7 @@ BACKSTAGE_ENV = node_bin=$$(sh "$(CURDIR)/scripts/backstage-node.sh"); \
 BACKSTAGE_HOME_ENV = BACKSTAGE_HOME=$$(node "$(CURDIR)/scripts/backstage-home.cjs" resolve "$$BACKSTAGE_HOME" "$(CURDIR)"); \
 	export BACKSTAGE_HOME
 
-.PHONY: help install install-global _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify hooks-install hooks-check
+.PHONY: help install install-global update _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify hooks-install hooks-check
 
 help:
 	@set -eu; \
@@ -47,6 +47,7 @@ help:
 	heading 'Install globally'; \
 	entry 'install' 'Install all skills in every supported assistant global directory.'; \
 	entry 'install-global' 'Alias for install; no project-local copies by default.'; \
+	entry 'update' 'Replace installed copies everywhere (equivalent to install FORCE=1).'; \
 	note 'Existing copies are protected. Use FORCE=1 to replace them.'; \
 	heading 'Contributor checks'; \
 	entry 'hooks-install' 'Enable repository pre-commit checks, preserving existing Git hooks.'; \
@@ -78,7 +79,7 @@ help:
 	heading 'Examples'; \
 	printf '%s\n' \
 		'  make install' \
-		'  make install FORCE=1' \
+		'  make update' \
 		'  make backstage' \
 		'  make backstage BACKSTAGE_APP_PORT=3001' \
 		'  make backstage CATALOG_FILES="/path/to/repo/catalog-info.yaml"' \
@@ -240,6 +241,13 @@ install:
 	$(MAKE) --no-print-directory _install DESTS="$$destinations"
 
 install-global: install
+
+update:
+	@set -eu; \
+	if [ -n "$$DEST" ]; then dests="$$DEST"; \
+	elif [ -n "$$GLOBAL_DESTS" ]; then dests="$$GLOBAL_DESTS"; \
+	else dests=$$(sh "$(CURDIR)/scripts/skill-destinations.sh"); fi; \
+	FORCE=1 $(MAKE) --no-print-directory _install DESTS="$$dests"
 
 _install:
 	@set -eu; \

@@ -22,6 +22,21 @@ at what you already have:
 > descriptors with my Backstage at https://backstage.example.com, reading the
 > token from the BACKSTAGE_TOKEN environment variable.
 
+## Fast path: answer everything in one prompt
+
+Each decision the skill would otherwise ask about can be supplied up front. A
+fully specified prompt skips the interactive round of questions:
+
+> Use backstage-catalog-builder. Sources: this repository plus
+> https://github.com/OWNER/ORG-CATALOG, which holds our existing descriptors
+> and the app-config with catalog.locations. Extend that configuration:
+> onboard any missing repos from https://github.com/OWNER, add justified APIs
+> and ownership, and generate TechDocs for new services. Write the bundle to
+> ./platform-catalog and merge the locations into its app-config. My Backstage
+> runs at https://backstage.example.com (token in the BACKSTAGE_TOKEN
+> environment variable): dry-run the new locations, then register them.
+> Confirm the proposal once, then carry it through every selected repository.
+
 ## What a complete result looks like
 
 The intended result is a usable configuration bundle, not just a repository

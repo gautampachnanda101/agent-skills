@@ -4,8 +4,12 @@ Reusable [Agent Skills](https://agentskills.io/) for coding assistants. Every
 top-level directory is one independent skill with a `SKILL.md` entry point,
 portable across assistants, editors, models, and operating systems.
 
+[![Verify](https://github.com/gautampachnanda101/agent-skills/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/gautampachnanda101/agent-skills/actions/workflows/verify.yml)
+[![Docs](https://github.com/gautampachnanda101/agent-skills/actions/workflows/docs.yml/badge.svg?branch=main)](https://gautampachnanda101.github.io/agent-skills/)
+
 **Documentation**: browse it on
-[GitHub](https://github.com/gautampachnanda101/agent-skills/tree/main/docs) or
+[GitHub Pages](https://gautampachnanda101.github.io/agent-skills/) or
+[GitHub](https://github.com/gautampachnanda101/agent-skills/tree/main/docs), or
 render it as [Backstage TechDocs](https://backstage.io/docs/features/techdocs/)
 through the `component:default/agent-skills` entity
 ([mkdocs.yml](./mkdocs.yml) is validated and built as part of CI-style

@@ -1,0 +1,30 @@
+# Changelog
+
+All notable changes to this repository's skills are documented here. Skill
+versions follow [Semantic Versioning](https://semver.org/) through each
+skill's `metadata.version` field.
+
+## [1.0.0] - 2026-11-25
+
+First tagged release of `backstage-catalog-builder`.
+
+### Added
+
+- Organization, user-account, repository, and selected-path scans that produce
+  evidence-based open-source Backstage catalog entities, descriptor files, and
+  persistent configuration bundles.
+- Gathering of existing configuration sources: descriptor/app-config paths or
+  repositories, or a running Backstage catalog API endpoint with a token held
+  securely (environment-variable name, credential file, or host secret
+  mechanism — never the value).
+- Zero-dependency `check-descriptors.mjs` and `check-techdocs.mjs` structural
+  checkers with `--json` output, enforcing documented default name rules
+  (63-character caps, single separators, npm-scope rejection) and TechDocs
+  MkDocs site shape, including monorepo `!include` layouts.
+- Guides for configuration delivery, MCP-assisted catalog work, generic
+  plugin discovery and integration, scope/evidence modeling, and TechDocs
+  MkDocs generation.
+- MkDocs documentation site (deployed to GitHub Pages), Make targets for
+  installation and update (`make install`, `make update`), a local Backstage
+  test instance (`make backstage`), and a local-model end-to-end verification
+  (`make skill-llm-verify`).

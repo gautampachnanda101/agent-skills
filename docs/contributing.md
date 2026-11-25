@@ -11,6 +11,13 @@ one assistant, editor, model, or operating system.
   frontmatter.
 - Include a lowercase, hyphen-separated `name` and a non-empty `description`.
   Describe both what the skill does and when to use it.
+- Follow the full [Agent Skills specification](https://agentskills.io/specification.md)
+  frontmatter: `license`, `compatibility` (at most 500 characters, only for
+  real environment requirements), and `metadata` (`author`, semantic
+  `version`) are expected for published skills. The
+  `tests/skills-spec.test.cjs` suite enforces these constraints in pre-commit
+  and CI; the official `skills-ref` validator is demonstration-only upstream,
+  so the repository tests encode the spec instead.
 - Keep the entry point focused; put optional details in linked files within
   the skill directory and load them only when needed.
 - Prefer portable instructions and standard tools. Declare dependencies and
@@ -60,4 +67,16 @@ The `Verify` GitHub Action runs pre-commit checks, `make skill-smoke`, and the
 local-model end-to-end check (`make skill-llm-verify`) as required jobs on
 every push to `main` and on pull requests. Model verification downloads are
 cached; a run stays within a few minutes of hosted-runner CPU. Fix failures
-before merge; the jobs are meant to block.
+before merge; the jobs are meant to block. The `Docs` Action builds this
+MkDocs site and publishes it to
+[GitHub Pages](https://gautampachnanda101.github.io/agent-skills/).
+
+## Releases
+
+User-visible skill changes follow a versioned release:
+
+1. Bump `metadata.version` in the skill's `SKILL.md` frontmatter using
+   [Semantic Versioning](https://semver.org/).
+2. Add a CHANGELOG.md entry describing the change.
+3. Push, wait for a green `Verify` run, then tag `v<version>` and create the
+   GitHub Release for it.

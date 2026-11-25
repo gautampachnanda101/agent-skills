@@ -25,8 +25,11 @@ without copying anything if a skill already exists there. To replace installed
 copies after pulling changes:
 
 ```sh
-make install FORCE=1
+make update
 ```
+
+`make update` is equivalent to `make install FORCE=1` and copies the current
+skill directories over every destination.
 
 Installation is local and does not register anything in Backstage.
 
@@ -66,6 +69,19 @@ installing multiple copies with the same name into locations searched by the
 same assistant. Some assistants, such as OpenCode, also read
 `~/.claude/skills/`, so they may find two identical copies; remove one if your
 assistant reports a duplicate.
+
+## Verified install behavior
+
+The installer writes complete skill directories (SKILL.md, guides, scripts)
+into all four destinations in one run: the shared `~/.agents/skills/` path and
+Kiro, Claude Code, and Cline personal paths. The copies are validated against
+the [Agent Skills specification](https://agentskills.io/specification.md) in
+tests, so files identical to the source land in every destination; what an
+individual assistant does with them is documented by that assistant. Discovery
+behavior differs per product: some assistants only read project-local paths,
+cloud sessions may ignore personal directories, and assistants such as OpenCode
+also read `~/.claude/skills/`. Replace installed copies deliberately and remove
+duplicates if your assistant reports them.
 
 ## Manual copying
 
