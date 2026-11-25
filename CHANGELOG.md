@@ -4,6 +4,17 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.8] - 2026-11-25
+
+### Changed
+
+- The documentation site theme now matches
+  [gautampachnanda101/homebrew-tap](https://gautampachnanda101.github.io/homebrew-tap/):
+  Material for MkDocs with indigo primary/accent, automatic light/dark
+  toggles, Space Grotesk and IBM Plex Mono fonts, navigation tabs, and code
+  copy buttons — while keeping the `techdocs-core` plugin so the site stays
+  renderable as Backstage TechDocs.
+
 ## [1.0.7] - 2026-11-25
 
 ### Changed

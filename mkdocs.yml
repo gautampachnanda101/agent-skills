@@ -13,5 +13,34 @@ nav:
   - Verification: verification.md
   - Contributing a skill: contributing.md
 
+theme:
+  name: material
+  # Matches https://gautampachnanda101.github.io/homebrew-tap/
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Space Grotesk
+    code: IBM Plex Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
 plugins:
   - techdocs-core
