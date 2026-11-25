@@ -65,3 +65,56 @@ test('grader accepts the clean-run report', () => {
   const result = runReport(fs.readFileSync(path.join(root, 'tests', 'expected', 'clean-report.md'), 'utf8'));
   assert.equal(result.status, 0, result.out);
 });
+
+const HEADER = '| Severity | Defect | Evidence | Why |\n| --- | --- | --- | --- |\n';
+const row = (severity, evidence = '`g.md:3`', defect = 'Defect') => `| \`${severity}\` | ${defect} | ${evidence} | Why |`;
+
+function report(rows, { findings = true } = {}) {
+  const section = findings ? `## Findings\n\n${HEADER}${rows.join('\n')}\n` : '';
+  return `## Classification\n\n- g.md is a how-to.\n\n${section}\n## Unevaluated\n\n- External links.\n`;
+}
+
+const rejected = [
+  ['no evidence attached', [row('major', 'no evidence attached')], /without a file:line location/],
+  ['an unknown severity ending in a known one', [row('bogus', '`g.md:3`', 'One unit')], /without a severity token/],
+  ['a bad row that mentions the word severity', [row('bogus', 'nowhere', 'Severity unclear')], /without a severity token/],
+  ['a blocker after a major', [row('major'), row('blocker')], /reader-risk order/],
+  ['a major after a minor', [row('minor'), row('major')], /reader-risk order/],
+  ['a minor after a nit', [row('nit'), row('minor')], /reader-risk order/],
+];
+
+for (const [name, rows, message] of rejected) {
+  test(`grader rejects ${name}`, () => {
+    const result = runReport(report(rows));
+    assert.equal(result.status, 1, result.out);
+    assert.match(result.out, message);
+  });
+}
+
+test('grader rejects a report without a Findings section', () => {
+  const result = runReport(report([], { findings: false }));
+  assert.equal(result.status, 1, result.out);
+  assert.match(result.out, /no Findings section/);
+});
+
+test('grader accepts ordered findings, full Git SHAs, and an empty table', () => {
+  const ordered = ['blocker', 'major', 'major', 'minor', 'nit', 'question'].map(s => row(s));
+  for (const rows of [ordered, [row('nit', '`g.md:3`, `4f4878760c0eebbceebeb8fafa68a49f1f23dd5a`')], []]) {
+    const result = runReport(report(rows));
+    assert.equal(result.status, 0, result.out);
+  }
+});
+
+test('--json prints only JSON', () => {
+  const out = execFileSync('node', [script, '--json', path.join(root, 'tests', 'expected', 'planted-defects-report.md')], { encoding: 'utf8' });
+  assert.equal(JSON.parse(out).finding_rows, 10);
+});
+
+test('running without arguments prints usage', () => {
+  assert.throws(() => execFileSync('node', [script], { encoding: 'utf8', stdio: 'pipe' }), error => {
+    assert.equal(error.status, 2);
+    assert.match(error.stdout, /Usage: node check-review-report\.mjs/);
+    assert.doesNotMatch(error.stdout, /import \{/);
+    return true;
+  });
+});
