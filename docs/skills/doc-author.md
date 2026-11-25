@@ -1,6 +1,6 @@
 # doc-author
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) · plugin name `agent-skills:doc-author`**
+**Version 1.1.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) · plugin name `agent-skills:doc-author`**
 
 Writes new documentation and rewrites existing pages with the discipline a
 [documentation-review](documentation-review.md) pass will later demand:

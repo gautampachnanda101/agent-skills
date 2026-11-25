@@ -5,7 +5,8 @@ in [SKILL.md](./SKILL.md). Record `pass`, `fail`, or `n/a` with evidence for
 every item; an unevaluable item is recorded as such, never assumed. Sources:
 Diátaxis (D), Google Developers Style Guide (G), Microsoft Writing Style
 Guide (M), GOV.UK content design and accessibility guidance — WCAG 2.2 AA
-(GV), Wiegers peer-review practice (W).
+(GV), Nielsen scannability and Pirolli & Card information foraging applied
+by Tom Johnson (F), Wiegers peer-review practice (W).
 
 ## Type and audience fit
 
@@ -22,6 +23,13 @@ Guide (M), GOV.UK content design and accessibility guidance — WCAG 2.2 AA
 
 - One `H1` that names the content; heading levels never skip; heading text
   describes rather than teases.
+- Headings are unique page-wide; no two headings share an anchor. (D)
+- The first two sentences identify the page's outcome or purpose — the
+  three-second test; preamble is a finding at `major` on task pages.
+  Guide headings carry verb phrases.
+- Findability: the page covers the synonyms and error strings its audience
+  searches, in visible prose or a terminal `<!-- search aliases: ... -->`
+  block; reference-style pages state parameter names users would grep.
 - Long pages carry a contents list; site navigation has a single home and
   every entry resolves to a real file.
 - Each topic is explained once; cross-links replace duplicated blocks. (W:

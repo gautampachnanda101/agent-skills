@@ -4,6 +4,29 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.1.0] - 2026-11-25
+
+### Added
+
+- Information-foraging and scannability discipline across the documentation
+  skills, grounded in Pirolli & Card's foraging research as applied by Tom
+  Johnson and Nielsen's scanning studies:
+  - `doc-author` 1.1.0 — outcome-first openers (inverted pyramid), verb-phrase
+    guide headings, expected-outcome or verification signal after every
+    procedural step, unambiguous unique headings for deep links, deliberate
+    ordered/bulleted list choice, and search-alias coverage using the
+    audience's own words and error strings (in prose, or a grep-able
+    terminal alias block with honest framing about search-engine
+    invisibility).
+  - `documentation-review` 1.3.0 — the three-second outcome test on task
+    pages, duplicate-heading (ambiguous anchor) findings, frontloaded-guide
+    heading checks, and synonym/error-string findability review.
+- Integration note: this incorporates the community-proposed `doc-architect`
+  draft rather than shipping it as a fifth skill — its quadrant-isolation,
+  verified-steps, and executability gates already existed in `doc-author`
+  and `documentation-review`, so only the novel foraging and scannability
+  rules were adopted, with corrected attribution and fixed examples.
+
 ## [1.0.9] - 2026-11-25
 
 ### Added

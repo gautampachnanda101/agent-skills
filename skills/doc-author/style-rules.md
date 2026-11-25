@@ -15,9 +15,20 @@ GOV.UK content design and accessibility (GV), Google Developers Style Guide
 ## Structure
 
 - One `H1`, no skipped heading levels, headings that describe content.
+- Headings are unique page-wide so anchors deep-link unambiguously.
 - Long pages open with a contents list; sections order follows the reader's
   work.
+- The first two sentences state the outcome or purpose — no preamble.
+  (inverted pyramid; Nielsen: 79% of users scan)
+- Guide headings use verb phrases with the outcome; reference headings name
+  the facts.
+- Ordered lists carry strict sequences only; bullets for unordered sets; key
+  UI labels, commands, and terms are bolded where the eye should land.
+- Each procedural step ends with its expected outcome or a verification
+  command.
 - Every internal link and image resolves from the file's own location.
+- Synonyms and error strings the audience searches appear in visible prose,
+  or in a terminal `<!-- search aliases: ... -->` block for repo grep.
 - Related pages link back; no orphan pages. (D)
 
 ## Voice and wording

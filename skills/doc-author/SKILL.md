@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools; Bash or Node are optional for running commands, link checks, and Markdown linters. Network access requires permission.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Documentation author
@@ -17,7 +17,10 @@ English, and commands that actually run. Grounded in Daniele Procida's
 Service's [GOV.UK content design guidance](https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/),
 the [Google Developers Style Guide](https://developers.google.com/style) and
 the [Microsoft Writing Style Guide](https://learn.microsoft.com/en-us/style-guide/welcome/),
-and docs-as-code practice from Anne Gentle and Karl Wiegers.
+docs-as-code practice from Anne Gentle and Karl Wiegers, and the
+information-foraging research of Pirolli & Card as applied to technical
+documentation by Tom Johnson — readers follow "information scent" toward
+their goal, so structure and terminology must make the scent strong.
 
 ## Start from the user need
 
@@ -49,9 +52,39 @@ skill flags first.
   opens with a contents list, and neighboring pages link back.
 - Duplicate nothing: place each fact once and link to it — duplicated
   guidance drifts apart.
-- One `H1` that names the content; heading levels step down without skips.
+- One `H1` that names the content; heading levels step down without skips;
+  headings are unique so every anchor deep-links unambiguously.
 - Navigation and cross-links must resolve; relative targets are checked
   against the filesystem before delivery.
+
+## Front-load the outcome, then follow the scent
+
+Readers of task-oriented docs mostly scan (Nielsen's classic finding: 79%
+of test users scan rather than read), and information-foraging research
+says they follow the strongest scent toward their goal — so the first two
+sentences must state the immediate outcome or purpose. No history, no
+preamble: what this is for, then the path. Depth, trade-offs, and edge
+cases come last.
+
+- Guide headings carry a verb phrase with the outcome (`Configure OAuth 2.0
+  Provider`, not `OAuth Settings`); reference headings name the facts.
+- Use ordered lists only for strict sequences; bullets for unordered sets;
+  bold UI labels, commands, and key terms where the eye should land.
+- Each procedural step ends with its expected outcome or verification
+  command, so the reader confirms progress instead of hoping.
+- Findability is a writing problem: use the words and error strings the
+  audience actually searches (GOV.UK calls this using users' own
+  vocabulary — say `permission denied` as well as the code `403`). When a
+  page needs synonyms the prose cannot carry, close it with a
+  grep-able alias block:
+
+  ```markdown
+  <!-- search aliases: token expired, IAM role binding, auth failure -->
+  ```
+
+  Honest framing: this is visible to repository search and most in-site
+  search, and invisible to external engines — search-critical terms belong
+  in visible prose wherever possible.
 
 ## Write to the style rules that reviewers enforce
 

@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools; Bash and Node are optional for verifying commands, links, and MkDocs/TechDocs structure. Fetching external network evidence requires host and user permission.
 metadata:
   author: gautampachnanda101
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Documentation review
@@ -19,7 +19,10 @@ Procida's [Diátaxis framework](https://diataxis.fr/), the
 the UK Government Digital Service's
 [GOV.UK content design guidance](https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/)
 (user needs first, plain English, accessible link text and formatting), and
-WCAG 2.2 AA — the standard GOV.UK content must meet.
+WCAG 2.2 AA — the standard GOV.UK content must meet. For structure and
+scannability findings, the grounding is information-foraging research
+(Pirolli & Card) and Nielsen's scanning studies, as applied to technical
+documentation by Tom Johnson.
 
 ## Start from the user need, not the page
 
@@ -53,9 +56,14 @@ the form they need; navigation claims must match reality.
 - One canonical home per topic: a landing page links outward, long pages
   carry a contents list, and topics are explained once. Duplication is not a
   style issue; it is a defect, because duplicate copies drift apart.
-- Single `H1` per page, consistent heading depth, headings that describe
-  content. Navigation must resolve: every nav entry, link, and image target
-  exists relative to its document.
+- Single `H1` per page, unique headings (ambiguous anchors break deep
+  links), consistent heading depth, headings that describe content.
+  Navigation must resolve: every nav entry, link, and image target exists
+  relative to its document.
+- Apply the three-second outcome test (Nielsen's scannability research:
+  79% of users scan): can a reader identify what the page does from the
+  first two sentences? A preamble instead of an outcome is a finding —
+  information scent starts at the top (Pirolli & Card's foraging model).
 - Flag missing structure: a page without an entry point (README, home, or
   index) or a site without one TOC.
 
