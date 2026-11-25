@@ -1,0 +1,10 @@
+site_name: sample-doc-service
+site_description: Sample site for TechDocs checker fixtures
+repo_url: https://github.com/acme/sample-doc-service
+
+plugins:
+  - techdocs-core
+
+nav:
+  - Home: index.md
+  - Usage: usage.md

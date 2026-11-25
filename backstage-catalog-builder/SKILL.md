@@ -1,6 +1,6 @@
 ---
 name: backstage-catalog-builder
-description: Discover GitHub organizations or user accounts, scan selected repositories and their files, and create or update evidence-based open-source Backstage catalog entities, file locations, and discovery configuration. Use when a request mentions Backstage, the software catalog, catalog-info.yaml or other entity descriptors, onboarding repositories into Backstage, ownership or dependency modeling, discovery providers or plugins, or validating catalog ingestion; covers organization-wide catalogs and single-repository onboarding.
+description: Discover GitHub organizations or user accounts, scan selected repositories and their files, and create or update evidence-based open-source Backstage catalog entities, file locations, and discovery configuration. Use when a request mentions Backstage, the software catalog, catalog-info.yaml or other entity descriptors, onboarding repositories into Backstage, ownership or dependency modeling, discovery providers or plugins, or validating catalog ingestion; covers organization-wide catalogs and single-repository onboarding. Also use it to generate or update MkDocs documentation and TechDocs annotations for modeled entities, including monorepo documentation layouts.
 ---
 
 # Backstage catalog builder
@@ -22,6 +22,7 @@ disagrees with these rules.
 | Inspecting or registering through a Backstage MCP connection | [mcp-workflow.md](./mcp-workflow.md) |
 | Evaluating, installing, or wiring any plugin or capability | [plugin-integration.md](./plugin-integration.md) |
 | Organization/account scope, evidence mapping, or discovery providers | [scope-and-modeling.md](./scope-and-modeling.md) |
+| Generating or updating MkDocs documentation (TechDocs), including monorepo documentation layouts | [techdocs-mkdocs.md](./techdocs-mkdocs.md) |
 
 ## End-user outcome
 
@@ -156,7 +157,10 @@ for the user. Never send credentials to an unconfirmed endpoint.
    specifications, deployment configuration, and existing `catalog-info.yaml`
    or other Backstage entity files. Identify actual deployable services,
    websites, libraries, APIs, and other supported entities from evidence, not
-   from every file. Distinguish source evidence from assumptions.
+   from every file. Distinguish source evidence from assumptions. When a missing
+   OpenAPI contract can be derived from framework annotations in source, propose
+   that generation as an option instead of leaving the gap unmentioned; see the
+   contract rules in [scope-and-modeling.md](./scope-and-modeling.md).
 4. Reuse existing entity identities and descriptor locations. In a monorepo,
    model independently owned or deployed units separately when supported by
    evidence; do not create an entity per directory or file. Create API,
@@ -261,6 +265,9 @@ for the user. Never send credentials to an unconfirmed endpoint.
 - For app-configuration assembly and local file mode, including Location
   hierarchy validation, API-definition inlining, persistence across restarts,
   and bundle layout, follow [configuration-delivery.md](./configuration-delivery.md).
+- When the request includes generating or updating documentation, follow
+  [techdocs-mkdocs.md](./techdocs-mkdocs.md) to build evidence-based MkDocs
+  sites, wire TechDocs annotations, and choose a layout for monorepos.
 
 ## Verify and report
 
@@ -275,6 +282,14 @@ for the user. Never send credentials to an unconfirmed endpoint.
   schema validator, so keep using the app's parser, `validate-entity`, or
   dry-run validation where available. Do not install dependencies without
   permission.
+- For entities carrying TechDocs documentation, run the bundled TechDocs
+  checker as an additional pass when available:
+  `node scripts/check-techdocs.mjs <descriptors-with-techdocs-annotations...>`.
+  It structurally validates `backstage.io/techdocs-ref: dir:` targets,
+  `site_name` matching the owning entity, the `techdocs-core` plugin, and
+  nav/`!include` resolution, including monorepo package sites. `url:` values
+  are recorded but not resolved; site-name mismatches are warnings unless
+  `--strict` is passed.
 - If an accessible Backstage instance and approved credentials are available,
   use the location dry run to validate the published descriptor. After actual
   registration, check the response and, where possible, query the catalog for

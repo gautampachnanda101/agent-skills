@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sample-doc-service
+  title: Sample documented service
+  description: Fixture service used to exercise TechDocs checks
+  annotations:
+    github.com/project-slug: acme/sample-doc-service
+    backstage.io/techdocs-ref: dir:./
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:default/catalog-test

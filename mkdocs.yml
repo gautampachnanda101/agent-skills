@@ -1,0 +1,15 @@
+site_name: agent-skills
+site_description: Reusable skills for coding assistants, including a Backstage catalog builder
+site_url: https://gautampachnanda101.github.io/agent-skills/
+repo_url: https://github.com/gautampachnanda101/agent-skills
+edit_uri: edit/main/docs/
+
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Using the skills: usage.md
+  - Verification: verification.md
+  - Contributing a skill: contributing.md
+
+plugins:
+  - techdocs-core

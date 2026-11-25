@@ -1,0 +1,8 @@
+site_name: aggregate-handbook
+plugins:
+  - techdocs-core
+  - monorepo
+nav:
+  - Home: index.md
+  - Alpha: !include packages/alpha/mkdocs.yml
+  - Bravo: !include packages/bravo/mkdocs.yml

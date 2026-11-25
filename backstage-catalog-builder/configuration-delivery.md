@@ -112,7 +112,7 @@ verification process in [plugin-integration.md](./plugin-integration.md).
 | Repository evidence / end-user need | Configuration to consider |
 | --- | --- |
 | APIs maintained in source | API entities, real schemas, API Docs rendering |
-| Developer documentation and MkDocs | TechDocs annotations plus approved builder/storage and source access |
+| Developer documentation and MkDocs | TechDocs annotations plus approved builder/storage and source access; generate or update the MkDocs site per [techdocs-mkdocs.md](./techdocs-mkdocs.md) |
 | Architecture decisions | ADR plugin and actual ADR directory |
 | GitHub pipelines | GitHub Actions plugin, repository annotation and authorized API integration |
 | Kubernetes manifests / deployed workloads | Kubernetes plugin, confirmed cluster access and matching workload annotations |

@@ -1,0 +1,6 @@
+site_name: monorepo-alpha-svc
+plugins:
+  - techdocs-core
+nav:
+  - Home: index.md
+  - Guides: guides.md

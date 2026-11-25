@@ -1,0 +1,5 @@
+site_name: alpha-handbook
+nav:
+  - Start:
+      - Overview: index.md
+      - Setup: setup.md

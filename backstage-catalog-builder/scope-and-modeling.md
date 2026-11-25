@@ -41,6 +41,9 @@ with absence.
 
 - Discover README/documentation trees, MkDocs/Docusaurus/Sphinx or other doc
   configuration, ADR directories, diagrams and documented external sources.
+  When generating or updating MkDocs documentation, follow
+  [techdocs-mkdocs.md](./techdocs-mkdocs.md): inventory every existing doc
+  site first and match each one to its owning entity before changing files.
 - Determine which component owns each documentation site and whether TechDocs
   supports its build configuration. Presence of Markdown is not proof that a
   TechDocs build works.
@@ -61,6 +64,19 @@ with absence.
   only when schemas, methods, parameters and responses can be established from
   source and the user approves; label unverified behavior. Never fill missing
   API definitions with fictitious endpoints or an upstream API subset.
+- When a repository maintains no OpenAPI/Swagger definition but its source
+  carries framework annotations or decorators that document the interface
+  (FastAPI with Pydantic models, springdoc or Swagger annotations,
+  drf-spectacular, flask-restx, TSOA, gRPC/OpenAPI comment blocks), treat the
+  annotations as a generation opportunity and propose it: show the detected
+  annotation evidence (files, framework, route coverage), the generation
+  method the framework actually supports, and request approval before writing
+  anything. Annotation presence alone is not an API entity. With approval,
+  prefer the framework's own generator output (for example FastAPI's
+  `openapi.json` or springdoc's `v3/api-docs`) over hand-assembled YAML,
+  derive only what the annotations establish, label uncovered behavior, save
+  the spec at an agreed location, and review it with the user before wiring
+  it into an API entity's `spec.definition`.
 
 ### Technical insights
 
@@ -91,6 +107,7 @@ runtime/build evidence when they disagree.
 | --- | --- |
 | Deployable binary, server, frontend, package manifest and release pipeline | Component; distinguish service, website, library, or CLI using the installation's conventions |
 | OpenAPI, AsyncAPI, GraphQL schema, protobuf or maintained interface schema | API with the actual definition and a supported type |
+| Route/schema annotations or decorators in source with no maintained OpenAPI spec | Proposal to derive a spec from the annotations (approval required); not an API entity by itself |
 | Confirmed application boundaries and shared ownership | System; Domain only when the business grouping is established |
 | Database, bucket, queue or other provisioned dependency in IaC/deployment configuration | Resource; distinguish definitions from actual deployed instances |
 | CODEOWNERS plus approved team mapping, existing owner references | Ownership; GitHub usernames/teams are not automatically Backstage entity references |

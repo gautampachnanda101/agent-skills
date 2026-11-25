@@ -27,7 +27,7 @@ BACKSTAGE_ENV = node_bin=$$(sh "$(CURDIR)/scripts/backstage-node.sh"); \
 BACKSTAGE_HOME_ENV = BACKSTAGE_HOME=$$(node "$(CURDIR)/scripts/backstage-home.cjs" resolve "$$BACKSTAGE_HOME" "$(CURDIR)"); \
 	export BACKSTAGE_HOME
 
-.PHONY: help install install-global _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-llm-verify hooks-install hooks-check
+.PHONY: help install install-global _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify hooks-install hooks-check
 
 help:
 	@set -eu; \
@@ -51,7 +51,8 @@ help:
 	heading 'Contributor checks'; \
 	entry 'hooks-install' 'Enable repository pre-commit checks, preserving existing Git hooks.'; \
 	entry 'hooks-check' 'Run pre-commit checks on all tracked files.'; \
-	entry 'skill-smoke' 'Run the bundled descriptor checker over skill fixtures and repo catalogs.'; \
+	entry 'skill-smoke' 'Run the bundled descriptor and TechDocs checkers over fixtures and this repository.'; \
+	entry 'skill-techdocs' 'Run the bundled TechDocs/MkDocs checker over fixtures and this repository.'; \
 	entry 'skill-llm-verify' 'Ask a local llama.cpp model to apply the skill and check its descriptor.'; \
 	heading 'Local Backstage'; \
 	entry 'backstage' 'Set up if needed, then start the UI and backend. Ctrl+C stops them.'; \
@@ -204,13 +205,25 @@ hooks-install:
 hooks-check:
 	@pre-commit run --all-files
 
-skill-smoke:
+skill-smoke: skill-techdocs
 	@node backstage-catalog-builder/scripts/check-descriptors.mjs \
 		tests/fixtures/descriptors/catalog-valid.yaml \
+		tests/fixtures/techdocs/single/catalog-info.yaml \
+		tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
+		tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
+		tests/fixtures/techdocs/aggregate/catalog-info.yaml \
 		backstage/catalog-info.yaml \
 		catalog-info.yaml && \
 	echo 'Structural checks passed. To confirm ingestion in a local catalog, run:' && \
 	echo '  make backstage CATALOG_FILES="$(CURDIR)/tests/fixtures/descriptors/catalog-valid.yaml"'
+
+skill-techdocs:
+	@node backstage-catalog-builder/scripts/check-techdocs.mjs \
+		catalog-info.yaml \
+		tests/fixtures/techdocs/single/catalog-info.yaml \
+		tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
+		tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
+		tests/fixtures/techdocs/aggregate/catalog-info.yaml
 
 skill-llm-verify:
 	@sh "$(CURDIR)/scripts/skill-llm-verify.sh"

@@ -52,6 +52,36 @@ jobs:
       - name: Run skill smoke checks
         run: make skill-smoke COLOR=never
 
+  techdocs-public:
+    name: TechDocs checker on public repositories
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Check this repository's TechDocs site
+        run: node backstage-catalog-builder/scripts/check-techdocs.mjs --root . --strict catalog-info.yaml
+
+      # Runs the MkDocs/TechDocs checker against a pinned public repository so
+      # real-world YAML conventions (deeply nested nav, quoted values, plugin
+      # maps) are exercised in CI. Bump the tag deliberately: a new tag may add
+      # pages or change the site shape, which the checker will report.
+      - name: Sample a pinned public TechDocs repository
+        run: |
+          git clone --depth 1 --filter=blob:none --branch v1.49.7 \
+            --single-branch --sparse \
+            https://github.com/backstage/backstage.git "$RUNNER_TEMP/backstage"
+          git -C "$RUNNER_TEMP/backstage" sparse-checkout set --skip-checks \
+            catalog-info.yaml mkdocs.yml docs
+          node backstage-catalog-builder/scripts/check-techdocs.mjs \
+            --root "$RUNNER_TEMP/backstage" --strict \
+            "$RUNNER_TEMP/backstage/catalog-info.yaml"
+
   skill-llm:
     name: Local model applies the skill
     runs-on: ubuntu-latest

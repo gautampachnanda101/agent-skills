@@ -6,6 +6,7 @@ metadata:
   description: Reusable skills for coding assistants, including a Backstage catalog builder
   annotations:
     github.com/project-slug: gautampachnanda101/agent-skills
+    backstage.io/techdocs-ref: dir:.
   tags: [agent-skills, backstage]
 spec:
   type: library

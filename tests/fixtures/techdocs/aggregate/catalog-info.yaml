@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: aggregate-handbook
+  title: Aggregated handbook
+  description: Root TechDocs site aggregating package sites (layout B)
+  annotations:
+    github.com/project-slug: acme/aggregated-handbook
+    backstage.io/techdocs-ref: dir:./
+spec:
+  type: website
+  lifecycle: experimental
+  owner: group:default/catalog-test
