@@ -32,10 +32,24 @@ PALETTE = [
     },
 ]
 
+# Same feature set as https://gautampachnanda101.github.io/homebrew-tap/:
+# mkdocs-techdocs-core unconditionally appends navigation.footer and
+# content.action.edit after reading mkdocs.yml, so they are removed here
+# rather than in mkdocs.yml.
+FEATURES = [
+    "navigation.tabs",
+    "navigation.sections",
+    "navigation.top",
+    "search.suggest",
+    "search.highlight",
+    "content.code.copy",
+]
+
 
 class PaletteRestorePlugin(BasePlugin):
     def on_config(self, config):
         theme = config["theme"]
         if theme["name"] == "material":
             theme["palette"] = PALETTE
+            theme["features"] = FEATURES
         return config

@@ -3,7 +3,6 @@ site_description: Reusable skills for coding assistants, including a Backstage c
 site_url: https://gautampachnanda101.github.io/agent-skills/
 repo_name: gautampachnanda101/agent-skills
 repo_url: https://github.com/gautampachnanda101/agent-skills
-edit_uri: edit/main/docs/
 
 nav:
   - Home: index.md

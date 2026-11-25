@@ -4,6 +4,20 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.9] - 2026-11-25
+
+### Changed
+
+- Site parity work for the homebrew-tap theme match: the
+  `palette-restore` plugin now also normalizes the theme features to the
+  same list as the homebrew-tap site, removing the `content.action.edit`
+  pencil button and `navigation.footer` page links that
+  `mkdocs-techdocs-core` appends unconditionally; the `edit_uri` mapping
+  was dropped for the same reason. One difference remains by design: the
+  Material version is pinned by `mkdocs-techdocs-core` to 9.7.7 (the other
+  site runs 9.6.23), so asset hashes differ while colors, fonts, toggles,
+  and features match.
+
 ## [1.0.8] - 2026-11-25
 
 ### Added
