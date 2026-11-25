@@ -29,22 +29,44 @@ esac
 llama_url=${LLAMA_CPP_URL:-"https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_BUILD/$llama_asset"}
 
 server_dir="$cache/tool"
-server_bin="$server_dir/llama-server"
-if [ ! -x "$server_bin" ]; then
+
+# Archives are kept exactly as packaged: llama-server finds its shared
+# libraries and ggml backends relative to its own location, so moving files
+# around (or dropping the versioned library symlinks) breaks loading.
+find_server() {
+	find "$1" -name llama-server -type f 2>/dev/null | head -n 1
+}
+
+# An executable bit is not enough: run the binary so missing shared libraries
+# are caught here rather than at server start.
+server_usable() {
+	[ -n "$1" ] && [ -x "$1" ] && "$1" --version >/dev/null 2>&1
+}
+
+server_bin=$(find_server "$server_dir")
+if server_usable "$server_bin"; then
+	echo "Using cached llama.cpp: $server_dir" >&2
+else
 	echo "Downloading llama.cpp from $llama_url ..." >&2
-	rm -rf "$server_dir"
-	mkdir -p "$cache"
-	curl -fL --retry 3 --retry-delay 5 "$llama_url" | tar -xzf - -C "$cache"
-	found=$(find "$cache" -maxdepth 3 -name llama-server -type f | grep -v "^\." | head -n 1)
-	[ -n "$found" ] || {
+	# Stage the download so a failure never replaces the existing cache.
+	staging="$cache/tool.new"
+	rm -rf "$staging"
+	mkdir -p "$staging"
+	curl -fL --retry 3 --retry-delay 5 "$llama_url" | tar -xzf - -C "$staging"
+	server_bin=$(find_server "$staging")
+	[ -n "$server_bin" ] || {
 		echo "llama-server not found in the archive." >&2
 		exit 1
 	}
-	mkdir -p "$server_dir"
-	mv "$(dirname "$found")"/* "$server_dir/"
 	chmod +x "$server_bin"
-else
-	echo "Using cached llama.cpp: $server_dir" >&2
+	server_usable "$server_bin" || {
+		echo "The downloaded llama-server does not run on this machine:" >&2
+		"$server_bin" --version >&2 || true
+		exit 1
+	}
+	rm -rf "$server_dir"
+	mv "$staging" "$server_dir"
+	server_bin=$(find_server "$server_dir")
 fi
 
 model_file="$cache/model.gguf"

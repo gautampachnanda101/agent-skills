@@ -1,6 +1,6 @@
 # doc-author
 
-**Version 1.1.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) · plugin name `agent-skills:doc-author`**
+**Version 1.1.2 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) · plugin name `agent-skills:doc-author`**
 
 Writes new documentation and rewrites existing pages with the discipline a
 [documentation-review](documentation-review.md) pass will later demand:
@@ -26,6 +26,7 @@ and verify every command, link, and lint check before delivery.
 | --- | --- |
 | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) | Need → form → structure → voice → validation flow |
 | [`style-rules.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/style-rules.md) | The self-validator checklist applied before delivery |
+| [`evals/evals.json`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/evals/evals.json) | Eval prompts and assertions |
 
 ## Mechanical pass built in
 

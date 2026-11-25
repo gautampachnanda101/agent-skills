@@ -1,0 +1,30 @@
+{
+  "skill_name": "doc-author",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Author the how-to guide this repository is missing:\n\n- Repository: acme/webhook-relay. Its README sells the product, but there is no how-to for the task operators search for most: configuring webhook retry after delivery failures.\n- Evidence from the source and docs: retries are configured in webhook-relay.yaml with max_attempts and backoff_seconds; backoff_seconds accepts an integer between 1 and 86400; changes apply on relayctl reload and are rejected mid-flight while a delivery is running; the CLI exits 2 with the message `config rejected: backoff_seconds out of range` when the value is invalid.\n- The audience: operators configuring the relay in production during an incident.\n\nAnswer with only one fenced markdown block containing the final retries.md page.",
+      "expected_output": "A how-to page whose opener states the user need and outcome, whose title carries a verb phrase, and whose steps only configure retries: every step imperative with its expected outcome or verification command, requirement wording deliberate, the error string included for findability, and no value or prerequisite beyond the supplied evidence.",
+      "assertions": [
+        "The page states the user need and the immediate outcome in its first two sentences",
+        "The form is a how-to: the goal is in the title, steps only, no theory",
+        "Every step is imperative and ends with its expected outcome or a verification command",
+        "Requirement wording is deliberate (must/need/can) with no simply, just, obviously, or easy",
+        "The error string config rejected: backoff_seconds out of range appears so operators find the page by the failure they see",
+        "No field, value, or prerequisite appears beyond the supplied evidence"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Rewrite this existing page as a correct Diátaxis reference page.\n\nThe current parameters.md is narrative prose: it tells the design history of the settings in paragraphs, calls the same parameter by three names (retry limit, maxAttempts, attempts ceiling), hides the default value of max_attempts in the middle of a sentence, and links onward with the text `click here`.\n\nThe facts the page must carry, from the source: webhook-relay.yaml has four parameters — max_attempts (integer 1-20, default 5), backoff_seconds (integer 1-86400, default 60), endpoint (string URL, required), verify_tls (boolean, default true). Every parameter applies only on relayctl reload.\n\nAnswer with only one fenced markdown block containing the final parameters.md page.",
+      "expected_output": "A reference page presenting the four parameters as complete lookup: one term per concept, type, range, and default visible per fact, a minimal example beside the parameters, no narrative or design history, and link text that says where it goes.",
+      "assertions": [
+        "The form is reference: facts as lookup, no design history or narrative",
+        "One term per concept: the parameter is max_attempts throughout",
+        "Type, range, and default are visible per parameter, with max_attempts' default stated directly",
+        "A minimal yaml example sits beside the parameters it illustrates",
+        "Link text, if present, describes its destination; the page preserves every given fact and invents none"
+      ]
+    }
+  ]
+}

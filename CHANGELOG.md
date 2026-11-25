@@ -4,6 +4,26 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.1.2] - 2026-11-25
+
+### Added
+
+- `doc-author` 1.1.2 ships `evals/evals.json` alongside its sibling skills:
+  two prompt scenarios — authoring a missing how-to from described evidence
+  and rewriting a narrative page into a reference form — with assertions
+  covering the user-need opener, Diátaxis form discipline, expected-outcome
+  steps, deliberate requirement wording, findability by an error string,
+  and evidence-only content.
+
+### Fixed
+
+- `backstage-catalog-builder` 1.0.4: `make skill-llm-verify` now keeps the
+  llama.cpp archive's own layout under `.llm-cache/tool/`, so `llama-server`
+  finds its shared libraries whether a build ships them beside the binary
+  (official releases) or in a sibling `lib/`. A cached binary that cannot run
+  triggers a fresh download, and a failed download no longer destroys the
+  existing cache. Regression tests cover both layouts and the fallback.
+
 ## [1.1.1] - 2026-11-25
 
 ### Changed
