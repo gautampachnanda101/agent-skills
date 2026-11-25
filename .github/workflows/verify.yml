@@ -90,9 +90,10 @@ jobs:
       # still matches.
       - name: Sample public monorepo MkDocs examples
         run: |
-          git clone --depth 1 --filter=blob:none \
-            f62ae22e387c1cb2ef358a0a74926400d3d8021f \
+          git clone --filter=blob:none --no-checkout \
             https://github.com/backstage/mkdocs-monorepo-plugin.git "$RUNNER_TEMP/mmp"
+          git -C "$RUNNER_TEMP/mmp" fetch --depth 1 origin f62ae22e387c1cb2ef358a0a74926400d3d8021f
+          git -C "$RUNNER_TEMP/mmp" checkout FETCH_HEAD
           for fixture in ok-different-docs-dir ok-git-authors-plugin; do
             dir="$RUNNER_TEMP/mmp/__tests__/integration/fixtures/$fixture"
             for site in "$dir/mkdocs.yml" "$dir"/*/mkdocs.yml; do
