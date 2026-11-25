@@ -47,9 +47,12 @@ fixtures (custom `docs_dir` in included sites, quoted `!include` values, bare
 subnav pages). The generation contract across layouts — multi-document
 catalogs, API contracts with aggregate Locations, per-package and aggregated
 monorepo sites, custom `docs_dir`, path-limited `dir:` scopes — is covered by
-[tests/output-examples.test.cjs](https://github.com/gautampachnanda101/agent-skills/blob/main/tests/output-examples.test.cjs)
+[tests/output-examples.test.cjs](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/tests/output-examples.test.cjs)
 with fixtures in
-[tests/fixtures/techdocs](https://github.com/gautampachnanda101/agent-skills/tree/main/tests/fixtures/techdocs).
+[tests/fixtures/techdocs](https://github.com/gautampachnanda101/agent-skills/tree/main/backstage-catalog-builder/tests/fixtures/techdocs).
+The descriptor, TechDocs, and output-contract suites, their fixtures, and the
+eval harness live inside the skill's own `tests/` and `scripts/` directories,
+so the skill travels with its verification.
 
 ## Local model end-to-end check
 

@@ -36,14 +36,19 @@ folder whose only required file is the `SKILL.md`:
 
 ```text
 skill-name/
-├── SKILL.md    # required: metadata + instructions
-└── ...         # optional supporting guides, scripts, and eval cases,
-                # loaded on demand
+├── SKILL.md      # required: metadata + instructions
+├── scripts/      # optional: executable code
+├── references/   # optional: documentation
+├── assets/       # optional: templates, resources
+└── ...           # any additional directories — in this repo: tests/ and
+                  # evals/ — loaded on demand
 ```
 
 In this repository, every top-level directory is one such skill — currently
-[`backstage-catalog-builder`](./backstage-catalog-builder/), whose actual
-contents you can browse rather than read about here.
+[`backstage-catalog-builder`](./backstage-catalog-builder/),
+[`peer-code-review`](./peer-code-review/), and
+[`documentation-review`](./documentation-review/), whose actual contents you
+can browse rather than read about here.
 
 ## Install
 

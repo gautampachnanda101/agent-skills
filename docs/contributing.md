@@ -34,6 +34,40 @@ In this page:
   external or destructive actions, and surface failures rather than hiding
   them.
 
+## The repeatable skill template
+
+Every skill is self-contained: what one skill needs travels inside its
+directory, while contracts spanning skills stay at the repository root. The
+shape follows the
+[specification](https://agentskills.io/specification.md)'s optional
+directories, plus this repository's convention of naming the optional bits:
+
+```
+<skill>/
+├── SKILL.md             # required: metadata + instructions, under 500 lines
+├── *.md                 # optional supporting guides, loaded on demand
+├── scripts/             # optional bundled, dependency-free tooling
+├── evals/evals.json     # optional prompts/assertions (agentskills.io format)
+└── tests/               # optional skill-local tests and fixtures
+```
+
+Template rules from the
+[best-practices guide](https://agentskills.io/skill-creation/best-practices.md)
+and the specification: keep `SKILL.md` under 500 lines and 5,000 tokens and
+move detail to supporting guides; state when each file should load (our
+guides live one level deep from `SKILL.md`, which matches the
+specification's file-reference rule, and the guides table in
+`SKILL.md` names each trigger); make `scripts/` dependency-free so the skill
+runs anywhere; ship eval prompts in `evals/evals.json`; and keep the
+skill's own tests and fixtures inside its `tests/` directory so they run in
+CI wherever the folder sits.
+
+Repository-root-only concerns: the cross-skill conformance tests
+(`tests/skills-spec.test.cjs`, `tests/claude-plugin.test.cjs`), installer
+and Make targets, CI workflows, the TechDocs site, and the plugin manifests
+under `.claude-plugin/`. The pre-commit test harness discovers both layers
+automatically.
+
 ## Register the skill everywhere it is discovered
 
 Adding a skill directory is not enough for it to ship. Update each place that

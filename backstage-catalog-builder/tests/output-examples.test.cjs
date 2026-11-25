@@ -5,13 +5,14 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
-const root = path.resolve(__dirname, '..');
-const scripts = path.join(root, 'backstage-catalog-builder', 'scripts');
+const skill = path.resolve(__dirname, '..');
+const repo = path.resolve(skill, '..');
+const scripts = path.join(skill, 'scripts');
 const descriptorChecker = path.join(scripts, 'check-descriptors.mjs');
 const techdocsChecker = path.join(scripts, 'check-techdocs.mjs');
 
 function run(script, args) {
-  return spawnSync(process.execPath, [script, ...args], { cwd: root, encoding: 'utf8' });
+  return spawnSync(process.execPath, [script, ...args], { cwd: repo, encoding: 'utf8' });
 }
 
 function tempDir(name) {
@@ -72,7 +73,7 @@ spec:
     $text: ./openapi.yaml
 `);
   fs.copyFileSync(
-    path.join(root, 'tests', 'fixtures', 'descriptors', 'openapi.yaml'),
+    path.join(skill, 'tests', 'fixtures', 'descriptors', 'openapi.yaml'),
     path.join(dir, 'samples-service', 'openapi.yaml'),
   );
   write(dir, 'aggregate/catalog-info.yaml', `apiVersion: backstage.io/v1alpha1
@@ -138,7 +139,7 @@ test('example: path-limited scope resolves docs outside the package directory', 
 
 test('example: monorepo per-package sites ship as independent bundles', () => {
   const dir = tempDir('monorepo-a');
-  const fixture = path.join(root, 'tests', 'fixtures', 'techdocs');
+  const fixture = path.join(skill, 'tests', 'fixtures', 'techdocs');
   for (const pkg of ['alpha', 'bravo']) {
     const base = path.join(fixture, 'monorepo', 'packages', pkg);
     fs.cpSync(base, path.join(dir, 'packages', pkg), { recursive: true });
@@ -150,7 +151,7 @@ test('example: monorepo per-package sites ship as independent bundles', () => {
 
 test('example: aggregated handbook with deep nav and package includes', () => {
   const dir = tempDir('aggregate-b');
-  fs.cpSync(path.join(root, 'tests', 'fixtures', 'techdocs', 'aggregate'), dir, { recursive: true });
+  fs.cpSync(path.join(skill, 'tests', 'fixtures', 'techdocs', 'aggregate'), dir, { recursive: true });
   const result = run(techdocsChecker, [path.join(dir, 'catalog-info.yaml')]);
   assert.equal(result.status, 0, result.stdout);
   assert.match(result.stdout, /3 mkdocs site\(s\)/);

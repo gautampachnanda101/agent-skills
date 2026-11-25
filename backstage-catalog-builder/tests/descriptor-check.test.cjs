@@ -5,9 +5,10 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
-const root = path.resolve(__dirname, '..');
-const script = path.join(root, 'backstage-catalog-builder', 'scripts', 'check-descriptors.mjs');
-const fixtures = path.join(root, 'tests', 'fixtures', 'descriptors');
+const skill = path.resolve(__dirname, '..');
+const repo = path.resolve(skill, '..');
+const script = path.join(skill, 'scripts', 'check-descriptors.mjs');
+const fixtures = path.join(skill, 'tests', 'fixtures', 'descriptors');
 
 const validComponent = `apiVersion: backstage.io/v1alpha1
 kind: Component
@@ -33,7 +34,7 @@ spec:
 `;
 
 function run(args) {
-  return spawnSync(process.execPath, [script, ...args], { cwd: root, encoding: 'utf8' });
+  return spawnSync(process.execPath, [script, ...args], { cwd: repo, encoding: 'utf8' });
 }
 
 function withTempDir(contents, name = 'catalog.yaml') {
@@ -46,8 +47,8 @@ function withTempDir(contents, name = 'catalog.yaml') {
 test('shipped fixtures and repository descriptors pass the checker', () => {
   const result = run([
     path.join(fixtures, 'catalog-valid.yaml'),
-    path.join(root, 'backstage/catalog-info.yaml'),
-    path.join(root, 'catalog-info.yaml'),
+    path.join(repo, 'backstage/catalog-info.yaml'),
+    path.join(repo, 'catalog-info.yaml'),
   ]);
   assert.equal(result.status, 0, result.stdout);
   assert.match(result.stdout, /4 document\(s\)/);

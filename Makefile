@@ -208,26 +208,26 @@ hooks-check:
 
 skill-smoke: skill-techdocs
 	@node backstage-catalog-builder/scripts/check-descriptors.mjs \
-		tests/fixtures/descriptors/catalog-valid.yaml \
-		tests/fixtures/techdocs/single/catalog-info.yaml \
-		tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
-		tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
-		tests/fixtures/techdocs/aggregate/catalog-info.yaml \
+		backstage-catalog-builder/tests/fixtures/descriptors/catalog-valid.yaml \
+		backstage-catalog-builder/tests/fixtures/techdocs/single/catalog-info.yaml \
+		backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
+		backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
+		backstage-catalog-builder/tests/fixtures/techdocs/aggregate/catalog-info.yaml \
 		backstage/catalog-info.yaml \
 		catalog-info.yaml && \
 	echo 'Structural checks passed. To confirm ingestion in a local catalog, run:' && \
-	echo '  make backstage CATALOG_FILES="$(CURDIR)/tests/fixtures/descriptors/catalog-valid.yaml"'
+	echo '  make backstage CATALOG_FILES="$(CURDIR)/backstage-catalog-builder/tests/fixtures/descriptors/catalog-valid.yaml"'
 
 skill-techdocs:
 	@node backstage-catalog-builder/scripts/check-techdocs.mjs \
 		catalog-info.yaml \
-		tests/fixtures/techdocs/single/catalog-info.yaml \
-		tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
-		tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
-		tests/fixtures/techdocs/aggregate/catalog-info.yaml
+		backstage-catalog-builder/tests/fixtures/techdocs/single/catalog-info.yaml \
+		backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
+		backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
+		backstage-catalog-builder/tests/fixtures/techdocs/aggregate/catalog-info.yaml
 
 skill-llm-verify:
-	@sh "$(CURDIR)/scripts/skill-llm-verify.sh"
+	@sh "$(CURDIR)/backstage-catalog-builder/scripts/skill-llm-verify.sh"
 
 install:
 	@set -eu; \

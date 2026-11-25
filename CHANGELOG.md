@@ -4,6 +4,19 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.4] - 2026-11-25
+
+### Changed
+
+- Skills are fully self-contained: the backstage skill's test suites,
+  fixtures, and the llama.cpp eval harness moved inside
+  `backstage-catalog-builder/` (`tests/`, `scripts/`), so the folder travels
+  with everything it needs. Repository-root directories now hold only
+  cross-skill contracts: spec and plugin-manifest conformance tests, the
+  installer, Make targets, CI, the docs site, and `.claude-plugin/`.
+- `docs/contributing.md` documents the repeatable per-skill template with
+  the size and load-trigger rules from agentskills.io best practices.
+
 ## [1.0.3] - 2026-11-25
 
 ### Added

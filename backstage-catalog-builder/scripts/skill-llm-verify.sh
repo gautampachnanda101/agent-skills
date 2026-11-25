@@ -1,9 +1,9 @@
 #!/bin/sh
 set -eu
 
-root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-skill="${SKILL_DIR:-$root/backstage-catalog-builder}"
-cache=${LLM_CACHE:-"$root/.llm-cache"}
+skill_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+skill="${SKILL_DIR:-$skill_dir}"
+cache=${LLM_CACHE:-"$(dirname "$skill_dir")/.llm-cache"}
 mkdir -p "$cache"
 
 LLAMA_BUILD=${LLAMA_BUILD:-b12681}
@@ -167,10 +167,10 @@ validate_mkdocs() {
 	site_dir="$cache/mkdocs-scenario-site"
 	rm -rf "$site_dir"
 	mkdir -p "$site_dir/docs"
-	cp "$root/tests/fixtures/techdocs/single/docs/index.md" \
-		"$root/tests/fixtures/techdocs/single/docs/usage.md" "$site_dir/docs/"
+	cp "$skill/tests/fixtures/techdocs/single/docs/index.md" \
+		"$skill/tests/fixtures/techdocs/single/docs/usage.md" "$site_dir/docs/"
 	sed 's/sample-doc-service/inventory-notifier/g' \
-		"$root/tests/fixtures/techdocs/single/catalog-info.yaml" >"$site_dir/catalog-info.yaml"
+		"$skill/tests/fixtures/techdocs/single/catalog-info.yaml" >"$site_dir/catalog-info.yaml"
 	mv "$generated" "$site_dir/mkdocs.yml"
 	{
 		echo '--- check-descriptors ---'

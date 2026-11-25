@@ -56,9 +56,21 @@ if (!supportsTests(active)) {
 }
 
 const root = path.resolve(__dirname, '..');
-const files = fs.readdirSync(path.join(root, 'tests'))
-  .filter(file => file.endsWith('.test.cjs'))
-  .map(file => path.join(root, 'tests', file));
+const files = [];
+const gather = dir =>
+  files.push(
+    ...fs.readdirSync(dir).filter(file => file.endsWith('.test.cjs')).map(file => path.join(dir, file)),
+  );
+
+// Repo-level tests cover cross-skill contracts; each skill's tests/ runs
+// beside them so a skill's suite travels with its folder.
+gather(path.join(root, 'tests'));
+for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+  const skill = path.join(root, entry.name);
+  if (entry.isDirectory() && fs.existsSync(path.join(skill, 'SKILL.md')) && fs.existsSync(path.join(skill, 'tests'))) {
+    gather(path.join(skill, 'tests'));
+  }
+}
 if (!files.length) throw new Error('No repository tests found.');
 const result = spawnSync(nodeBin, ['--test', ...files], { cwd: root, stdio: 'inherit', env });
 if (result.error) throw result.error;

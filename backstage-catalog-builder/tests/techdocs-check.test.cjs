@@ -5,9 +5,10 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
-const root = path.resolve(__dirname, '..');
-const script = path.join(root, 'backstage-catalog-builder', 'scripts', 'check-techdocs.mjs');
-const fixtures = path.join(root, 'tests', 'fixtures', 'techdocs');
+const skill = path.resolve(__dirname, '..');
+const repo = path.resolve(skill, '..');
+const script = path.join(skill, 'scripts', 'check-techdocs.mjs');
+const fixtures = path.join(skill, 'tests', 'fixtures', 'techdocs');
 
 const singleDescriptor = path.join(fixtures, 'single', 'catalog-info.yaml');
 const aggregateDescriptor = path.join(fixtures, 'aggregate', 'catalog-info.yaml');
@@ -15,7 +16,7 @@ const alphaDescriptor = path.join(fixtures, 'monorepo', 'packages', 'alpha', 'ca
 const bravoDescriptor = path.join(fixtures, 'monorepo', 'packages', 'bravo', 'catalog-info.yaml');
 
 function run(args) {
-  return spawnSync(process.execPath, [script, ...args], { cwd: root, encoding: 'utf8' });
+  return spawnSync(process.execPath, [script, ...args], { cwd: repo, encoding: 'utf8' });
 }
 
 function copyFixture(name) {
@@ -42,7 +43,7 @@ function removeLine(source, needle) {
 
 test('fixtures and the repository itself pass the TechDocs checker', () => {
   const result = run([
-    path.join(root, 'catalog-info.yaml'),
+    path.join(repo, 'catalog-info.yaml'),
     singleDescriptor,
     alphaDescriptor,
     bravoDescriptor,
