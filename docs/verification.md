@@ -38,8 +38,15 @@ node backstage-catalog-builder/scripts/check-techdocs.mjs catalog-info.yaml
 `site_name` mismatches are warnings (fail with `--strict`); `url:`
 `techdocs-ref` values are recorded, not resolved. CI additionally checks a
 pinned public repository (Backstage at a fixed tag) to exercise the checker
-against real-world MkDocs YAML, including deeply nested nav sections. The
-fixtures live in
+against real-world MkDocs YAML, including deeply nested nav sections, and a
+second pinned sample (the `mkdocs-monorepo-plugin` test fixtures) covering
+real monorepo shapes such as custom `docs_dir` inside included sites, quoted
+`!include` values, and bare subnav pages. The generation contract across
+layouts (multi-document catalogs, API contracts with aggregate Locations,
+per-package and aggregated monorepo sites, custom `docs_dir`, path-limited
+`dir:` scopes) is exercised by
+[tests/output-examples.test.cjs](https://github.com/gautampachnanda101/agent-skills/blob/main/tests/output-examples.test.cjs)
+with fixtures in
 [tests/fixtures/techdocs](https://github.com/gautampachnanda101/agent-skills/tree/main/tests/fixtures/techdocs).
 
 ## Local model end-to-end check

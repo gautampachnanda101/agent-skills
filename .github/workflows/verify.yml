@@ -82,6 +82,29 @@ jobs:
             --root "$RUNNER_TEMP/backstage" --strict \
             "$RUNNER_TEMP/backstage/catalog-info.yaml"
 
+      # Second pinned sample: real-world monorepo MkDocs fixtures (custom
+      # docs_dir in included sites, quoted !include values, bare subnav
+      # pages). The fixtures target the monorepo plugin alone, so a
+      # techdocs-core plugin line and a synthetic entity descriptor are added
+      # by the check; site_name is taken from each fixture so the entity name
+      # still matches.
+      - name: Sample public monorepo MkDocs examples
+        run: |
+          git clone --depth 1 --filter=blob:none \
+            f62ae22e387c1cb2ef358a0a74926400d3d8021f \
+            https://github.com/backstage/mkdocs-monorepo-plugin.git "$RUNNER_TEMP/mmp"
+          for fixture in ok-different-docs-dir ok-git-authors-plugin; do
+            dir="$RUNNER_TEMP/mmp/__tests__/integration/fixtures/$fixture"
+            for site in "$dir/mkdocs.yml" "$dir"/*/mkdocs.yml; do
+              [ -f "$site" ] || continue
+              node -e 'const fs=require("fs");const p=process.argv[1];let t=fs.readFileSync(p,"utf8");if(!/^  - techdocs-core$/m.test(t))t=t.replace(/^plugins:\s*$/m,"plugins:\n  - techdocs-core");fs.writeFileSync(p,t)' "$site"
+            done
+            site_name=$(node -e 'const t=require("fs").readFileSync(process.argv[1],"utf8");const m=t.match(/^\s*site_name:\s*["'"'"']?(.*?)["'"'"']?\s*$/m);process.stdout.write(m?m[1]:"")' "$dir/mkdocs.yml")
+            [ -n "$site_name" ] || { echo "No site_name found in $fixture" >&2; exit 1; }
+            printf 'apiVersion: backstage.io/v1alpha1\nkind: Component\nmetadata:\n  name: %s\n  annotations:\n    backstage.io/techdocs-ref: dir:./\nspec:\n  type: library\n  lifecycle: experimental\n  owner: group:default/catalog-test\n' "$site_name" > "$dir/catalog-info.yaml"
+            node backstage-catalog-builder/scripts/check-techdocs.mjs "$dir/catalog-info.yaml"
+          done
+
   skill-llm:
     name: Local model applies the skill
     runs-on: ubuntu-latest
