@@ -1,1 +1,2 @@
 mkdocs-techdocs-core
+-e ./docs/plugins

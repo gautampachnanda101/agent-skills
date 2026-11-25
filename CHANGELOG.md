@@ -6,6 +6,13 @@ skill's `metadata.version` field.
 
 ## [1.0.8] - 2026-11-25
 
+### Added
+
+- A **Skills section** on the documentation site with one page per skill
+  (overview plus backstage-catalog-builder, peer-code-review,
+  documentation-review), mirroring the homebrew-tap site's per-item pages
+  and exposing every skill in the navigation.
+
 ### Changed
 
 - The documentation site theme now matches
@@ -13,7 +20,10 @@ skill's `metadata.version` field.
   Material for MkDocs with indigo primary/accent, automatic light/dark
   toggles, Space Grotesk and IBM Plex Mono fonts, navigation tabs, and code
   copy buttons — while keeping the `techdocs-core` plugin so the site stays
-  renderable as Backstage TechDocs.
+  renderable as Backstage TechDocs. Because `mkdocs-techdocs-core` resets
+  the theme palette unconditionally, a small local `palette-restore` plugin
+  (installed through `docs/requirements.txt`) re-applies the palette after
+  it.
 
 ## [1.0.7] - 2026-11-25
 

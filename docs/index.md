@@ -26,16 +26,21 @@ editor, model, or operating system.
 
 ## Available skills
 
-| Skill | Purpose | Entry point |
+The long-form inventory lives in the [Skills section](skills/index.md); each
+page covers what the skill does, its grounding, what ships with it, and how
+to verify it.
+
+| Skill | Purpose | Page |
 | --- | --- | --- |
-| [backstage-catalog-builder](https://github.com/gautampachnanda101/agent-skills/tree/main/skills/backstage-catalog-builder) | Scans a GitHub organization, user account, repository, or selected paths, then creates or updates evidence-based open-source Backstage catalog entities, locations, discovery configuration, and an expected-entity inventory. Builds on existing entity-configuration sources, generates or updates MkDocs documentation (TechDocs), including monorepo layouts, and ships a zero-dependency descriptor checker. | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/SKILL.md) |
-| [peer-code-review](https://github.com/gautampachnanda101/agent-skills/tree/main/skills/peer-code-review) | Runs evidence-based peer code reviews of diffs, commits, or pull requests in small paced passes against checklists derived from Google's eng-practices, Fagan inspections, Wiegers, Weinberg, and McConnell; checks UI changes for WCAG 2.2 AA accessibility as GOV.UK applies it; reports prioritized findings with file:line evidence, severity, and kind-but-technical tone. | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/SKILL.md) |
-| [documentation-review](https://github.com/gautampachnanda101/agent-skills/tree/main/skills/documentation-review) | Reviews documentation against Diátaxis type and audience, structure and navigation, Google/Microsoft style rules, GOV.UK content design (user needs first, plain English, requirement wording), and WCAG 2.2 AA accessibility; verifies commands, code samples, and links; reports prioritized evidence-backed findings and uses commit history for freshness. | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/SKILL.md) |
+| [backstage-catalog-builder](skills/backstage-catalog-builder.md) | Evidence-based Backstage catalog entities, discovery configuration, and TechDocs sites, built from GitHub scans and existing configuration | [page](skills/backstage-catalog-builder.md) |
+| [peer-code-review](skills/peer-code-review.md) | Diff and pull-request reviews with checklists, severity-tagged evidence, and UI accessibility checks | [page](skills/peer-code-review.md) |
+| [documentation-review](skills/documentation-review.md) | Documentation reviews grounded in Diátaxis, style guides, and GOV.UK accessibility | [page](skills/documentation-review.md) |
 
 ## In this site
 
 | Page | Start there when you want to |
 | --- | --- |
+| [Skills](skills/index.md) | Browse every published skill and what ships inside each |
 | [Installing the skills](installation.md) | Copy skills into every supported assistant, install the Claude plugin, or pick project-local destinations |
 | [Using the skills](usage.md) | Prompt patterns, a fast path that skips the questions, and what a complete run delivers |
 | [Verification](verification.md) | Validate descriptors and TechDocs yourself, or try output in a local Backstage |

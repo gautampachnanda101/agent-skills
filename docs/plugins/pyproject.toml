@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mkdocs-palette-restore"
+version = "1.0.0"
+description = "Restores the Material palette that mkdocs-techdocs-core resets"
+requires-python = ">=3.9"
+
+[project.entry-points."mkdocs.plugins"]
+palette-restore = "mkdocs_palette_restore:PaletteRestorePlugin"
+
+[tool.setuptools]
+packages = ["mkdocs_palette_restore"]

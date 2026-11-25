@@ -7,6 +7,11 @@ edit_uri: edit/main/docs/
 
 nav:
   - Home: index.md
+  - Skills:
+      - Overview: skills/index.md
+      - backstage-catalog-builder: skills/backstage-catalog-builder.md
+      - peer-code-review: skills/peer-code-review.md
+      - documentation-review: skills/documentation-review.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md
@@ -44,3 +49,5 @@ theme:
 
 plugins:
   - techdocs-core
+  # Runs after techdocs-core, which resets the theme palette unconditionally.
+  - palette-restore
