@@ -1,11 +1,29 @@
 # Using the skills
 
-Open the repository to catalog in the assistant and ask, for example:
+Open the repository you want to catalog in your assistant and ask for the
+skill by name. The examples below grow from a single repository to a fully
+specified run.
+
+In this page:
+
+- [Catalog a single repository](#catalog-a-single-repository)
+- [Account-wide configuration](#account-wide-configuration)
+- [Extend an existing catalog](#extend-an-existing-catalog)
+- [Fast path: one prompt, every decision](#fast-path-one-prompt-every-decision)
+- [What a complete result looks like](#what-a-complete-result-looks-like)
+- [Boundaries to expect](#boundaries-to-expect)
+- [Assistant skill documentation](#assistant-skill-documentation)
+
+## Catalog a single repository
+
+The smallest useful request:
 
 > Use the backstage-catalog-builder skill to create a Backstage catalog for
 > this repository.
 
-For a complete account-wide configuration, ask:
+## Account-wide configuration
+
+For an organization or user account, ask for the full scope up front:
 
 > Use backstage-catalog-builder for https://github.com/OWNER. Discover all
 > eligible repositories, generate missing catalog entries from their files,
@@ -13,8 +31,9 @@ For a complete account-wide configuration, ask:
 > supported APIs, infrastructure, ownership and documentation. Confirm scope
 > and missing decisions once, then verify catalog coverage and persistence.
 
-To keep an existing catalog instead of starting from scratch, point the skill
-at what you already have:
+## Extend an existing catalog
+
+To build on configuration that already exists, point the skill at it:
 
 > Use backstage-catalog-builder against my existing entity configuration at
 > ./platform-catalog (descriptors plus the app-config catalog.locations), then
@@ -22,10 +41,10 @@ at what you already have:
 > descriptors with my Backstage at https://backstage.example.com, reading the
 > token from the BACKSTAGE_TOKEN environment variable.
 
-## Fast path: answer everything in one prompt
+## Fast path: one prompt, every decision
 
-Each decision the skill would otherwise ask about can be supplied up front. A
-fully specified prompt skips the interactive round of questions:
+Each decision the skill would otherwise ask about can be supplied up front.
+A fully specified prompt skips the interactive round of questions:
 
 > Use backstage-catalog-builder. Sources: this repository plus
 > https://github.com/OWNER/ORG-CATALOG, which holds our existing descriptors
@@ -37,34 +56,39 @@ fully specified prompt skips the interactive round of questions:
 > environment variable): dry-run the new locations, then register them.
 > Confirm the proposal once, then carry it through every selected repository.
 
+The token is referenced by name, never pasted. The skill asks for
+environment-variable names, credential-file paths, or the host's secret
+mechanism instead of token values — in a fast-path prompt, follow the same
+rule.
+
 ## What a complete result looks like
 
 The intended result is a usable configuration bundle, not just a repository
-list or discovery plugin. Each approved repository is inspected and either
-represented by justified entities or reported with a specific blocker. The
-skill assembles locations, approved organization data, app configuration and
-an expected-entity inventory, and verifies ingestion when access permits.
+list or discovery plugin:
+
+- each approved repository inspected and either represented by justified
+  entities or reported with a specific blocker;
+- locations, approved organization data, app configuration, and an
+  expected-entity inventory assembled together;
+- ingestion verified when access permits.
 
 Inspection covers actions/CI, teams and organization metadata, documentation
-and ADRs, API contracts, infrastructure and technical-insight evidence. Plugin
-configuration is derived from discovered capabilities and approved policies,
-not guessed annotations or scores. See the
-[configuration delivery workflow](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/configuration-delivery.md).
+and ADRs, API contracts, infrastructure, and technical-insight evidence.
+Plugin configuration is derived from discovered capabilities and approved
+policies, not guessed annotations or scores. The detailed workflow lives in
+[configuration-delivery.md](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/configuration-delivery.md).
 
 ## Boundaries to expect
 
-- The assistant should ask whether existing entity configuration can be
-  supplied as paths or a repository holding descriptors, or as a catalog
-  endpoint for the running instance; a token is requested only through an
-  environment-variable name, credential-file path, or secret mechanism, never
-  as its value.
+- Supplying existing entity configuration (paths, a repository, or a catalog
+  endpoint) is the starting question; the token value itself is never
+  requested.
 - Creating local descriptors and registering them with Backstage are separate
   steps.
 - If the skill is not found, check the destination, the active assistant or
   agent, and its skill permissions or settings.
-
-Discovery and available capabilities depend on the assistant and its
-configuration; compatibility has not been verified in every client.
+- Discovery and available capabilities depend on the assistant and its
+  configuration; compatibility has not been verified in every client.
 
 ## Assistant skill documentation
 

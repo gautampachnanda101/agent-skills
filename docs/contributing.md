@@ -4,6 +4,14 @@ This repository is designed to grow many independent skills. Follow the open
 [Agent Skills](https://agentskills.io/) format; skills stay independent of any
 one assistant, editor, model, or operating system.
 
+In this page:
+
+- [Layout and naming](#layout-and-naming) — directory and frontmatter rules
+- [Register the skill everywhere it is discovered](#register-the-skill-everywhere-it-is-discovered)
+- [Checks before pushing](#checks-before-pushing)
+- [CI expectations](#ci-expectations)
+- [Releases](#releases) — versioning and the release routine
+
 ## Layout and naming
 
 - Place each skill in its own top-level directory, with a `SKILL.md` entry

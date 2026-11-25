@@ -1,56 +1,70 @@
-# Installation
+# Installing the skills
 
-Clone or download the repository. The repository's top-level skill directories
-are the source; assistants do not automatically discover them just because the
-repository is open.
+Clone or download the repository first. The top-level skill directories are
+the source — assistants do not automatically discover them just because the
+repository is open. Installation is always local and never registers anything
+in Backstage.
 
-`make install` copies every top-level skill directory, including supporting
-files, into the personal skills directories of the supported assistants. It
-requires Make and a POSIX shell. The installer always writes the shared
-`~/.agents/skills/` directory (GitHub Copilot in VS Code and CLI, OpenCode,
-Codex, Gemini CLI, Cursor, Windsurf) and the personal directories of Kiro
-(`~/.kiro/skills/`), Claude Code (`~/.claude/skills/`), and Cline
-(`~/.cline/skills/`); no assistants are discovered first. No project-local
-installation is made by default, and no administrator permissions are
-required. Detection is best-effort: assistants with no known installation
-footprint may need an explicit override.
+In this page:
+
+- [Quick start](#quick-start) — the one command for every supported assistant
+- [Updating installed copies](#updating-installed-copies)
+- [Installing as a Claude plugin](#installing-as-a-claude-plugin)
+- [Destinations and overrides](#destinations-and-overrides) — the full path
+  table
+- [Manual copying](#manual-copying) — including a PowerShell example
+- [Assistant-specific notes](#assistant-specific-notes)
+
+## Quick start
 
 ```sh
 make install
 ```
 
-`make install-global` is an alias for the same automatic installation. Existing
-copies are protected: the installer checks every destination first and fails
-without copying anything if a skill already exists there. To replace installed
-copies after pulling changes:
+One run copies every skill directory — `SKILL.md`, guides, and scripts — into
+all four destination groups: the shared `~/.agents/skills/` path (GitHub
+Copilot in VS Code and CLI, OpenCode, Codex, Gemini CLI, Cursor, Windsurf) and
+the personal paths of Kiro (`~/.kiro/skills/`), Claude Code
+(`~/.claude/skills/`), and Cline (`~/.cline/skills/`). No assistants are
+discovered first, nothing project-local is written, and no administrator
+permissions are required.
+
+Copies match the source and are validated against the
+[Agent Skills specification](https://agentskills.io/specification.md) in the
+repository tests. What each assistant does with them is documented by that
+assistant: discovery behavior differs per product, some assistants only read
+project-local paths, and cloud sessions may ignore personal directories.
+
+## Updating installed copies
+
+Existing copies are protected: `make install` fails without copying anything
+if a skill already exists at a destination. Replace them deliberately after
+pulling changes:
 
 ```sh
 make update
 ```
 
-`make update` is equivalent to `make install FORCE=1` and copies the current
-skill directories over every destination.
+`make update` is equivalent to `make install FORCE=1`. Copies never update
+automatically, so re-run it whenever the source changes.
 
-Installation is local and does not register anything in Backstage.
+## Installing as a Claude plugin
 
-## Claude plugin installation
-
-Claude Code users can install the repository as a marketplace instead, which
-keeps updates flowing through the plugin system:
+Claude Code can also install the repository as a marketplace, which keeps
+updates flowing through the plugin system:
 
 ```sh
 claude plugin marketplace add gautampachnanda101/agent-skills
 claude plugin install agent-skills@gautampachnanda101-agent-skills
 ```
 
-The marketplace and plugin manifests live in `.claude-plugin/` at the
-repository root; `claude plugin validate --strict .` checks them. Updates
-arrive through `claude plugin update agent-skills@gautampachnanda101-agent-skills`
-when the published version changes. Installing through the marketplace and
-copying into `~/.claude/skills/` with `make install` both work; keep only one,
-or your assistant may report a duplicate.
+Receive published updates with
+`claude plugin update agent-skills@gautampachnanda101-agent-skills`. The
+marketplace and plugin manifests live in `.claude-plugin/` at the repository
+root and are validated in CI. If you also copy into `~/.claude/skills/` with
+`make install`, keep only one route — Claude may report a duplicate.
 
-## Per-project and manual destinations
+## Destinations and overrides
 
 The paths below are a reference for manual installation; personal paths apply
 across projects.
@@ -68,11 +82,13 @@ across projects.
 | Windsurf | `.agents/skills/` or `.windsurf/skills/` | `~/.agents/skills/` or `~/.codeium/windsurf/skills/` |
 | Cline | `.cline/skills/` | `~/.cline/skills/` |
 
-Optional overrides replace the automatic global destinations or install into a
-single directory:
+Two variables override the automatic destinations:
 
 ```sh
+# Replace the global destination list
 make install GLOBAL_DESTS="$HOME/.agents/skills:$HOME/.kiro/skills"
+
+# Install into a single directory
 make install DEST="$HOME/.kiro/skills"
 make install DEST="/path/to/project/.claude/skills"
 ```
@@ -80,30 +96,17 @@ make install DEST="/path/to/project/.claude/skills"
 For example, installing `backstage-catalog-builder` for the current project in
 VS Code's local agent and OpenCode produces
 `.agents/skills/backstage-catalog-builder/SKILL.md`. To use it in Kiro too,
-copy it separately to `.kiro/skills/backstage-catalog-builder/`. Copies do not
-update automatically; replace them deliberately when updating the source. Avoid
-installing multiple copies with the same name into locations searched by the
-same assistant. Some assistants, such as OpenCode, also read
-`~/.claude/skills/`, so they may find two identical copies; remove one if your
-assistant reports a duplicate.
+copy it separately to `.kiro/skills/backstage-catalog-builder/`.
 
-## Verified install behavior
-
-The installer writes complete skill directories (SKILL.md, guides, scripts)
-into all four destinations in one run: the shared `~/.agents/skills/` path and
-Kiro, Claude Code, and Cline personal paths. The copies are validated against
-the [Agent Skills specification](https://agentskills.io/specification.md) in
-tests, so files identical to the source land in every destination; what an
-individual assistant does with them is documented by that assistant. Discovery
-behavior differs per product: some assistants only read project-local paths,
-cloud sessions may ignore personal directories, and assistants such as OpenCode
-also read `~/.claude/skills/`. Replace installed copies deliberately and remove
-duplicates if your assistant reports them.
+Avoid keeping multiple copies with the same name in locations one assistant
+searches: assistants such as OpenCode read both `~/.agents/skills/` and
+`~/.claude/skills/`, so a duplicate is possible; remove one if the assistant
+reports it.
 
 ## Manual copying
 
-Alternatively, copy the **entire skill directory** manually. For example, in
-PowerShell from the root of this repository:
+Copy the **entire skill directory** by hand, substituting the destination from
+the table above. PowerShell example from the repository root:
 
 ```powershell
 $destination = Join-Path $HOME ".agents/skills"
@@ -116,21 +119,16 @@ if (Test-Path $skill) {
 }
 ```
 
-For another assistant or project, substitute its skills directory from the
-table above. Copying is local and does not register anything in Backstage.
-
 ## Assistant-specific notes
 
-- Kiro's default agent discovers workspace and global skills; custom agents
-  need the skill in their `resources` configuration. Kiro also supports
-  importing a skill from a public repository URL pointing to the skill
-  directory or its `SKILL.md`. Global skill availability differs in cloud
-  environments. See the
-  [Kiro documentation](https://kiro.dev/docs/skills/) for agent configuration
-  and version-specific behavior.
-- Cursor's local and cloud agents handle personal skills differently; consult
+- **Kiro**: the default agent discovers workspace and global skills; custom
+  agents need the skill in their `resources` configuration. Kiro can import a
+  skill from a public repository URL pointing at the skill directory or its
+  `SKILL.md`. See the
+  [Kiro documentation](https://kiro.dev/docs/skills/) — global availability
+  differs in cloud environments.
+- **Cursor**: local and cloud agents handle personal skills differently; see
   the [Cursor documentation](https://cursor.com/docs/skills) before relying on
   a personal installation in the cloud.
-- `make help` lists every Make target, option, and example. Help uses colours
-  in supported terminals and plain text when redirected; use `COLOR=always` to
-  force colours, or `COLOR=never` / `NO_COLOR=1` to disable them.
+- `make help` lists every Make target and option, including the color
+  settings (`COLOR=always|never`, `NO_COLOR=1`).
