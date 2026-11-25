@@ -63,10 +63,12 @@ const gather = dir =>
   );
 
 // Repo-level tests cover cross-skill contracts; each skill's tests/ runs
-// beside them so a skill's suite travels with its folder.
+// beside them so a skill's suite travels with its folder (skills/ is the
+// plugin's default skill directory too).
 gather(path.join(root, 'tests'));
-for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
-  const skill = path.join(root, entry.name);
+const skillsRoot = path.join(root, 'skills');
+for (const entry of fs.readdirSync(skillsRoot, { withFileTypes: true })) {
+  const skill = path.join(skillsRoot, entry.name);
   if (entry.isDirectory() && fs.existsSync(path.join(skill, 'SKILL.md')) && fs.existsSync(path.join(skill, 'tests'))) {
     gather(path.join(skill, 'tests'));
   }

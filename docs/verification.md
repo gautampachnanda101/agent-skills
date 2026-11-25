@@ -21,8 +21,8 @@ and fixtures:
 
 ```sh
 make skill-smoke
-node backstage-catalog-builder/scripts/check-descriptors.mjs catalog-info.yaml
-node backstage-catalog-builder/scripts/check-techdocs.mjs catalog-info.yaml
+node skills/backstage-catalog-builder/scripts/check-descriptors.mjs catalog-info.yaml
+node skills/backstage-catalog-builder/scripts/check-techdocs.mjs catalog-info.yaml
 ```
 
 Both are zero-dependency and run on Node 18+.
@@ -47,9 +47,9 @@ fixtures (custom `docs_dir` in included sites, quoted `!include` values, bare
 subnav pages). The generation contract across layouts — multi-document
 catalogs, API contracts with aggregate Locations, per-package and aggregated
 monorepo sites, custom `docs_dir`, path-limited `dir:` scopes — is covered by
-[tests/output-examples.test.cjs](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/tests/output-examples.test.cjs)
+[tests/output-examples.test.cjs](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/tests/output-examples.test.cjs)
 with fixtures in
-[tests/fixtures/techdocs](https://github.com/gautampachnanda101/agent-skills/tree/main/backstage-catalog-builder/tests/fixtures/techdocs).
+[tests/fixtures/techdocs](https://github.com/gautampachnanda101/agent-skills/tree/main/skills/backstage-catalog-builder/tests/fixtures/techdocs).
 The descriptor, TechDocs, and output-contract suites, their fixtures, and the
 eval harness live inside the skill's own `tests/` and `scripts/` directories,
 so the skill travels with its verification.
@@ -75,7 +75,7 @@ monorepo layouts) is validated deterministically by the checker tests and the
 public-repository CI job instead.
 
 The prompts live in the skill-local
-[evals/evals.json](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/evals/evals.json)
+[evals/evals.json](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/evals/evals.json)
 in the format from
 [agentskills.io/skill-creation/evaluating-skills](https://agentskills.io/skill-creation/evaluating-skills),
 with the bundled checkers serving as the assertions. Each run also replays the
@@ -208,7 +208,7 @@ published descriptors only** — it does not generate them from source files.
 Use the skill for missing descriptors, file inspection, ownership decisions,
 and cross-repository modeling; GitHub user accounts need user-repository
 enumeration rather than an organization provider. See
-[scope-and-modeling.md](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/scope-and-modeling.md).
+[scope-and-modeling.md](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/scope-and-modeling.md).
 
 ### Connect through MCP
 
@@ -235,7 +235,7 @@ Other MCP-capable assistants can use the same HTTP endpoint with their own
 secret-aware authorization; update the client URL if the backend port changes.
 A saved connection config alone proves nothing — initialization plus a
 successful tool call is the connectivity evidence. The skill's
-[mcp-workflow.md](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/mcp-workflow.md)
+[mcp-workflow.md](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/mcp-workflow.md)
 covers catalog-model discovery, per-entity server validation, paginated
 inspection, safe registration, and coverage reconciliation: it treats
 transport success and tool-result errors separately, and never mistakes a

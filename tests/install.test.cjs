@@ -28,7 +28,7 @@ test('default installation installs globally in every supported assistant direct
   for (const folder of ['.agents', '.kiro', '.claude', '.cline']) {
     assert.equal(
       fs.readFileSync(path.join(skill(folder), 'SKILL.md'), 'utf8'),
-      fs.readFileSync(path.join(root, 'backstage-catalog-builder/SKILL.md'), 'utf8'),
+      fs.readFileSync(path.join(root, 'skills/backstage-catalog-builder/SKILL.md'), 'utf8'),
     );
   }
 });

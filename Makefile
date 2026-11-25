@@ -207,27 +207,27 @@ hooks-check:
 	@pre-commit run --all-files
 
 skill-smoke: skill-techdocs
-	@node backstage-catalog-builder/scripts/check-descriptors.mjs \
-		backstage-catalog-builder/tests/fixtures/descriptors/catalog-valid.yaml \
-		backstage-catalog-builder/tests/fixtures/techdocs/single/catalog-info.yaml \
-		backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
-		backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
-		backstage-catalog-builder/tests/fixtures/techdocs/aggregate/catalog-info.yaml \
+	@node skills/backstage-catalog-builder/scripts/check-descriptors.mjs \
+		skills/backstage-catalog-builder/tests/fixtures/descriptors/catalog-valid.yaml \
+		skills/backstage-catalog-builder/tests/fixtures/techdocs/single/catalog-info.yaml \
+		skills/backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
+		skills/backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
+		skills/backstage-catalog-builder/tests/fixtures/techdocs/aggregate/catalog-info.yaml \
 		backstage/catalog-info.yaml \
 		catalog-info.yaml && \
 	echo 'Structural checks passed. To confirm ingestion in a local catalog, run:' && \
-	echo '  make backstage CATALOG_FILES="$(CURDIR)/backstage-catalog-builder/tests/fixtures/descriptors/catalog-valid.yaml"'
+	echo '  make backstage CATALOG_FILES="$(CURDIR)/skills/backstage-catalog-builder/tests/fixtures/descriptors/catalog-valid.yaml"'
 
 skill-techdocs:
-	@node backstage-catalog-builder/scripts/check-techdocs.mjs \
+	@node skills/backstage-catalog-builder/scripts/check-techdocs.mjs \
 		catalog-info.yaml \
-		backstage-catalog-builder/tests/fixtures/techdocs/single/catalog-info.yaml \
-		backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
-		backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
-		backstage-catalog-builder/tests/fixtures/techdocs/aggregate/catalog-info.yaml
+		skills/backstage-catalog-builder/tests/fixtures/techdocs/single/catalog-info.yaml \
+		skills/backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/alpha/catalog-info.yaml \
+		skills/backstage-catalog-builder/tests/fixtures/techdocs/monorepo/packages/bravo/catalog-info.yaml \
+		skills/backstage-catalog-builder/tests/fixtures/techdocs/aggregate/catalog-info.yaml
 
 skill-llm-verify:
-	@sh "$(CURDIR)/backstage-catalog-builder/scripts/skill-llm-verify.sh"
+	@LLM_CACHE="$(CURDIR)/.llm-cache" sh "$(CURDIR)/skills/backstage-catalog-builder/scripts/skill-llm-verify.sh"
 
 install:
 	@set -eu; \
@@ -255,33 +255,35 @@ _install:
 		echo "Destination must not be empty." >&2; exit 1; \
 	fi; \
 	found=0; \
-	for entry in */SKILL.md; do \
+	for entry in skills/*/SKILL.md; do \
 		[ -f "$$entry" ] && found=1; \
 	done; \
 	if [ "$$found" -eq 0 ]; then \
 		echo "No skills found." >&2; exit 1; \
 	fi; \
-	IFS=':'; \
+	IFS=":"; \
 	for dest in $$DESTS; do \
 		if [ -z "$$dest" ]; then \
 			echo "Destination must not be empty." >&2; exit 1; \
 		fi; \
 		[ "$$FORCE" = 1 ] && continue; \
-		for entry in */SKILL.md; do \
+		for entry in skills/*/SKILL.md; do \
 			[ -f "$$entry" ] || continue; \
-			skill=$${entry%/SKILL.md}; \
-			if [ -e "$$dest/$$skill" ] || [ -L "$$dest/$$skill" ]; then \
-				echo "Skill already exists: $$dest/$$skill; no skills installed. Use FORCE=1 to replace." >&2; exit 1; \
+			skill="$${entry%/SKILL.md}"; \
+			name="$${skill#skills/}"; \
+			if [ -e "$$dest/$$name" ] || [ -L "$$dest/$$name" ]; then \
+				echo "Skill already exists: $$dest/$$name; no skills installed. Use FORCE=1 to replace." >&2; exit 1; \
 			fi; \
 		done; \
 	done; \
 	for dest in $$DESTS; do \
 		mkdir -p "$$dest"; \
-		for entry in */SKILL.md; do \
+		for entry in skills/*/SKILL.md; do \
 			[ -f "$$entry" ] || continue; \
-			skill=$${entry%/SKILL.md}; \
-			rm -rf "$$dest/$$skill"; \
-			cp -R "$$skill" "$$dest/"; \
-			printf 'Installed %s in %s\n' "$$skill" "$$dest"; \
+			skill="$${entry%/SKILL.md}"; \
+			name="$${skill#skills/}"; \
+			rm -rf "$$dest/$$name"; \
+			cp -R "$$skill" "$$dest/$$name"; \
+			printf 'Installed %s in %s\n' "$$name" "$$dest"; \
 		done; \
 	done

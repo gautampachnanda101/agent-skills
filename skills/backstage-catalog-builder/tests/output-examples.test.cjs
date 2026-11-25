@@ -6,7 +6,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const skill = path.resolve(__dirname, '..');
-const repo = path.resolve(skill, '..');
+const repo = path.resolve(skill, '../..');
 const scripts = path.join(skill, 'scripts');
 const descriptorChecker = path.join(scripts, 'check-descriptors.mjs');
 const techdocsChecker = path.join(scripts, 'check-techdocs.mjs');

@@ -65,7 +65,7 @@ jobs:
           node-version: '24'
 
       - name: Check this repository's TechDocs site
-        run: node backstage-catalog-builder/scripts/check-techdocs.mjs --root . --strict catalog-info.yaml
+        run: node skills/backstage-catalog-builder/scripts/check-techdocs.mjs --root . --strict catalog-info.yaml
 
       # Runs the MkDocs/TechDocs checker against a pinned public repository so
       # real-world YAML conventions (deeply nested nav, quoted values, plugin
@@ -78,7 +78,7 @@ jobs:
             https://github.com/backstage/backstage.git "$RUNNER_TEMP/backstage"
           git -C "$RUNNER_TEMP/backstage" sparse-checkout set --skip-checks \
             catalog-info.yaml mkdocs.yml docs
-          node backstage-catalog-builder/scripts/check-techdocs.mjs \
+          node skills/backstage-catalog-builder/scripts/check-techdocs.mjs \
             --root "$RUNNER_TEMP/backstage" --strict \
             "$RUNNER_TEMP/backstage/catalog-info.yaml"
 
@@ -103,7 +103,7 @@ jobs:
             site_name=$(node -e 'const t=require("fs").readFileSync(process.argv[1],"utf8");const m=t.match(/^\s*site_name:\s*["'"'"']?(.*?)["'"'"']?\s*$/m);process.stdout.write(m?m[1]:"")' "$dir/mkdocs.yml")
             [ -n "$site_name" ] || { echo "No site_name found in $fixture" >&2; exit 1; }
             printf 'apiVersion: backstage.io/v1alpha1\nkind: Component\nmetadata:\n  name: %s\n  annotations:\n    backstage.io/techdocs-ref: dir:./\nspec:\n  type: library\n  lifecycle: experimental\n  owner: group:default/catalog-test\n' "$site_name" > "$dir/catalog-info.yaml"
-            node backstage-catalog-builder/scripts/check-techdocs.mjs "$dir/catalog-info.yaml"
+            node skills/backstage-catalog-builder/scripts/check-techdocs.mjs "$dir/catalog-info.yaml"
           done
 
   skill-llm:

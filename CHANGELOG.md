@@ -4,6 +4,16 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.6] - 2026-11-25
+
+### Changed
+
+- Skill directories moved under `skills/` (matching the layout of the
+  ecosystem's reference repository). `skills/` is the Claude plugin's default
+  skill directory, so new skills now ship through the plugin with no manifest
+  edit; the installer, conformance tests, pre-commit harness, Make targets,
+  CI, and documentation all resolve the new layout.
+
 ## [1.0.5] - 2026-11-25
 
 ### Added

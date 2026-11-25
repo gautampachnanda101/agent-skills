@@ -3,18 +3,18 @@
 [![Verify](https://github.com/gautampachnanda101/agent-skills/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/gautampachnanda101/agent-skills/actions/workflows/verify.yml)
 [![Docs](https://github.com/gautampachnanda101/agent-skills/actions/workflows/docs.yml/badge.svg?branch=main)](https://gautampachnanda101.github.io/agent-skills/)
 
-Reusable [Agent Skills](https://agentskills.io/) for coding assistants. Every
-top-level directory is one independent skill — a `SKILL.md`, guides, scripts,
-and fixtures — portable across assistants, editors, models, and operating
-systems. The skills today:
+Reusable [Agent Skills](https://agentskills.io/) for coding assistants. Each
+[skills/](./skills/) subdirectory is one independent skill — a `SKILL.md`,
+guides, scripts, and tests — portable across assistants, editors, models, and
+operating systems. The skills today:
 
-- [`backstage-catalog-builder`](./backstage-catalog-builder/SKILL.md) —
+- [`backstage-catalog-builder`](./skills/backstage-catalog-builder/SKILL.md) —
   scans GitHub repositories and builds evidence-based open-source Backstage
   catalogs, including TechDocs generation and structural validation.
-- [`peer-code-review`](./peer-code-review/SKILL.md) — evidence-based peer
+- [`peer-code-review`](./skills/peer-code-review/SKILL.md) — evidence-based peer
   code review grounded in Google's review guide, Fagan inspections, and the
   peer-review literature.
-- [`documentation-review`](./documentation-review/SKILL.md) — documentation
+- [`documentation-review`](./skills/documentation-review/SKILL.md) — documentation
   quality reviews grounded in Diátaxis and the Google/Microsoft style
   guides.
 
@@ -44,9 +44,9 @@ skill-name/
                   # evals/ — loaded on demand
 ```
 
-In this repository, every top-level directory is one such skill. The folder
-is the source of truth — browse the top-level directories to see what any
-skill actually contains — and the
+In this repository, each [skills/](./skills/) subdirectory is one such skill.
+The folder is the source of truth — browse the skill directories to see what
+any skill actually contains — and the
 [documentation home](https://gautampachnanda101.github.io/agent-skills/)
 keeps the maintained inventory with each skill's purpose.
 

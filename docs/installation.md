@@ -1,6 +1,6 @@
 # Installing the skills
 
-Clone or download the repository first. The top-level skill directories are
+Clone or download the repository first. The directories under `skills/` are
 the source — assistants do not automatically discover them just because the
 repository is open. Installation is always local and never registers anything
 in Backstage.
@@ -115,7 +115,7 @@ $skill = Join-Path $destination "backstage-catalog-builder"
 if (Test-Path $skill) {
     Write-Output "Skill already exists; review it before replacing it."
 } else {
-    Copy-Item -Recurse backstage-catalog-builder $skill
+    Copy-Item -Recurse skills/backstage-catalog-builder $skill
 }
 ```
 

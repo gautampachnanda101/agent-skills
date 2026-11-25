@@ -19,16 +19,18 @@ function simpleScalar(value) {
   return text;
 }
 
+const skillsDir = path.join(root, 'skills');
+
 const skillDirs = fs
-  .readdirSync(root, { withFileTypes: true })
-  .filter(entry => entry.isDirectory() && fs.existsSync(path.join(root, entry.name, 'SKILL.md')))
+  .readdirSync(skillsDir, { withFileTypes: true })
+  .filter(entry => entry.isDirectory() && fs.existsSync(path.join(skillsDir, entry.name, 'SKILL.md')))
   .map(entry => entry.name);
 
-assert.ok(skillDirs.length > 0, 'expected at least one skill directory');
+assert.ok(skillDirs.length > 0, 'expected at least one skill directory under skills/');
 
 for (const dir of skillDirs) {
   test(`SKILL.md frontmatter conforms to the Agent Skills spec: ${dir}`, () => {
-    const file = path.join(root, dir, 'SKILL.md');
+    const file = path.join(skillsDir, dir, 'SKILL.md');
     const text = fs.readFileSync(file, 'utf8');
     const match = /^---\n([\s\S]*?)\n---\n/.exec(text);
     assert.ok(match, `${dir}/SKILL.md must start with YAML frontmatter`);

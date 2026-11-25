@@ -14,9 +14,10 @@ In this page:
 
 ## Layout and naming
 
-- Place each skill in its own top-level directory, with a `SKILL.md` entry
-  point. The directory name must match the skill's `name` in the YAML
-  frontmatter.
+- Place each skill in its own directory under `skills/`, with a `SKILL.md`
+  entry point. The directory name must match the skill's `name` in the YAML
+  frontmatter. `skills/` is also the Claude plugin's default skill directory,
+  so a new skill directory ships through the plugin with no manifest edit.
 - Include a lowercase, hyphen-separated `name` and a non-empty `description`.
   Describe both what the skill does and when to use it.
 - Follow the full [Agent Skills specification](https://agentskills.io/specification.md)
@@ -75,7 +76,8 @@ enumerates skills:
 
 1. The **Available skills** table in the documentation
    [home page](index.md).
-2. The `make install` installer copies every top-level directory with a
+2. The `make install` installer copies every directory under `skills/` that
+   contains a
    `SKILL.md`, so no change is needed there; verify with
    `make skill-smoke` that new fixture descriptors still pass.
 3. If the skill bundles verification assets, extend `make skill-llm-verify`

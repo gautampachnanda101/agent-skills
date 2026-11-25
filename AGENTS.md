@@ -6,8 +6,9 @@ independent of any one assistant, editor, model, or operating system.
 
 ## Authoring skills
 
-- Place each skill in its own directory, with a `SKILL.md` entry point. The
-  directory name must match the skill's `name` in YAML frontmatter.
+- Place each skill in its own directory under `skills/`, with a `SKILL.md`
+  entry point. The directory name must match the skill's `name` in YAML
+  frontmatter. `skills/` is also the Claude plugin's default skill directory.
 - Include a lowercase, hyphen-separated `name` and a non-empty `description`
   in the frontmatter. Describe both what the skill does and when to use it.
 - Write clear, actionable instructions. State prerequisites, expected inputs,

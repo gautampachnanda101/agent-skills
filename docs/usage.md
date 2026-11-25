@@ -76,7 +76,7 @@ Inspection covers actions/CI, teams and organization metadata, documentation
 and ADRs, API contracts, infrastructure, and technical-insight evidence.
 Plugin configuration is derived from discovered capabilities and approved
 policies, not guessed annotations or scores. The detailed workflow lives in
-[configuration-delivery.md](https://github.com/gautampachnanda101/agent-skills/blob/main/backstage-catalog-builder/configuration-delivery.md).
+[configuration-delivery.md](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/configuration-delivery.md).
 
 ## Boundaries to expect
 

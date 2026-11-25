@@ -26,16 +26,28 @@ test('plugin manifest is valid', () => {
   const manifest = readJson('.claude-plugin/plugin.json');
 
   assert.ok(manifest.name && NAME_PATTERN.test(manifest.name), 'name must be kebab-case');
-  assert.ok(!fs.existsSync(path.join(root, 'skills')), 'standard skills/ dir must not replace declared skills');
-  for (const skill of manifest.skills ?? []) {
-    const dir = pluginPath(manifest, skill);
-    assert.ok(fs.existsSync(path.join(dir, 'SKILL.md')), `skill '${skill}' must hold SKILL.md directly`);
-    const name = /name: (.+)/.exec(fs.readFileSync(path.join(dir, 'SKILL.md'), 'utf8'))[1];
-    assert.equal(name, path.basename(dir), 'skill name must match its directory');
-  }
+  // skills/ is the plugin default skill directory: Claude Code loads every
+  // subdirectory holding SKILL.md without a manifest entry. Declared skills
+  // would double-load; the dedicated test below checks the real layout.
   if (manifest.version) assert.match(manifest.version, /^\d+\.\d+\.\d+$/, 'version must be semantic');
   if (manifest.homepage) assert.match(manifest.homepage, /^https:/, 'homepage must parse as a URL');
   assert.equal(manifest.license, 'Apache-2.0');
+});
+
+test('each skills/ subdirectory is a spec-shaped skill', () => {
+  const skillsRoot = path.join(root, 'skills');
+  assert.ok(fs.existsSync(skillsRoot), 'skills/ must exist for plugin default discovery');
+  const dirs = fs
+    .readdirSync(skillsRoot, { withFileTypes: true })
+    .filter(entry => entry.isDirectory())
+    .map(entry => entry.name);
+  assert.ok(dirs.length > 0, 'at least one skill directory expected');
+  for (const dir of dirs) {
+    const skillFile = path.join(skillsRoot, dir, 'SKILL.md');
+    assert.ok(fs.existsSync(skillFile), `skills/${dir} must hold SKILL.md directly`);
+    const name = /name: (.+)/.exec(fs.readFileSync(skillFile, 'utf8'))[1];
+    assert.equal(name, dir, 'skill name must match its directory');
+  }
 });
 
 test('marketplace entry matches the manifest it lists', () => {
