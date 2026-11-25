@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools; Bash and Node are optional for verifying commands, links, and MkDocs/TechDocs structure. Fetching external network evidence requires host and user permission.
 metadata:
   author: gautampachnanda101
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Documentation review
@@ -117,6 +117,23 @@ Check, with automated checks where possible and judgment elsewhere:
 Findings here use the same severity scale; an instruction that breaks a
 screen reader (`click the red button on the right`, a link that says
 `documentation`) is a `major`, not a nit.
+
+## Run the mechanical pass first
+
+Documentation linting is the deterministic layer before judgment: run the
+project's configured Markdown linter (`markdownlint`), prose linter (`vale`
+with the house style), link checker (`markdown-link-check`), or the
+repository's own TechDocs checker (`check-techdocs.mjs`) for MkDocs sites —
+whatever the project declares, via the host's Bash or Node tools.
+
+- Fix-or-report, never assume: a configured linter that cannot run is
+  recorded as unevaluated.
+- Machine findings are corrected directly (fix-and-verify loop) rather than
+  reported as review findings; only linter-invisible issues — accuracy,
+  audience fit, structure, accessibility judgment — go in the findings
+  table.
+- Lint suppressions (`<!-- markdownlint-disable -->`) added without
+  justification are a `major`, same rule as code suppressions.
 
 ## Verify evidence, not vibes
 

@@ -24,6 +24,8 @@ the Claude plugin route.
   with pacing, checklists, and UI accessibility.
 - [documentation-review](documentation-review.md) — documentation reviews
   grounded in Diátaxis, style guides, and GOV.UK accessibility.
+- [doc-author](doc-author.md) — authors new pages and rewrites existing
+  ones with the same rules the review skill enforces.
 
 Every skill is validated in CI: spec conformance, bundled structural
 checkers, an eval-driven local-model check, and — where the skill ships its

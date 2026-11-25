@@ -27,7 +27,7 @@ BACKSTAGE_ENV = node_bin=$$(sh "$(CURDIR)/scripts/backstage-node.sh"); \
 BACKSTAGE_HOME_ENV = BACKSTAGE_HOME=$$(node "$(CURDIR)/scripts/backstage-home.cjs" resolve "$$BACKSTAGE_HOME" "$(CURDIR)"); \
 	export BACKSTAGE_HOME
 
-.PHONY: help install install-global update _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify hooks-install hooks-check
+.PHONY: help install install-global update status _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify hooks-install hooks-check
 
 help:
 	@set -eu; \
@@ -48,6 +48,7 @@ help:
 	entry 'install' 'Install all skills in every supported assistant global directory.'; \
 	entry 'install-global' 'Alias for install; no project-local copies by default.'; \
 	entry 'update' 'Replace installed copies everywhere (equivalent to install FORCE=1).'; \
+	entry 'status' 'Compare installed skill versions against the checked-out source.'; \
 	note 'Existing copies are protected. Use FORCE=1 to replace them.'; \
 	heading 'Contributor checks'; \
 	entry 'hooks-install' 'Enable repository pre-commit checks, preserving existing Git hooks.'; \
@@ -80,6 +81,7 @@ help:
 	printf '%s\n' \
 		'  make install' \
 		'  make update' \
+		'  make status' \
 		'  make backstage' \
 		'  make backstage BACKSTAGE_APP_PORT=3001' \
 		'  make backstage CATALOG_FILES="/path/to/repo/catalog-info.yaml"' \
@@ -249,6 +251,35 @@ update:
 	else dests=$$(sh "$(CURDIR)/scripts/skill-destinations.sh"); fi; \
 	FORCE=1 $(MAKE) --no-print-directory _install DESTS="$$dests"
 
+# Compares each installed skill copy against the checked-out source by
+# SKILL.md metadata.version so users can see drift before running make update.
+status:
+	@set -eu; \
+	if [ -n "$$DEST" ]; then dests="$$DEST"; \
+	elif [ -n "$$GLOBAL_DESTS" ]; then dests="$$GLOBAL_DESTS"; \
+	else dests=$$(sh "$(CURDIR)/scripts/skill-destinations.sh"); fi; \
+	for entry in skills/*/SKILL.md; do \
+		[ -f "$$entry" ] || continue; \
+		src="$${entry%/SKILL.md}"; \
+		name="$${src#skills/}"; \
+		src_version=$$(sed -n "s/^  version: \"\([^\]*\)\"$$/\1/p" "$$src/SKILL.md" | head -n 1); \
+		printf "%s: source %s\n" "$$name" "$$src_version"; \
+		IFS=":"; \
+		for dest in $$dests; do \
+			[ -n "$$dest" ] || continue; \
+			dest_file="$$dest/$$name/SKILL.md"; \
+			if [ ! -f "$$dest_file" ]; then \
+				printf "  %-46s not installed\n" "$$dest/$$name"; \
+			else \
+				inst=$$(sed -n "s/^  version: \"\([^\]*\)\"$$/\1/p" "$$dest_file" | head -n 1); \
+				if [ "$$inst" = "$$src_version" ]; then \
+					printf "  %-46s up to date\n" "$$dest/$$name"; \
+				else \
+					printf "  %-46s installed %s\n" "$$dest/$$name" "$$inst"; \
+				fi; \
+			fi; \
+		done; \
+	done
 _install:
 	@set -eu; \
 	if [ -z "$$DESTS" ]; then \

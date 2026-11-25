@@ -6,6 +6,26 @@ skill's `metadata.version` field.
 
 ## [1.0.9] - 2026-11-25
 
+### Added
+
+- A fourth skill, `doc-author` 1.0.0: authors new documentation and rewrites
+  existing pages with the user-need-first flow, Diátaxis typing, GOV.UK
+  plain-English and requirement-wording rules, and a built-in lint-and-verify
+  pass (`markdownlint`, `vale`, link checkers, or the TechDocs checker);
+  ships a `style-rules.md` self-validator. Registered in the site navigation,
+  plugin discovery (no manifest edit needed with the `skills/` layout), and
+  the inventory tables.
+- Linting and code-quality passes in both review skills:
+  `peer-code-review` 1.2.0 runs configured linters/type-checkers before the
+  human pass, flags new lint suppressions, coverage drops, and loosened type
+  discipline, and reports unavailable tooling as unevaluated;
+  `documentation-review` 1.2.0 adds the same discipline for documentation —
+  `markdownlint`, `vale`, link checkers, and the TechDocs checker in a
+  fix-and-verify loop.
+- `make status`: compares every installed skill copy against the checked-out
+  source by `SKILL.md` `metadata.version`, per destination, so users can see
+  drift before running `make update`.
+
 ### Changed
 
 - Site parity work for the homebrew-tap theme match: the

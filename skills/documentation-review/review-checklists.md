@@ -105,6 +105,22 @@ inputs. Use automated checks where available; record judgment items as
   the readability items above against WCAG's `understandable` principle.
   (GV)
 
+## Linting and prose checks
+
+Run the mechanical layer before judgment; record what ran and what could
+not.
+
+- Which tools ran (`markdownlint`, `vale`, `markdown-link-check`, the
+  repository's TechDocs checker)? Configured-but-unavailable is recorded as
+  unevaluated, not assumed clean.
+- Machine findings fixed-and-reverified rather than copied into the report;
+  the report keeps only judgment findings. (W: findings not opinions)
+- Added lint suppressions (`<!-- markdownlint-disable -->`) carry a stated
+  reason; blanket disables are a `major`.
+- For MkDocs/TechDocs sites, the bundled zero-dependency checker validated
+  nav, includes, `site_name`, and entity match — with `--json` when a
+  report is needed.
+
 ## Freshness and ownership
 
 - The page has an owner: a person or team accountable for it. Un-owned pages

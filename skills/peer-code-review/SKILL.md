@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and Git or Bash tools. Checklists are Markdown; commands such as tests and linters run only where authorized and available. No network access is required beyond fetching the change under review.
 metadata:
   author: gautampachnanda101
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Peer code review
@@ -48,6 +48,26 @@ applies it to content, for user-interface changes.
 - Respond within one business day (Google's rule) and keep the author
   unblocked: if a full review is not possible now, send the broad design
   comments immediately and the rest later.
+
+## Run the mechanical passes before reading lines
+
+Linters, formatters, and type-checkers are the deterministic first pass —
+Wiegers' and Google's shared principle is that review attention belongs to
+judgment questions machines cannot answer. When the project declares a
+linter (ESLint, Ruff, mypy, golangci-lint, cargo clippy, or equivalent),
+run it via the host's Git or Bash tools before reading line by line, and
+run it again after fixes; re-review only files that changed since the last
+check.
+
+- Record what ran and what could not run: an unavailable linter is reported
+  as unevaluated, never assumed clean.
+- Machine findings are context, not findings: do not re-report linter
+  output; use it to focus attention on the code around flagged lines.
+- Quality signals deserve findings even when the linter is green:
+  newly added lint suppressions (`noqa`, `eslint-disable`, `#[allow]`) need
+  a reason in the change; a coverage drop on changed paths is a `major`;
+  new `any` escapes or widened exceptions in typed code are `minor`;
+  duplicated logic the linter cannot see goes through the checklists.
 
 ## Apply the checklist
 

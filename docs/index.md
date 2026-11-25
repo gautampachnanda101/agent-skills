@@ -35,6 +35,7 @@ to verify it.
 | [backstage-catalog-builder](skills/backstage-catalog-builder.md) | Evidence-based Backstage catalog entities, discovery configuration, and TechDocs sites, built from GitHub scans and existing configuration | [page](skills/backstage-catalog-builder.md) |
 | [peer-code-review](skills/peer-code-review.md) | Diff and pull-request reviews with checklists, severity-tagged evidence, and UI accessibility checks | [page](skills/peer-code-review.md) |
 | [documentation-review](skills/documentation-review.md) | Documentation reviews grounded in Diátaxis, style guides, and GOV.UK accessibility | [page](skills/documentation-review.md) |
+| [doc-author](skills/doc-author.md) | Writes and rewrites pages with the same rules the review skill enforces: user need, Diátaxis form, plain English, verified commands | [page](skills/doc-author.md) |
 
 ## In this site
 

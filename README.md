@@ -17,6 +17,9 @@ operating systems. The skills today:
 - [`documentation-review`](./skills/documentation-review/SKILL.md) — documentation
   quality reviews grounded in Diátaxis and the Google/Microsoft style
   guides.
+- [`doc-author`](./skills/doc-author/SKILL.md) — authors new pages and
+  rewrites existing ones following Diátaxis and GOV.UK content design,
+  with built-in lint-and-verify validation.
 
 This README is the landing page; the complete documentation lives in
 [the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),

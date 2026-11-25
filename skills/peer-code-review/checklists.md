@@ -75,6 +75,27 @@ standard, the level public-sector content must meet.
 - Are headings hierarchical and unique in generated pages (screen-reader
   navigation)?
 
+## Linting and code-quality signals
+
+Run what is available; record what is not.
+
+- Which linters/formatters/type-checkers ran (ESLint, Ruff, mypy,
+  golangci-lint, cargo clippy)? Anything configured yet unavailable is
+  recorded as unevaluated, not assumed clean.
+- Do machine findings focus the human pass (flagged lines, hot files) rather
+  than get re-reported verbatim?
+- Were lint suppressions added (`noqa`, `eslint-disable`, `#[allow]`)? Each
+  needs a reason in the change; blanket suppressions are a `major`. (G:
+  mechanical checks live outside review)
+- Did test coverage drop on changed paths, or did coverage tooling stay
+  silent? Silent coverage on behavior-changing paths is a `major` to justify.
+- Did type discipline loosen (new `any`/`Any` escapes, widened exception
+  types, unchecked casts)? `minor` unless it crosses a security or API
+  boundary.
+- Would the linter catch this class of defect elsewhere — and is that worth
+  a tooling ticket rather than line-by-line nitpicks? (W: mechanical checks
+  belong in tooling)
+
 ## Documentation, communication, and release
 
 - Does the change update relevant documentation, README, and help text in
