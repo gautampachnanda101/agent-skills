@@ -33,7 +33,7 @@ PALETTE = [
 ]
 
 
-class PaletteRestorePlugin(BasePlugin[object]):
+class PaletteRestorePlugin(BasePlugin):
     def on_config(self, config):
         theme = config["theme"]
         if theme["name"] == "material":
