@@ -1,6 +1,6 @@
 ---
 name: backstage-catalog-builder
-description: Discover GitHub organizations or user accounts, scan selected repositories and their files, and create or update evidence-based open-source Backstage catalog entities, file locations, and discovery configuration, building on existing entity-configuration sources the user can supply such as descriptor or app-config paths/repositories, or a running catalog API endpoint with a securely held token. Use when a request mentions Backstage, the software catalog, catalog-info.yaml or other entity descriptors, onboarding repositories into Backstage, ownership or dependency modeling, discovery providers or plugins, or validating catalog ingestion; covers organization-wide catalogs and single-repository onboarding. Also use it to generate or update MkDocs documentation and TechDocs annotations for modeled entities, including monorepo documentation layouts.
+description: Scan GitHub organizations, user accounts, or repositories and create or update evidence-based open-source Backstage catalog entities, catalog-info.yaml descriptors, locations, discovery providers, and app configuration, building on existing entity configuration. Also generates MkDocs TechDocs documentation. Use for Backstage onboarding, software-catalog modeling or ingestion validation, plugin wiring, or documentation generation.
 ---
 
 # Backstage catalog builder
@@ -15,6 +15,11 @@ descriptors does not itself register them with Backstage.
 This file holds the always-applicable rules. Load a supporting guide only when
 its workflow applies, and report a conflict instead of guessing if a guide
 disagrees with these rules.
+
+Guides are plain files in this skill's directory. Load one by reading the file
+relative to this SKILL.md (for example,
+`backstage-catalog-builder/configuration-delivery.md`) with the host
+assistant's file or resource tools; a link alone is not auto-resolved.
 
 | Workflow | Load |
 | --- | --- |
@@ -246,6 +251,15 @@ the complete truth.
   needed. Add `providesApis`, `dependsOn`, `system`, annotations, and links only
   when supported by evidence and applicable to the entity. Preserve explicitly
   maintained metadata.
+- Derive `metadata.name` from manifests rather than copying them. The default
+  Backstage ruleset accepts names of at most 63 characters: sequences of
+  alphanumerics separated by single `-`, `_`, or `.` characters, with no
+  leading or trailing separator — so `@org/Billing-Service.v2` becomes
+  `org-billing-service-v2`; keep the original spelling as `metadata.title`.
+  Uppercase letters are valid (`CircleciBuildsDumpV2_avro_gcs`); names are
+  unique per kind and namespace case-insensitively, an installation may
+  configure its own ruleset, and namespaces accept only alphanumerics
+  separated by `-`.
 - For an API definition, use a real definition or a valid Backstage placeholder
   referencing one; verify that the chosen location type and integrations support
   the reference. Do not fabricate an API definition.
@@ -304,11 +318,18 @@ the complete truth.
 
 ## Verify and report
 
+Run the passes in order and resolve failures in one pass before starting the
+next: (1) YAML syntax parsing, (2) the structural checker scripts, (3)
+Backstage backend validation (`validate-entity` or a location dry run) where an
+authorized endpoint exists, and (4) reporting. A blocking finding invalidates
+the passes that would follow it.
+
 - Parse every changed YAML document using an available YAML parser. Check
   required fields, unique entity identities, referenced local files, and
   evidence for relationships. When Node.js is available, run the bundled
   zero-dependency checker as an additional pass:
-  `node scripts/check-descriptors.mjs <changed-descriptor-files...>`.
+  `node scripts/check-descriptors.mjs <changed-descriptor-files...>`
+  (`--json` for machine-readable report output).
   It reports structural findings (missing required fields, duplicate
   identities or top-level keys, invalid names, missing Location targets,
   and missing `$text`/`$yaml` API placeholders). It is not a full YAML or

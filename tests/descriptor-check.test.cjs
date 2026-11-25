@@ -154,6 +154,37 @@ test('tab indentation, invalid names, wrong apiVersion and duplicate keys fail',
   }
 });
 
+test('default name and namespace rules reject npm scopes, bad separators, and over-length values', () => {
+  const cases = [
+    { name: '@acme/Billing-Service.v2', expecting: /invalid metadata\.name '@acme\/Billing-Service\.v2'/ },
+    { name: '-leading-sep', expecting: /invalid metadata\.name '-leading-sep'/ },
+    { name: 'a..b', expecting: /invalid metadata\.name 'a\.\.b'/ },
+    { name: 'a'.repeat(64), expecting: /exceeds the default 63-character limit \(64\)/ },
+  ];
+  const dirs = cases.map(item => withTempDir(validComponent.replace('sample-note-service', item.name)));
+  const badNamespace = withTempDir(validComponent.replace('  name: sample-note-service', '  name: sample-note-service\n  namespace: .bad.ns'));
+  const longNamespace = withTempDir(validComponent.replace('  name: sample-note-service', `  name: sample-note-service\n  namespace: ${'n'.repeat(64)}`));
+  const goodNamespace = withTempDir(validComponent.replace('  name: sample-note-service', '  name: sample-note-service\n  namespace: team-one'));
+  dirs.push(badNamespace, longNamespace, goodNamespace);
+  try {
+    cases.forEach((item, index) => {
+      const result = run([dirs[index].file]);
+      assert.equal(result.status, 1, `case ${item.name} should fail: ${result.stdout}`);
+      assert.match(result.stdout, item.expecting);
+    });
+    const namespaceResult = run([badNamespace.file]);
+    assert.equal(namespaceResult.status, 1);
+    assert.match(namespaceResult.stdout, /invalid metadata\.namespace '\.bad\.ns'/);
+    const longResult = run([longNamespace.file]);
+    assert.equal(longResult.status, 1);
+    assert.match(longResult.stdout, /namespace.*exceeds the default 63-character limit/);
+    const goodResult = run([goodNamespace.file]);
+    assert.equal(goodResult.status, 0, goodResult.stdout);
+  } finally {
+    for (const { dir } of dirs) fs.rmSync(dir, { recursive: true });
+  }
+});
+
 test('JSON mode reports documents and problems; --strict upgrades warnings', () => {
   const jsonResult = run(['--json', path.join(fixtures, 'catalog-valid.yaml')]);
   assert.equal(jsonResult.status, 0);

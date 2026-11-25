@@ -165,7 +165,8 @@ nav:
   changed descriptors:
   `node scripts/check-descriptors.mjs <files>`, then the TechDocs checker:
   `node scripts/check-techdocs.mjs <descriptors-with-techdocs-annotations...>`
-  (`--strict` to treat site-name mismatches as findings). It validates
+  (`--json` for machine-readable report output; `--strict` to treat site-name
+  mismatches as findings). It validates
   `dir:` targets against real files, the `techdocs-core` plugin, and every nav
   page and `!include`, including monorepo package sites.
 - Verify each `nav` entry, cross-page link, and image path resolves inside the

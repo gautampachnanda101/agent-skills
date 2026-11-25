@@ -13,7 +13,9 @@ const REQUIRED = {
 };
 const REF_FIELDS = ['owner', 'system', 'subcomponentOf'];
 const REF_LISTS = ['dependsOn', 'providesApis', 'consumesApis'];
-const NAME_PATTERN = /^([a-zA-Z0-9][-a-zA-Z0-9._]*)?[a-zA-Z0-9]$/;
+const NAME_PATTERN = /^[a-zA-Z0-9]+([-_.][a-zA-Z0-9]+)*$/;
+const NAMESPACE_PATTERN = /^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$/;
+const NAME_MAX_LENGTH = 63;
 const TOP_KEY_PATTERN = /^([A-Za-z][A-Za-z0-9_-]*):(.*?)\s*$/;
 const SUB_KEY_PATTERN = /^ {2}([A-Za-z][A-Za-z0-9_-]*):(.*?)\s*$/;
 
@@ -23,7 +25,9 @@ function usage() {
 Zero-dependency structural checks for Backstage entity descriptors:
   - apiVersion ${API_VERSION} and a recognized kind
   - required metadata.name and spec fields per kind
-  - Backstage name syntax for metadata.name and namespace
+  - Backstage default name rules for metadata.name and namespace: at most
+    ${NAME_MAX_LENGTH} characters, alphanumerics separated by single '-', '_' or
+    '.' for names and by '-' for namespaces
   - duplicate (kind, namespace, name) identities across all input files
   - duplicate top-level keys inside one document
   - Location spec.targets existing relative to each descriptor's directory
@@ -224,12 +228,16 @@ function checkDocument(entries, file, problems, identities) {
   }
   const name = clean(metadataName.rest);
   if (!name || !NAME_PATTERN.test(name)) {
-    problems.push({ severity: 'error', file, line: metadataName.line, message: `invalid metadata.name '${name}': whitespace, colons, slashes and leading or trailing dashes are not allowed` });
+    problems.push({ severity: 'error', file, line: metadataName.line, message: `invalid metadata.name '${name}': default rules require alphanumerics separated by single '-', '_' or '.', with no leading or trailing separator` });
+  } else if (name.length > NAME_MAX_LENGTH) {
+    problems.push({ severity: 'error', file, line: metadataName.line, message: `metadata.name '${name}' exceeds the default ${NAME_MAX_LENGTH}-character limit (${name.length})` });
   }
   const namespaceKey = metadataKeys.find(entry => entry.key === 'namespace');
   const namespace = namespaceKey ? clean(namespaceKey.rest) : 'default';
-  if (namespaceKey && (!namespace || !NAME_PATTERN.test(namespace))) {
-    problems.push({ severity: 'error', file, line: namespaceKey.line, message: `invalid metadata.namespace '${namespace}'` });
+  if (namespaceKey && (!namespace || !NAMESPACE_PATTERN.test(namespace))) {
+    problems.push({ severity: 'error', file, line: namespaceKey.line, message: `invalid metadata.namespace '${namespace}': default rules require 1-63 characters, alphanumerics separated by single '-'` });
+  } else if (namespaceKey && namespace.length > NAME_MAX_LENGTH) {
+    problems.push({ severity: 'error', file, line: namespaceKey.line, message: `metadata.namespace '${namespace}' exceeds the default ${NAME_MAX_LENGTH}-character limit (${namespace.length})` });
   }
   if (name && NAME_PATTERN.test(name)) {
     const identity = `${kind}:${namespace}:${name}`;
