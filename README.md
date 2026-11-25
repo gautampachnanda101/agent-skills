@@ -44,11 +44,11 @@ skill-name/
                   # evals/ — loaded on demand
 ```
 
-In this repository, every top-level directory is one such skill — currently
-[`backstage-catalog-builder`](./backstage-catalog-builder/),
-[`peer-code-review`](./peer-code-review/), and
-[`documentation-review`](./documentation-review/), whose actual contents you
-can browse rather than read about here.
+In this repository, every top-level directory is one such skill. The folder
+is the source of truth — browse the top-level directories to see what any
+skill actually contains — and the
+[documentation home](https://gautampachnanda101.github.io/agent-skills/)
+keeps the maintained inventory with each skill's purpose.
 
 ## Install
 
