@@ -40,8 +40,8 @@ test('status flags version drift between an installed copy and the source', t =>
   const { run, env } = setup(t);
   const dest = path.join(env.HOME, 'drift-skills');
   fs.mkdirSync(path.join(dest, 'documentation-review'), { recursive: true });
-  const stale = fs.readFileSync(path.join(root, 'skills/documentation-review/SKILL.md'), 'utf8')
-    .replace('version: "1.2.0"', 'version: "0.0.9"');
+  const source = fs.readFileSync(path.join(root, 'skills/documentation-review/SKILL.md'), 'utf8');
+  const stale = source.replace(/version: "[\d.]+"/, 'version: "0.0.9"');
   fs.writeFileSync(path.join(dest, 'documentation-review', 'SKILL.md'), stale);
   const output = run('status', `DEST=${dest}`);
   assert.match(output, /documentation-review\s+installed 0\.0\.9/);
