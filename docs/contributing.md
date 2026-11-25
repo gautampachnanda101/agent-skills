@@ -39,9 +39,8 @@ In this page:
 Adding a skill directory is not enough for it to ship. Update each place that
 enumerates skills:
 
-1. The **Available skills** table in the root
-   [README](https://github.com/gautampachnanda101/agent-skills#readme) and in
-   [index](index.md).
+1. The **Available skills** table in the documentation
+   [home page](index.md).
 2. The `make install` installer copies every top-level directory with a
    `SKILL.md`, so no change is needed there; verify with
    `make skill-smoke` that new fixture descriptors still pass.

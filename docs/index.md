@@ -38,6 +38,11 @@ editor, model, or operating system.
 | [Verification](verification.md) | Validate descriptors and TechDocs yourself, or try output in a local Backstage |
 | [Contributing a skill](contributing.md) | Add the next skill, follow the release process, and pass the required checks |
 
+This documentation is the companion to the
+[repository README](https://github.com/gautampachnanda101/agent-skills#readme),
+which carries the CI badges and the two quick-install commands; every detail
+beyond those lives in the pages above.
+
 The entity registered for this repository is `component:default/agent-skills`
 in [catalog-info.yaml](https://github.com/gautampachnanda101/agent-skills/blob/main/catalog-info.yaml);
 these TechDocs are attached through the `backstage.io/techdocs-ref` annotation.

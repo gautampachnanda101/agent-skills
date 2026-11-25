@@ -10,6 +10,12 @@ systems. The first skill is `backstage-catalog-builder`: it scans GitHub
 repositories and builds evidence-based open-source Backstage catalogs,
 including TechDocs generation and structural validation.
 
+This README is the landing page; the complete documentation lives in
+[the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),
+built from [docs/](./docs/) and attached to the
+`component:default/agent-skills` entity
+([catalog-info.yaml](./catalog-info.yaml)).
+
 ## Install
 
 Requires Make and a POSIX shell. Copy every skill into the personal skills
@@ -28,44 +34,32 @@ claude plugin marketplace add gautampachnanda101/agent-skills
 claude plugin install agent-skills@gautampachnanda101-agent-skills
 ```
 
-Use one route or the other; see
-[Installation](https://gautampachnanda101.github.io/agent-skills/installation/)
-for project-local paths, updates, and per-assistant destinations.
+Every destination, project-local paths, `make update`, and per-assistant
+notes: [Installing the skills](https://gautampachnanda101.github.io/agent-skills/installation/).
 
 ## Use
 
-Open the repository you want to catalog and ask:
+Open the repository you want to catalog and ask for the skill by name, for
+example: *"Use the backstage-catalog-builder skill to create a Backstage
+catalog for this repository."*
 
-> Use the backstage-catalog-builder skill to create a Backstage catalog for
-> this repository.
-
-More prompts, including an account-wide run and a fast path that skips the
-interactive questions, are in
-[Using the skills](https://gautampachnanda101.github.io/agent-skills/usage/).
+Prompt examples, an account-wide run, and a fast path that skips the
+interactive questions: [Using the skills](https://gautampachnanda101.github.io/agent-skills/usage/).
 
 ## Documentation
 
-| Page | Covers |
-| --- | --- |
-| [Installing the skills](https://gautampachnanda101.github.io/agent-skills/installation/) | Global, project-local, and Claude plugin installs; update guidance |
-| [Using the skills](https://gautampachnanda101.github.io/agent-skills/usage/) | Example prompts, complete-result expectations, assistant docs |
-| [Verification](https://gautampachnanda101.github.io/agent-skills/verification/) | Bundled checkers, local-model CI check, local Backstage instance |
-| [Contributing a skill](https://gautampachnanda101.github.io/agent-skills/contributing/) | Layout, frontmatter, and release conventions for the next skill |
-
-The documentation is a [TechDocs](https://backstage.io/docs/features/techdocs/)
-site built by the `Docs` workflow and attached to the
-`component:default/agent-skills` entity ([catalog-info.yaml](./catalog-info.yaml)).
-Local preview: run `pip install -r docs/requirements.txt`, then `mkdocs serve`.
+The complete documentation — installing (including the Claude plugin route),
+prompt patterns, verification with the bundled checkers and a local Backstage
+instance, and the contribution and release process — lives in the
+[TechDocs site](https://gautampachnanda101.github.io/agent-skills/), whose
+[home page](https://gautampachnanda101.github.io/agent-skills/) is the table
+of contents. To preview locally, run `pip install -r docs/requirements.txt`,
+then `mkdocs serve`.
 
 ## Contributing
 
-See [Contributing a skill](https://gautampachnanda101.github.io/agent-skills/contributing/).
-Locally, enable the pre-commit hooks and run the checks:
-
-```sh
-make hooks-install
-make hooks-check
-```
+The conventions, checks, and release process are in
+[Contributing a skill](https://gautampachnanda101.github.io/agent-skills/contributing/).
 
 ## License
 
