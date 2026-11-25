@@ -16,6 +16,27 @@ built from [docs/](./docs/) and attached to the
 `component:default/agent-skills` entity
 ([catalog-info.yaml](./catalog-info.yaml)).
 
+## How Agent Skills work
+
+Assistants load skills by
+[progressive disclosure](https://agentskills.io/specification.md): a session
+starts with only each skill's `name` and `description` (about 100 tokens),
+the full `SKILL.md` is read when a task matches, and guides, eval cases, and
+the bundled zero-dependency checkers load only when the workflow calls for
+them. Each skill is one folder:
+
+```text
+backstage-catalog-builder/
+├── SKILL.md                  # required: metadata + instructions
+├── configuration-delivery.md # supporting guides, loaded on demand
+├── mcp-workflow.md           ┘
+├── plugin-integration.md     ┘
+├── scope-and-modeling.md     ┘
+├── techdocs-mkdocs.md        ┘
+├── evals/evals.json          # prompts, expected outputs, assertions
+└── scripts/                  # check-descriptors.mjs, check-techdocs.mjs
+```
+
 ## Install
 
 Requires Make and a POSIX shell. Copy every skill into the personal skills
@@ -60,6 +81,12 @@ then `mkdocs serve`.
 
 The conventions, checks, and release process are in
 [Contributing a skill](https://gautampachnanda101.github.io/agent-skills/contributing/).
+
+## Support
+
+Bug reports, questions, and ideas go to
+[GitHub Issues](https://github.com/gautampachnanda101/agent-skills/issues),
+the same channel the plugin's support URL points to.
 
 ## License
 
