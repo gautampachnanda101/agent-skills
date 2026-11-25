@@ -27,6 +27,12 @@ by Tom Johnson (F), Wiegers peer-review practice (W).
 - The first two sentences identify the page's outcome or purpose — the
   three-second test; preamble is a finding at `major` on task pages.
   Guide headings carry verb phrases.
+- Page order matches the reader's goal: steps or parameters follow the
+  summary; deep context, trade-offs, and edge cases close the page. A quick
+  start pushed below background is a `major` on task pages.
+- Code examples sit adjacent to the definitions or parameters they
+  illustrate; a reader scanning a definition should not hunt for its
+  sample.
 - Findability: the page covers the synonyms and error strings its audience
   searches, in visible prose or a terminal `<!-- search aliases: ... -->`
   block; reference-style pages state parameter names users would grep.

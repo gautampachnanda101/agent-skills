@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools; Bash or Node are optional for running commands, link checks, and Markdown linters. Network access requires permission.
 metadata:
   author: gautampachnanda101
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Documentation author
@@ -68,10 +68,19 @@ cases come last.
 
 - Guide headings carry a verb phrase with the outcome (`Configure OAuth 2.0
   Provider`, not `OAuth Settings`); reference headings name the facts.
+  On troubleshooting and reference pages, the errors and synonyms users
+  search may headline their own sections.
+- Keep the page in that order: summary, then the steps, specifications, or
+  parameters adjacent to the summary — deep context, trade-offs, and edge
+  cases close the page. An edge case placed before the quick start is a
+  deferral of the reader's goal.
 - Use ordered lists only for strict sequences; bullets for unordered sets;
   bold UI labels, commands, and key terms where the eye should land.
 - Each procedural step ends with its expected outcome or verification
   command, so the reader confirms progress instead of hoping.
+- Put minimal working examples directly beside the parameter or
+  configuration they illustrate, especially on reference pages — a reader
+  scanning a definition should never hunt for its sample.
 - Findability is a writing problem: use the words and error strings the
   audience actually searches (GOV.UK calls this using users' own
   vocabulary — say `permission denied` as well as the code `403`). When a

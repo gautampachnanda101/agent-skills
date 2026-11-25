@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools; Bash and Node are optional for verifying commands, links, and MkDocs/TechDocs structure. Fetching external network evidence requires host and user permission.
 metadata:
   author: gautampachnanda101
-  version: "1.3.0"
+  version: "1.3.1"
 ---
 
 # Documentation review
@@ -64,6 +64,9 @@ the form they need; navigation claims must match reality.
   79% of users scan): can a reader identify what the page does from the
   first two sentences? A preamble instead of an outcome is a finding —
   information scent starts at the top (Pirolli & Card's foraging model).
+- Check the page order too: steps or parameters belong directly after the
+  summary, with deep context, trade-offs, and edge cases at the bottom; code
+  examples belong beside the definitions they illustrate.
 - Flag missing structure: a page without an entry point (README, home, or
   index) or a site without one TOC.
 

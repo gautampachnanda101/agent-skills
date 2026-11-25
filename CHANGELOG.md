@@ -4,6 +4,18 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.1.1] - 2026-11-25
+
+### Changed
+
+- Completed the doc-architect draft integration with its remaining three
+  rules, found by a rule-by-rule audit: the three-part page order (steps or
+  parameters directly after the summary, deep context and edge cases last),
+  code examples adjacent to the definitions they illustrate, and error
+  strings permitted to headline troubleshooting/reference sections.
+  `doc-author` 1.1.1, `documentation-review` 1.3.1; both SKILL bodies,
+  checklists, and the site pages updated.
+
 ## [1.1.0] - 2026-11-25
 
 ### Added
