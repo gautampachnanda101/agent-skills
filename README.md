@@ -42,6 +42,13 @@ checks). Local preview: `pip install -r docs/requirements.txt && mkdocs serve`.
    See [docs/usage.md](./docs/usage.md) for more prompts and what a complete
    result includes.
 
+   In Claude Code, the repository is also a plugin marketplace:
+
+   ```sh
+   claude plugin marketplace add gautampachnanda101/agent-skills
+   claude plugin install agent-skills@gautampachnanda101-agent-skills
+   ```
+
 ## Verification
 
 - `make skill-smoke` runs the bundled descriptor and TechDocs/MkDocs checkers

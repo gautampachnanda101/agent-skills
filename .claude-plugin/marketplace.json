@@ -1,0 +1,14 @@
+{
+  "name": "gautampachnanda101-agent-skills",
+  "owner": {
+    "name": "Gautam Pachnanda",
+    "url": "https://github.com/gautampachnanda101"
+  },
+  "plugins": [
+    {
+      "name": "agent-skills",
+      "source": "./",
+      "description": "Backstage catalog building as an Agent Skill, with bundled structural checkers and TechDocs generation"
+    }
+  ]
+}

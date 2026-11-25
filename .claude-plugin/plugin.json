@@ -1,0 +1,25 @@
+{
+  "name": "agent-skills",
+  "displayName": "Agent Skills",
+  "version": "1.0.1",
+  "description": "Backstage catalog building as an Agent Skill: scans GitHub organizations or repositories, creates evidence-based catalog-info.yaml entities and discovery configuration, wires MkDocs/TechDocs, and validates everything with bundled checkers.",
+  "author": {
+    "name": "Gautam Pachnanda",
+    "url": "https://github.com/gautampachnanda101"
+  },
+  "homepage": "https://gautampachnanda101.github.io/agent-skills/",
+  "repository": "https://github.com/gautampachnanda101/agent-skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "backstage",
+    "software-catalog",
+    "techdocs",
+    "mkdocs",
+    "agent-skills"
+  ],
+  "skills": [
+    "./backstage-catalog-builder"
+  ],
+  "documentationUrl": "https://gautampachnanda101.github.io/agent-skills/",
+  "supportUrl": "https://github.com/gautampachnanda101/agent-skills/issues"
+}

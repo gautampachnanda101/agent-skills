@@ -4,6 +4,19 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.1] - 2026-11-25
+
+### Added
+
+- Claude plugin distribution: `.claude-plugin/plugin.json` and
+  `.claude-plugin/marketplace.json` make the repository its own marketplace,
+  so anyone can install with
+  `claude plugin marketplace add gautampachnanda101/agent-skills` followed by
+  `claude plugin install agent-skills@gautampachnanda101-agent-skills`.
+- A `plugin-manifest` CI job that runs `claude plugin validate --strict .`
+  with the current Claude Code CLI, plus hermetic manifest tests in the
+  repository suite.
+
 ## [1.0.0] - 2026-11-25
 
 First tagged release of `backstage-catalog-builder`.

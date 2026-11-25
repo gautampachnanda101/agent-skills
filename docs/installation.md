@@ -33,6 +33,23 @@ skill directories over every destination.
 
 Installation is local and does not register anything in Backstage.
 
+## Claude plugin installation
+
+Claude Code users can install the repository as a marketplace instead, which
+keeps updates flowing through the plugin system:
+
+```sh
+claude plugin marketplace add gautampachnanda101/agent-skills
+claude plugin install agent-skills@gautampachnanda101-agent-skills
+```
+
+The marketplace and plugin manifests live in `.claude-plugin/` at the
+repository root; `claude plugin validate --strict .` checks them. Updates
+arrive through `claude plugin update agent-skills@gautampachnanda101-agent-skills`
+when the published version changes. Installing through the marketplace and
+copying into `~/.claude/skills/` with `make install` both work; keep only one,
+or your assistant may report a duplicate.
+
 ## Per-project and manual destinations
 
 The paths below are a reference for manual installation; personal paths apply

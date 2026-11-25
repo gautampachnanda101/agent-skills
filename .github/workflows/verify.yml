@@ -129,3 +129,18 @@ jobs:
 
       - name: Verify the skill with a local model
         run: make skill-llm-verify
+
+  plugin-manifest:
+    name: Claude plugin manifest validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # The Claude Code CLI validates .claude-plugin/plugin.json and
+      # marketplace.json; --strict turns manifest warnings into failures.
+      - name: Install the Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code@latest
+
+      - name: Validate the plugin and marketplace manifests
+        run: claude plugin validate --strict .
