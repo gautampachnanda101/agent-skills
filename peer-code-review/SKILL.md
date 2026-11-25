@@ -1,11 +1,11 @@
 ---
 name: peer-code-review
-description: Run an evidence-based peer code review of a diff, commit series, or pull request using the documented practices of Google's eng-practices review guide, Fagan inspections, Karl Wiegers' peer-review research, and McConnell's checklists, with pacing rules from the peer-review literature. Reviews in small passes against a fixed checklist, reports prioritized findings with file:line evidence and severity, explains why instead of what, and separates blockers from nits and questions. Use when asked to review code, a pull request, a diff, a commit, or to define or improve a team's review process.
+description: Run an evidence-based peer code review of a diff, commit series, or pull request using the documented practices of Google's eng-practices review guide, Fagan inspections, Karl Wiegers' peer-review research, and McConnell's checklists, with pacing rules from the peer-review literature. Reviews in small passes with a fixed checklist, reports prioritized findings with file:line evidence and severity, explains why instead of what, and for user-interface changes checks accessibility against WCAG 2.2 AA as GOV.UK applies it. Use when asked to review code, a pull request, a diff, a commit, or to define or improve a team's review process.
 license: Apache-2.0
 compatibility: Host assistant with file-read and Git or Bash tools. Checklists are Markdown; commands such as tests and linters run only where authorized and available. No network access is required beyond fetching the change under review.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Peer code review
@@ -16,8 +16,10 @@ a verdict the author can act on immediately. Grounded in Google's
 [eng-practices code review guide](https://google.github.io/eng-practices/review/),
 Fagan's inspection method, Karl Wiegers' [*Peer Reviews in Software*](https://processimpact.com/),
 Gerald Weinberg's egoless review principles, Steve McConnell's *Code
-Complete*, and the peer-review research of Cohen (SmartBear) and Bacchelli &
-Bird.
+Complete*, the peer-review research of Cohen (SmartBear) and Bacchelli &
+Bird, and the UK Government Digital Service's accessibility standard —
+[WCAG 2.2 AA as GOV.UK](https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/plan-manage-content/understand-accessibility/)
+applies it to content, for user-interface changes.
 
 ## Gather context first
 

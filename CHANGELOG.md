@@ -4,6 +4,24 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [1.0.5] - 2026-11-25
+
+### Added
+
+- GOV.UK grounding where it applies, from the UK Government Digital Service
+  content and accessibility guidance (WCAG 2.2 AA):
+  - `documentation-review` 1.1.0: user-needs-first review framing, plain
+    English as a mandatory rule with GOV.UK's research rationale, deliberate
+    requirement wording (`must`/`need`/`can`), and a full accessibility
+    checklist — link text, heading hierarchy, colour-independent meaning,
+    contrast, alt text, tables, and open formats over PDFs.
+  - `peer-code-review` 1.1.0: a UI-accessibility checklist section for
+    changes that touch user-facing interfaces or generated pages (keyboard,
+    semantics, labels, contrast), skipped as `n/a` otherwise.
+- `backstage-catalog-builder` is unchanged: catalog modeling is a different
+  evidence domain, and its generated sites are already shape-validated by
+  the TechDocs checker.
+
 ## [1.0.4] - 2026-11-25
 
 ### Changed

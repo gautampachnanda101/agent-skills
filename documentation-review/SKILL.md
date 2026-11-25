@@ -1,11 +1,11 @@
 ---
 name: documentation-review
-description: Review documentation against the leading documentation engineering practices — the Diátaxis framework by Daniele Procida for structure and type, the Google Developers Style Guide and Microsoft Writing Style Guide for voice, and docs-as-code review practice from Anne Gentle and Karl Wiegers. Classifies each page's type and audience, checks structure and navigation, verifies commands, code samples, and links, then reports prioritized findings with file:line evidence and suggested fixes. Use when asked to review, audit, or improve documentation, a README, tutorial, how-to, reference page, explanation, or documentation site.
+description: Review documentation against leading documentation engineering practices — the Diátaxis framework by Daniele Procida, the Google Developers Style Guide and Microsoft Writing Style Guide, GOV.UK content design (user needs first, plain English, clear requirement wording), and WCAG 2.2 AA as adopted for GOV.UK content. Classifies each page's type and audience, checks structure, navigation, voice, and accessibility (link text, headings, tables, images, colour, contrast), verifies commands, code samples, and links, then reports prioritized findings with file:line evidence and suggested fixes. Use when asked to review, audit, or improve documentation, a README, tutorial, how-to, reference page, or documentation site, or to check docs accessibility.
 license: Apache-2.0
 compatibility: Host assistant with file-read tools; Bash and Node are optional for verifying commands, links, and MkDocs/TechDocs structure. Fetching external network evidence requires host and user permission.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Documentation review
@@ -16,8 +16,18 @@ every claim, command, and link survives verification. Grounded in Daniele
 Procida's [Diátaxis framework](https://diataxis.fr/), the
 [Google Developers Style Guide](https://developers.google.com/style) and the
 [Microsoft Writing Style Guide](https://learn.microsoft.com/en-us/style-guide/welcome/),
-and the docs-as-code review practice described by Anne Gentle and Karl
-Wiegers' peer-review research.
+the UK Government Digital Service's
+[GOV.UK content design guidance](https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/)
+(user needs first, plain English, accessible link text and formatting), and
+WCAG 2.2 AA — the standard GOV.UK content must meet.
+
+## Start from the user need, not the page
+
+GOV.UK's first content rule: identify the user need before writing, then
+publish only what meets it. When reviewing, name the need each page serves;
+content that serves no need is a finding even when it is well written. This
+sharpens the audience step below: `tutorial` pages need a learning outcome,
+`reference` pages need complete lookup, `how-tos` need task completion.
 
 ## Classify each page before judging it
 
@@ -59,13 +69,54 @@ From the Google and Microsoft style guides, review for:
 - **Clarity**: one idea per paragraph, short sentences, and no undefined
   jargon. Expand acronyms at first use. One term per concept throughout —
   two names for the same thing reads as different things.
+- **Plain English**: GOV.UK makes it mandatory for everyone, including
+  specialists — research it cites found 80% of readers, and the most
+  specialist readers most of all, prefer clear English. Prefer the short
+  word (`buy` over `purchase`, `help` over `assist`, `about` over
+  `approximately`), split sentences over 25 words, and keep paragraphs to
+  five sentences.
 - **Honesty**: drop `simply`, `just`, `obviously`, and `easy`; they tell
   confused readers they are wrong. State costs and prerequisites plainly.
+- **Requirement wording**: GOV.UK distinguishes strength deliberately —
+  `must` for requirements the reader cannot skip without real consequence,
+  `need` for process requirements, `can` for optional. Flag inverted or
+  inflated wording (`must` on optional steps, `can` on required ones), and
+  beware negatives: GOV.UK warns that `can't`/`don't` are easy to misread
+  as their opposites.
 - **Scannability**: options and environments as tables, steps as numbered
   lists, warnings as callouts — not paragraphs. Prose walls are findings at
   the same severity as broken links, because readers skim.
 
 See [review-checklists.md](./review-checklists.md) for the full checklist.
+
+## Review accessibility as part of content quality
+
+GOV.UK treats accessibility as a content concern, not just a build concern:
+content must meet WCAG 2.2 AA — perceivable, operable, understandable,
+robust — because "all users will have different needs at different times".
+Check, with automated checks where possible and judgment elsewhere:
+
+- **Link text**: descriptive and frontloaded; never `click here`, `here`, or
+  a bare URL; each phrase leads wherever it claims — the same text must not
+  point to different targets, and document links state format and size.
+- **Heading structure**: hierarchical without skipped levels; unique page
+  titles; headings describe the section (screen readers navigate by them).
+- **Meaning not carried by colour or shape alone**: status text does not
+  rely on `red`/`green` wording; contrast meets 4.5:1 (text) and 3:1
+  (large text and UI) — flag when judgment cannot confirm and a tool is
+  unavailable.
+- **Images**: meaningful alt text; complex graphs and charts described in
+  nearby text, not only in the image.
+- **Tables**: header rows for data tables; no layout tables.
+- **Attachments**: open formats preferred over PDFs; when a PDF is needed,
+  it should be tagged/accessible or an HTML equivalent offered.
+- **Plain English as cognitive accessibility**: the readability findings
+  above double as accessibility findings — GOV.UK's rationale is literacy
+  and comprehension, not style.
+
+Findings here use the same severity scale; an instruction that breaks a
+screen reader (`click the red button on the right`, a link that says
+`documentation`) is a `major`, not a nit.
 
 ## Verify evidence, not vibes
 

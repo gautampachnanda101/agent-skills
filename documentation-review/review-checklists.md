@@ -4,7 +4,8 @@ Walk these checklists per page after classifying it with the Diátaxis table
 in [SKILL.md](./SKILL.md). Record `pass`, `fail`, or `n/a` with evidence for
 every item; an unevaluable item is recorded as such, never assumed. Sources:
 Diátaxis (D), Google Developers Style Guide (G), Microsoft Writing Style
-Guide (M), Wiegers peer-review practice (W).
+Guide (M), GOV.UK content design and accessibility guidance — WCAG 2.2 AA
+(GV), Wiegers peer-review practice (W).
 
 ## Type and audience fit
 
@@ -41,6 +42,13 @@ Guide (M), Wiegers peer-review practice (W).
 - Sentence-case headings; punctuation in lists is consistent.
 - Numbers, placeholders, and file names are formatted consistently
   (`catalog-info.yaml`, not sometimes `catalog info yaml`).
+- Requirements word their strength deliberately: `must` only where skipping
+  has real consequence, `need` for process requirements, `can` for optional;
+  negative contractions (`can't`, `don't`) avoided where they could be
+  misread. (GV)
+- Plain English throughout: short words over formal ones (`buy`, `help`,
+  `about` over `purchase`, `assist`, `approximately`); sentences over 25
+  words split; paragraphs at most 5 sentences. (GV)
 
 ## Technical accuracy and completeness
 
@@ -64,6 +72,38 @@ Guide (M), Wiegers peer-review practice (W).
   unevaluated. (M: link maintenance is documentation maintenance)
 - For MkDocs/TechDocs sites, the bundled zero-dependency checker validates
   nav, includes, and `site_name` against the entity.
+
+## Accessibility (WCAG 2.2 AA as GOV.UK applies it)
+
+Accessibility is a content concern, not only a build concern: `how it's
+written` and `how it's formatted` are among GOV.UK's named accessibility
+inputs. Use automated checks where available; record judgment items as
+`unevaluated` rather than passing them silently.
+
+- Link text is descriptive and frontloaded; no `click here`, `here`, `more`,
+  or bare URLs as the only text. (GV)
+- One link text maps to one destination; the same target reached more than
+  once uses the same or equivalently phrased text. (GV)
+- Document links state the format and size in the text; links into paid or
+  registration-walled content are flagged. (GV)
+- Links sit in context at the point of use, not dumped as an unsorted
+  further-reading pile; anchors deep into other pages carry text that says
+  where the reader lands. (GV)
+- Heading levels step down without skips; each page has a unique title;
+  headings describe their section content. (GV)
+- Meaning never rides on colour or sensory wording alone (`see the red
+  box`, `on the right`); status and state words name the meaning. (GV)
+- Contrast: body text 4.5:1, large text and UI 3:1 — evaluated with a tool
+  when available, otherwise `unevaluated` with the screenshot/claim noted.
+- Images carry alt text; complex graphs and charts are described in nearby
+  text, not only inside the image. (GV)
+- Data tables have header rows; no tables exist just to position content.
+  (GV)
+- Attachments prefer open formats over PDFs; PDFs carry an accessible or
+  HTML equivalent. (GV)
+- Plain-English findings double as cognitive accessibility findings: record
+  the readability items above against WCAG's `understandable` principle.
+  (GV)
 
 ## Freshness and ownership
 

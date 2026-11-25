@@ -55,6 +55,26 @@ OWASP top-risks framing (O).
 - Is the diff free of unrelated churn (reformatting, import reordering) that
   buries the real change? (W: review small amounts regularly)
 
+## User-interface accessibility (WCAG 2.2 AA as GOV.UK applies it)
+
+Applies only when the change touches user-facing interface or generated
+documents and pages; skip the section otherwise and record `n/a`. Sources:
+UK Government Digital Service's accessibility guidance and the WCAG 2.2 AA
+standard, the level public-sector content must meet.
+
+- Does every interactive control work by keyboard alone, with visible focus?
+- Is HTML semantic (buttons as `button`, links as `link`), with ARIA only
+  where native semantics do not exist?
+- Do images carry alt text, and do complex visuals have text equivalents?
+- Does meaning ever ride on colour alone (`red means failure`)? (WCAG:
+  perceivable)
+- Do label/placeholder associations name every input; does text meet 4.5:1
+  contrast (3:1 for large text and UI)?
+- Do user-facing messages and generated documents read as plain English —
+  GOV.UK's rationale is comprehension, not style?
+- Are headings hierarchical and unique in generated pages (screen-reader
+  navigation)?
+
 ## Documentation, communication, and release
 
 - Does the change update relevant documentation, README, and help text in
