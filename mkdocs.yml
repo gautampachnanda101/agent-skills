@@ -17,6 +17,7 @@ nav:
   - Verification: verification.md
   - Local Backstage: local-backstage.md
   - Contributing a skill: contributing.md
+  - Plan: plan.md
   - Decisions:
       - Overview: decisions/index.md
       - 0001 Record decisions: decisions/0001-record-decisions.md
