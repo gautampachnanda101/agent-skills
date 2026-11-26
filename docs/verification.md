@@ -208,6 +208,12 @@ harness problems the first run exposed:
 
 Runs cost $0.06 to $0.24 each; all of this phase's runs together cost $3.13.
 
+With the `openai` adapter and Qwen3 8B on a local llama.cpp server, at no
+cost, 1 of 9 cases passed: the unrelated question. The model never loaded a
+skill. In the review cases it listed the files and then reviewed the skills'
+own guides instead of the project's pages. A local model of this size can
+exercise the harness for free, but it does not follow the skills.
+
 ## Check a review report
 
 The two review skills ship graders for the reports they produce. See
