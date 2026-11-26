@@ -23,7 +23,7 @@
  *   node scripts/skill-evals.mjs --grade <skill> <eval-id> <reply-file>
  *
  * --baseline sends the same task without the skill, for comparison.
- * Exits 1 if any graded run fails.
+ * Exits 1 if any graded run fails or nothing matched; 2 on bad arguments.
  */
 import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -33,14 +33,28 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SEVERITIES = ['blocker', 'major', 'minor', 'nit', 'question', 'defer'];
 
+function usageError(message) {
+  console.error(`skill-evals: ${message}`);
+  process.exit(2);
+}
+
 function option(name, fallback) {
   const i = process.argv.indexOf(name);
-  return i === -1 ? fallback : process.argv[i + 1];
+  if (i === -1) return fallback;
+  const value = process.argv[i + 1];
+  if (value === undefined || value.startsWith('--')) usageError(`${name} needs a value`);
+  return value;
 }
 
 function loadEvals(skill) {
   const file = path.join(root, 'skills', skill, 'evals', 'evals.json');
   return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
+}
+
+function requireEvals(skill) {
+  const spec = loadEvals(skill);
+  if (!spec) usageError(`no evals/evals.json for skill "${skill}"`);
+  return spec;
 }
 
 function numbered(text) {
@@ -58,6 +72,11 @@ export function buildPrompt(skill, spec, evalCase, { baseline = false } = {}) {
   } else {
     parts.push('You cannot run tools; everything you may read is below.');
   }
+  // Inputs are labelled by file name alone, so fixture folder names (which
+  // may hint at the answer) never reach the model. Names must be unique.
+  const names = (evalCase.files ?? []).map(file => path.basename(file));
+  const clash = names.find((name, i) => names.indexOf(name) !== i);
+  if (clash) throw new Error(`${skill}#${evalCase.id}: two input files are named ${clash}`);
   for (const file of evalCase.files ?? []) {
     const text = fs.readFileSync(path.join(dir, file), 'utf8');
     const name = path.basename(file);
@@ -166,7 +185,11 @@ function main() {
   const gradeArgs = process.argv.indexOf('--grade');
   if (gradeArgs !== -1) {
     const [skill, id, file] = process.argv.slice(gradeArgs + 1);
-    const evalCase = loadEvals(skill).evals.find(e => String(e.id) === id);
+    if (!file) usageError('--grade needs <skill> <eval-id> <reply-file>');
+    const evalCase = requireEvals(skill).evals.find(e => String(e.id) === id);
+    if (!evalCase) usageError(`${skill} has no eval with id ${id}`);
+    if (!evalCase.checks) usageError(`${skill}#${id} has no checks to grade`);
+    if (!fs.existsSync(file)) usageError(`no reply file at ${file}`);
     const result = grade(skill, evalCase, fs.readFileSync(file, 'utf8'));
     console.log(JSON.stringify(result, null, 2));
     process.exit(result.passed ? 0 : 1);
@@ -177,7 +200,9 @@ function main() {
     console.log(header.replace(/^#!.*\n\/\*\*\n/, '').replace(/^ \* ?/gm, '').trim());
     process.exit(2);
   }
-  const runs = Number(option('--runs', '1'));
+  const runsOption = option('--runs', '1');
+  if (!/^[1-9]\d*$/.test(runsOption)) usageError(`--runs must be a whole number of 1 or more, not "${runsOption}"`);
+  const runs = Number(runsOption);
   const baseline = process.argv.includes('--baseline');
   const out = path.resolve(option('--out', path.join(root, '.eval-results')));
   fs.mkdirSync(out, { recursive: true });
@@ -185,7 +210,7 @@ function main() {
   const onlyEval = option('--eval');
   const summary = [];
   for (const skill of only ? [only] : skillsWithEvals()) {
-    const spec = loadEvals(skill);
+    const spec = requireEvals(skill);
     for (const evalCase of spec.evals.filter(e => e.checks && (!onlyEval || String(e.id) === onlyEval))) {
       const prompt = buildPrompt(skill, spec, evalCase, { baseline });
       for (let run = 1; run <= runs; run++) {
@@ -209,6 +234,10 @@ function main() {
     }
   }
   fs.writeFileSync(path.join(out, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
+  if (!summary.length) {
+    console.error(`skill-evals: no graded cases matched${only ? ` --skill ${only}` : ''}${onlyEval ? ` --eval ${onlyEval}` : ''}`);
+    process.exit(1);
+  }
   const passed = summary.filter(s => s.passed).length;
   console.log(`${passed}/${summary.length} runs passed; replies in ${out}`);
   process.exit(passed === summary.length ? 0 : 1);

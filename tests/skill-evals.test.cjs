@@ -98,3 +98,56 @@ test('without SKILL_EVAL_CMD the runner prints usage', () => {
   assert.equal(result.status, 2);
   assert.match(result.stdout, /SKILL_EVAL_CMD/);
 });
+
+function runRunner(args, env = { SKILL_EVAL_CMD: 'cat >/dev/null; echo reply' }) {
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-evals-'));
+  try {
+    return spawnSync(process.execPath, [runner, ...args, '--out', out], { encoding: 'utf8', env: { ...process.env, ...env } });
+  } finally {
+    fs.rmSync(out, { recursive: true, force: true });
+  }
+}
+
+test('a run that grades nothing fails instead of passing', () => {
+  const result = runRunner(['--skill', 'peer-code-review', '--eval', '999']);
+  assert.equal(result.status, 1, result.stdout + result.stderr);
+  assert.match(result.stderr, /no graded cases matched --skill peer-code-review --eval 999/);
+});
+
+test('bad arguments are refused with a message, not a crash', () => {
+  const cases = [
+    [['--skill', 'peer-code-review', '--runs', '0'], /--runs must be a whole number of 1 or more, not "0"/],
+    [['--skill', 'peer-code-review', '--runs', 'two'], /--runs must be a whole number/],
+    [['--skill', 'peer-code-review', '--runs'], /--runs needs a value/],
+    [['--skill', 'no-such-skill'], /no evals\/evals.json for skill "no-such-skill"/],
+  ];
+  for (const [args, message] of cases) {
+    const result = runRunner(args);
+    assert.equal(result.status, 2, `${args.join(' ')}: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, message);
+    assert.doesNotMatch(result.stderr, /TypeError|at .*\.mjs/);
+  }
+});
+
+test('--grade refuses an unknown skill, case, or reply file', () => {
+  const reply = path.join(root, 'skills', 'peer-code-review', 'tests', 'expected', 'clean-report.md');
+  const cases = [
+    [['no-such-skill', '1', reply], /no evals\/evals.json for skill "no-such-skill"/],
+    [['peer-code-review', '999', reply], /peer-code-review has no eval with id 999/],
+    [['peer-code-review', '2', '/nonexistent/reply.md'], /no reply file at/],
+    [['peer-code-review'], /--grade needs <skill> <eval-id> <reply-file>/],
+  ];
+  for (const [args, message] of cases) {
+    const result = spawnSync(process.execPath, [runner, '--grade', ...args], { encoding: 'utf8' });
+    assert.equal(result.status, 2, `${args.join(' ')}: ${result.stdout}${result.stderr}`);
+    assert.match(result.stderr, message);
+  }
+  const ok = spawnSync(process.execPath, [runner, '--grade', 'peer-code-review', '2', reply], { encoding: 'utf8' });
+  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
+});
+
+test('two input files with the same name are refused', async () => {
+  const { buildPrompt } = await load();
+  const evalCase = { id: 'dup', files: ['tests/fixtures/planted/guide.md', 'tests/fixtures/clean/../planted/guide.md'], prompt: 'x' };
+  assert.throws(() => buildPrompt('documentation-review', {}, evalCase), /two input files are named guide\.md/);
+});

@@ -124,8 +124,9 @@ SKILL_EVAL_CMD='claude -p --tools "" --setting-sources "" --no-session-persisten
 ```
 
 Each run ends with a line such as `30/30 runs passed`, and writes every
-reply and its grade to `.eval-results/`. A case passes when the reply
-meets its checks:
+reply and its grade to `.eval-results/`. The command exits 1 when any run
+fails or when no case matched the filters, and 2 on a bad argument. A case
+passes when the reply meets its checks:
 
 | Check | Meaning |
 | --- | --- |

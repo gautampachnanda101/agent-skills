@@ -125,12 +125,14 @@ jobs:
           node-version: '24'
 
       # llama.cpp binary (~20 MB) plus the ~490 MB quantized model; the
-      # restore keeps later runs to a few minutes of compute.
+      # restore keeps later runs to a few minutes of compute. The key hashes
+      # the script that pins the build, model, and checksums, so changing a
+      # pin starts a fresh cache.
       - name: Cache llama.cpp and model
         uses: actions/cache@v4
         with:
           path: .llm-cache
-          key: skill-llm-${{ matrix.os }}-b12681-qwen2.5-0.5b-v4
+          key: skill-llm-${{ matrix.os }}-${{ hashFiles('skills/backstage-catalog-builder/scripts/skill-llm-verify.sh') }}
 
       - name: Verify the skill with a local model
         run: make skill-llm-verify
@@ -144,8 +146,10 @@ jobs:
 
       # The Claude Code CLI validates .claude-plugin/plugin.json and
       # marketplace.json; --strict turns manifest warnings into failures.
+      # Pinned so a new CLI release cannot fail CI without a change here;
+      # bump it deliberately.
       - name: Install the Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code@latest
+        run: npm install -g @anthropic-ai/claude-code@2.1.332
 
       - name: Validate the plugin and marketplace manifests
         run: claude plugin validate --strict .

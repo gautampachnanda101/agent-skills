@@ -4,6 +4,19 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
+## [Unreleased]
+
+### Fixed
+
+- `make skill-evals` no longer reports success when nothing ran: an
+  unmatched `--skill` or `--eval` now exits 1. A bad `--runs` value, an
+  unknown skill, an unknown `--grade` case, or a missing reply file exits 2
+  with a message instead of a crash. Two input files with the same name are
+  refused, because the prompt labels files by name.
+- CI pins the Claude Code CLI used to validate the plugin manifest, and the
+  local-model cache key now follows the pins in `skill-llm-verify.sh`, so a
+  changed pin no longer reuses a stale cache.
+
 ## [1.2.0] - 2026-11-25
 
 ### Added
