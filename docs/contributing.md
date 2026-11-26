@@ -13,6 +13,10 @@ In this page:
 - [CI expectations](#ci-expectations)
 - [Releases](#releases) — versioning and the release routine
 
+Read the [decision records](decisions/index.md) before changing how evals,
+CI, pinning, releases, or skill names work, and add one for a new lasting
+decision.
+
 ## Layout and naming
 
 - Place each skill in its own directory under `skills/`, with a `SKILL.md`

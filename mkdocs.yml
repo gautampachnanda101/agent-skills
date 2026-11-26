@@ -17,6 +17,16 @@ nav:
   - Verification: verification.md
   - Local Backstage: local-backstage.md
   - Contributing a skill: contributing.md
+  - Decisions:
+      - Overview: decisions/index.md
+      - 0001 Record decisions: decisions/0001-record-decisions.md
+      - 0002 Answer-key evals: decisions/0002-grade-skill-replies-with-answer-keys.md
+      - 0003 Local model in CI: decisions/0003-small-local-model-in-ci.md
+      - 0004 Pinning: decisions/0004-pin-everything-by-digest-or-commit.md
+      - 0005 Releases: decisions/0005-a-person-publishes-releases.md
+      - 0006 Skill names: decisions/0006-skill-names.md
+      - 0007 Protecting main: decisions/0007-protect-main-without-requiring-pull-requests.md
+      - Template: decisions/template.md
 theme:
   name: material
   palette:

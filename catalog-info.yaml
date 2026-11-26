@@ -10,5 +10,5 @@ metadata:
   tags: [agent-skills, backstage]
 spec:
   type: library
-  lifecycle: experimental
-  owner: group:default/catalog-test
+  lifecycle: production
+  owner: user:default/gautampachnanda101

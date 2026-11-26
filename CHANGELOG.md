@@ -29,11 +29,31 @@ skill's `metadata.version` field.
   notes from `.github/release-notes/` or the changelog. It skips a version
   already released.
 - Dependabot proposes GitHub Actions updates after a seven-day cooldown.
+- `main` is protected against deletion and force-pushes, and `v*` release
+  tags against deletion and moving. The rules live in `.github/rulesets/`
+  and `scripts/rulesets.sh` applies them.
+- A size budget for every `SKILL.md`: at most 500 lines and about 5,000
+  tokens, as the Agent Skills spec recommends, and every guide in a skill
+  must be linked from its `SKILL.md`.
+- Decision records in `docs/decisions/` for the eval design, the local
+  model in CI, pinning, releases, skill names, and protecting `main`.
+
+### Changed (repository)
+
+- `backstage-catalog-builder` 1.2.0 fits the size budget (about 6,400
+  tokens before, 4,700 after). Detail moved, unchanged, into guides:
+  `discover-sources.md` (tools and repository enumeration),
+  `verify-and-report.md` (validation passes and reporting), the scope
+  confirmations in `scope-and-modeling.md`, and API registration in
+  `configuration-delivery.md`. `SKILL.md` keeps a summary and a link.
+- This repository's catalog entity is owned by
+  `user:default/gautampachnanda101`, with lifecycle `production`; it was
+  the test placeholder `group:default/catalog-test` and `experimental`.
 
 ### Fixed
 
 - Lint findings: a code fence without blank lines in
-  `backstage-catalog-builder` (1.1.1), bare example URLs in the usage
+  `backstage-catalog-builder`, bare example URLs in the usage
   guide, and shell warnings in `backstage-node.sh` and
   `skill-llm-verify.sh`. `backstage-node.sh` now passes `--no-use` to nvm in
   a way POSIX `sh` supports.

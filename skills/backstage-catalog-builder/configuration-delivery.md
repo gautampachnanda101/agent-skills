@@ -161,3 +161,17 @@ and authorization.
 Name every selected repository missing from the running catalog and why (counts
 are reported separately per SKILL.md). Never describe a partial demo, plugin
 installation, or schema-only pass as the complete outcome.
+
+## 7. Register through the catalog API
+
+- Only perform API registration with explicit approval. The open-source catalog
+  API uses `POST /locations` under the supplied catalog API base URL, with JSON
+  fields `type` and `target`; `?dryRun=true` validates without registering.
+  Authenticate with a Backstage bearer token if the installation requires it.
+  Run the dry run first, inspect errors, and register only after it succeeds.
+  By default the API accepts only `url` locations; a `file` target is rejected
+  with a 400 unless the backend allows it in code. For local files, use a
+  `type: file` entry in `catalog.locations` instead.
+  Treat a conflict as success only after verifying that the existing location
+  matches the intended target and type. Never delete or replace registrations
+  automatically.

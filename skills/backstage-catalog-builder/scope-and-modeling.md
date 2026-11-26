@@ -1,5 +1,23 @@
 # Organization, repository, and file scope
 
+## Confirm the scope
+
+Before inspecting an organization, a user account, or a request for complete
+configuration, confirm these in the one batch of questions:
+
+1. For organization/account scope, confirm the host and owner, selected
+   repositories, inclusion of forks, archived/private repositories, default
+   branch or pinned revisions, and clone/output directory. Default the proposal
+   to public, non-archived, non-fork repositories; obtain approval before cloning
+   a large collection, accessing private repositories, or publishing changes.
+   Organization membership is not proof of service ownership.
+2. For a complete configuration request, confirm the persistent output directory
+   and whether the app may be modified/restarted. Discover current app version,
+   configuration, installed plugins and catalog entries before proposing changes.
+   Ask only for unavailable ownership mappings, secrets references, and material
+   policy choices. Once approved, carry out the work rather than returning a
+   generic example or making the user manually configure each repository.
+
 ## Required discovery checklist
 
 Inspect every applicable area below for each approved repository. Combine local

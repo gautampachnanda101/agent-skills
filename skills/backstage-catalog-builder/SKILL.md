@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read, Git or Bash tools, and network access for GitHub discovery, the Backstage plugin directory, MCP or catalog APIs. Node.js 20+ is required for the bundled structural checkers; a Python mkdocs install or a running Backstage instance is optional for deeper validation.
 metadata:
   author: gautampachnanda101
-  version: "1.1.1"
+  version: "1.2.0"
 ---
 
 # Backstage catalog builder
@@ -34,6 +34,8 @@ assistant's file or resource tools; a link alone is not auto-resolved.
 | Organization/account scope, evidence mapping, or discovery providers | [scope-and-modeling.md](./scope-and-modeling.md) |
 | Generating or updating MkDocs documentation (TechDocs), including monorepo documentation layouts | [techdocs-mkdocs.md](./techdocs-mkdocs.md) |
 | Suggesting owners, lifecycles, systems, and other decisions from repository data | [suggest-from-evidence.md](./suggest-from-evidence.md) |
+| Choosing tools, reading a running catalog, or enumerating repositories | [discover-sources.md](./discover-sources.md) |
+| Validating descriptors, checking ingestion, and reporting results | [verify-and-report.md](./verify-and-report.md) |
 
 ## End-user outcome
 
@@ -106,18 +108,9 @@ suggestion to replace, not a value to keep.
    ambiguous component boundaries, names, namespaces, or relationships before
    writing them. Batch questions when practical; if the user cannot provide a
    required value, report the blocker instead of inventing one.
-4. For organization/account scope, confirm the host and owner, selected
-   repositories, inclusion of forks, archived/private repositories, default
-   branch or pinned revisions, and clone/output directory. Default the proposal
-   to public, non-archived, non-fork repositories; obtain approval before cloning
-   a large collection, accessing private repositories, or publishing changes.
-   Organization membership is not proof of service ownership.
-5. For a complete configuration request, confirm the persistent output directory
-   and whether the app may be modified/restarted. Discover current app version,
-   configuration, installed plugins and catalog entries before proposing changes.
-   Ask only for unavailable ownership mappings, secrets references, and material
-   policy choices. Once approved, carry out the work rather than returning a
-   generic example or making the user manually configure each repository.
+4. For organization or account scope, or a complete configuration request,
+   confirm the scope and output first, following *Confirm the scope* in
+   [scope-and-modeling.md](./scope-and-modeling.md).
 
 The Backstage token is distinct from a Git provider token. Never print, quote,
 commit, or place tokens in generated files, command arguments, or logs. Use a
@@ -131,66 +124,19 @@ the complete truth.
 
 ## Discover tools and repositories
 
-- Prefer an available Backstage MCP connection for catalog inspection and
-  verification. Discover the server and list its actual tools through the host
-  assistant, then inspect their input schemas. Do not assume tool names or that
-  every catalog REST operation is exposed. Backstage's MCP Actions Backend uses
-  `/api/mcp-actions/v1` under the confirmed backend URL; configure authentication
-  through the host's secret input or an approved environment reference.
-- Use discovered read tools to inspect existing entities, supported capabilities
-  and catalog state. Mutating tools require the same approval as REST
-  registration or configuration changes. If MCP lacks a required operation,
-  use approved local-file/REST tooling and report the gap. An MCP connection
-  does not replace source inspection or missing-descriptor generation.
-- Confirm MCP initialization and tool listing before claiming connectivity.
-  Distinguish connection configuration, connected server, successful tool call,
-  and verified ingestion. Never bypass network policy to reach the endpoint.
-   Follow [mcp-workflow.md](./mcp-workflow.md) for capability mapping, per-document
-   validation, safe registration, pagination and expected-entity reconciliation.
-- When no MCP connection exists but a confirmed endpoint and securely held
-  token are available, use the catalog REST API directly for the same
-  read-first purpose: inventory registered locations with `GET /locations`,
-  query ingested identities with `GET /entities/by-query` (or
-  `POST /entities/by-query` when filters exceed URL length), validate a draft
-  entity with `POST /validate-entity`, and analyze a proposed location with
-  `POST /analyze-location`. Send requests only to the confirmed backend URL and
-  authenticate with the approved secret mechanism only if the installation
-  requires it. Statically configured `catalog.locations` entries never appear
-  in this API's deletable locations; they change only through app
-  configuration.
-- Discover the host assistant's available Git/source-control, repository search,
-  file/tree reading, YAML validation, shell, and browser tools before using them.
-  Follow the host's tool discovery mechanism; do not assume MCP server names or
-  assistant-specific APIs exist. Check authentication and permissions without
-  exposing tokens. Prefer local files for local scope, then authenticated
-  source-control tools. `gh`, Git, or an approved HTTP client are fallbacks when
-  available. Report network-policy blocks rather than bypassing them.
-- Identify the source-control host first and treat repository enumeration as
-  host-specific adapter work: GitHub, GitLab, Bitbucket, Azure DevOps, and
-  plain local checkouts each have their own enumeration APIs and catalog
-  discovery providers. On GitHub, resolve owner type using `/users/{owner}`;
-  for organizations enumerate `/orgs/{org}/repos`, for user accounts enumerate
-  `/users/{user}/repos`, not the organization endpoint. On any host, follow
-   pagination to completion. Search results may be capped or omit unindexed
-   files; they are not a complete inventory. The detailed guidance in this
-   skill covers GitHub and its discovery provider in depth; for other hosts,
-   apply the same sequence with that host's APIs and report the reduced
-   confidence rather than inventing host-specific behavior.
-- Record repository name, URL, default branch, visibility, archived/fork status,
-  and inspected commit. Apply the approved filters and show selected/skipped
-  counts before generating catalog files. Never interpret API failure, missing
-  permissions, rate limits, or a truncated tree as an empty organization.
-- For approved organization modeling, inspect teams and parent-team relationships
-  with authorized access. Generate Group/User entities only from confirmed data
-  and with consent to publish membership. Otherwise leave ownership unresolved
-  or use an explicitly approved synthetic test owner. Do not infer personal
-  data or assign all services to the account owner automatically.
-- Read [scope-and-modeling.md](./scope-and-modeling.md) for full-scope evidence
-  mapping, cross-repository relationships, and discovery-plugin configuration.
-- Explicitly discover CI/actions, organization metadata and teams, documentation,
-  API contracts, and technical-insight evidence using the checklist in that
-  guide. Repository enumeration alone is not sufficient inspection. Track each
-  area as found, absent, blocked, or not applicable, with evidence.
+Follow [discover-sources.md](./discover-sources.md) before inspecting a
+catalog or listing repositories. In short:
+
+- Prefer a Backstage MCP connection for catalog reads; without one, use the
+  catalog REST API read-first with a confirmed endpoint and securely held
+  token. List the tools a host actually has; never assume names.
+- Enumerate repositories with the host's own API (on GitHub, check whether
+  the owner is a user or an organization first), follow pagination to the
+  end, and never read a failure, rate limit, or truncated tree as empty.
+- Record each repository's URL, default branch, visibility, archived and fork
+  status, and inspected commit, and show selected and skipped counts.
+- Track CI, teams, documentation, API contracts, and other evidence as found,
+  absent, blocked, or not applicable.
 
 ## Inspect and model the repository
 
@@ -298,17 +244,10 @@ the complete truth.
   defaults to allowing Component, API, and Location; other kinds may need
   explicit rules. Do not broaden rules or alter integrations without explaining
   the impact and obtaining approval.
-- Only perform API registration with explicit approval. The open-source catalog
-  API uses `POST /locations` under the supplied catalog API base URL, with JSON
-  fields `type` and `target`; `?dryRun=true` validates without registering.
-  Authenticate with a Backstage bearer token if the installation requires it.
-  Run the dry run first, inspect errors, and register only after it succeeds.
-  By default the API accepts only `url` locations; a `file` target is rejected
-  with a 400 unless the backend allows it in code. For local files, use a
-  `type: file` entry in `catalog.locations` instead.
-  Treat a conflict as success only after verifying that the existing location
-  matches the intended target and type. Never delete or replace registrations
-  automatically.
+- Only perform API registration with explicit approval: dry-run first, and
+  register only after it succeeds. Never delete or replace registrations
+  automatically. Follow *Register through the catalog API* in
+  [configuration-delivery.md](./configuration-delivery.md).
 - A remote URL must point to a published descriptor revision that Backstage can
   read. Local edits are not visible at that URL until published. If publication,
   permissions, authentication, or backend access are unavailable, leave the
@@ -340,48 +279,18 @@ Backstage backend validation (`validate-entity` or a location dry run) where an
 authorized endpoint exists, and (4) reporting. A blocking finding invalidates
 the passes that would follow it.
 
-- Parse every changed YAML document using an available YAML parser. Check
-  required fields, unique entity identities, referenced local files, and
-  evidence for relationships. When Node.js is available, run the bundled
-  zero-dependency checker as an additional pass:
-  `node scripts/check-descriptors.mjs <changed-descriptor-files...>`
-  (`--json` for machine-readable report output).
-  It reports structural findings (missing required fields, duplicate
-  identities or top-level keys, invalid names, missing Location targets,
-  and missing `$text`/`$yaml` API placeholders). It is not a full YAML or
-  schema validator, so keep using the app's parser, `validate-entity`, or
-  dry-run validation where available. Do not install dependencies without
-  permission.
-- For entities carrying TechDocs documentation, run the bundled TechDocs
-  checker as an additional pass when available:
-  `node scripts/check-techdocs.mjs <descriptors-with-techdocs-annotations...>`.
-  It structurally validates `backstage.io/techdocs-ref: dir:` targets,
-  `site_name` matching the owning entity, the `techdocs-core` plugin, and
-  nav/`!include` resolution, including monorepo package sites. `url:` values
-  are recorded but not resolved; site-name mismatches are warnings unless
-  `--strict` is passed.
-- If an accessible Backstage instance and approved credentials are available,
-  use the location dry run to validate the published descriptor. After actual
-  registration, check the response and, where possible, query the catalog for
-  the intended entities and processing errors. Ingestion is asynchronous: a
-  successful registration alone does not prove that entities were ingested.
-- Summarize changed files, entities, evidence, exclusions, validation results,
-  registration status, and unresolved questions or manual steps. Explicitly
-  distinguish local-only changes, registered locations, and verified ingestion.
-- For multi-repository scope, report selected, inspected, changed, skipped,
-  blocked, and ingested counts separately. Check identity uniqueness across the
-  entire catalog, not just within each file. Report unresolved ownership and
-  external relations rather than silently replacing them.
-- Reconcile the expected inventory with the running catalog: every selected
-  repository must be represented by its justified entity references or have an
-  explicit blocker/exclusion. Compare identities, not just total counts.
-  Separate repositories from Component/API/System/Resource/Group counts and
-  exclude synthetic fixtures from real-repository coverage.
-- When browser tools can access the instance, verify catalog listing, entity
-  details, owner/system links, dependency graph, and actual API rendering for
-  affected entities. Check processing errors and captured console failures.
-  If UI access is blocked, do not claim UI success from HTTP status or schema
-  validation alone. Separate provider discovery success from source modeling.
+Follow [verify-and-report.md](./verify-and-report.md) for each pass. In
+short:
+
+- Parse every changed YAML document, then run
+  `node scripts/check-descriptors.mjs <changed-descriptor-files...>` and, for
+  TechDocs entities, `node scripts/check-techdocs.mjs <descriptors...>`.
+  Neither replaces the app's parser or `validate-entity`.
+- Registration is not ingestion: query the catalog for the intended entities
+  and processing errors, and compare identities, not just counts.
+- Report changed files, entities, evidence, exclusions, validation results,
+  and registration status, and keep local-only changes, registered
+  locations, and verified ingestion separate.
 
 ## References
 

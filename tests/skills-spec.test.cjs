@@ -73,3 +73,27 @@ for (const dir of skillDirs) {
     }
   });
 }
+
+// The Agent Skills spec recommends a SKILL.md under 500 lines and about
+// 5,000 tokens; detail belongs in guides loaded on demand. Tokens are
+// estimated at four characters each.
+const LINE_LIMIT = 500;
+const TOKEN_LIMIT = 5000;
+
+for (const dir of skillDirs) {
+  test(`SKILL.md stays within the size budget, and every guide is linked: ${dir}`, () => {
+    const skillDir = path.join(skillsDir, dir);
+    const text = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
+    const lines = text.split('\n').length;
+    const tokens = Math.ceil(text.length / 4);
+    assert.ok(lines <= LINE_LIMIT, `${dir}/SKILL.md has ${lines} lines; the limit is ${LINE_LIMIT}`);
+    assert.ok(tokens <= TOKEN_LIMIT, `${dir}/SKILL.md is about ${tokens} tokens; the limit is ${TOKEN_LIMIT}. Move detail into a guide.`);
+    const linked = new Set([...text.matchAll(/\]\(\.\/([^)#\s]+)/g)].map(m => m[1]));
+    for (const target of linked) {
+      assert.ok(fs.existsSync(path.join(skillDir, target)), `${dir}/SKILL.md links to missing ${target}`);
+    }
+    for (const guide of fs.readdirSync(skillDir).filter(f => f.endsWith('.md') && f !== 'SKILL.md')) {
+      assert.ok(linked.has(guide), `${dir}/${guide} is never linked from SKILL.md, so no assistant will load it`);
+    }
+  });
+}

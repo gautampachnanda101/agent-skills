@@ -1,6 +1,6 @@
 # backstage-catalog-builder
 
-**Version 1.1.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/SKILL.md) · plugin name `agent-skills:backstage-catalog-builder`**
+**Version 1.2.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/SKILL.md) · plugin name `agent-skills:backstage-catalog-builder`**
 
 Scans a GitHub organization, user account, single repository, or selected
 paths and produces evidence-based open-source Backstage catalog entities,
@@ -24,7 +24,7 @@ running Backstage catalog API endpoint with a securely held token.
 | Path | Role |
 | --- | --- |
 | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/SKILL.md) | Instructions and rules, loaded when a task matches |
-| [`configuration-delivery.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/configuration-delivery.md), `mcp-workflow.md`, `plugin-integration.md`, `scope-and-modeling.md` | Loaded on demand per workflow |
+| [`configuration-delivery.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/configuration-delivery.md), `discover-sources.md`, `mcp-workflow.md`, `plugin-integration.md`, `scope-and-modeling.md`, `suggest-from-evidence.md`, `techdocs-mkdocs.md`, `verify-and-report.md` | Loaded on demand per workflow |
 | [`scripts/check-descriptors.mjs`, `check-techdocs.mjs`](https://github.com/gautampachnanda101/agent-skills/tree/main/skills/backstage-catalog-builder/scripts) | Zero-dependency structural checkers with `--json` |
 | [`evals/evals.json`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/evals/evals.json) | Eval prompts and checker-backed assertions |
 | [`tests/`](https://github.com/gautampachnanda101/agent-skills/tree/main/skills/backstage-catalog-builder/tests) | Descriptor, TechDocs, and output-contract suites with fixtures, plus the TechDocs/MkDocs documentation site |
