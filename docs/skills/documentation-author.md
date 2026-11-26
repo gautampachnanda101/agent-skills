@@ -1,6 +1,6 @@
-# doc-author
+# documentation-author
 
-**Version 1.2.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) · plugin name `agent-skills:doc-author`**
+**Version 2.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/SKILL.md) · plugin name `agent-skills:documentation-author`**
 
 Writes new documentation and rewrites existing pages to the standard a
 [documentation-review](documentation-review.md) pass will check. It states
@@ -25,9 +25,9 @@ from your repository before it asks.
 
 | Path | Role |
 | --- | --- |
-| [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) | Need → form → structure → voice → validation flow |
-| [`style-rules.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/style-rules.md) | The self-validator checklist applied before delivery |
-| [`evals/evals.json`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/evals/evals.json) | Eval prompts and assertions |
+| [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/SKILL.md) | Need → form → structure → voice → validation flow |
+| [`style-rules.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/style-rules.md) | The self-validator checklist applied before delivery |
+| [`evals/evals.json`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/evals/evals.json) | Eval prompts and assertions |
 
 ## Mechanical pass built in
 
@@ -37,7 +37,7 @@ It fixes what they find, and reports anything it could not check.
 
 ## Use it
 
-> Write the getting-started guide for this repository using the doc-author
+> Write the getting-started guide for this repository using the documentation-author
 > skill, following Diátaxis.
 
 Pairs with [documentation-review](documentation-review.md): author first,

@@ -145,7 +145,7 @@ the skill and one without:
 | Skill | Cases | With the skill | Without |
 | --- | --- | --- | --- |
 | backstage-catalog-builder | Suggest an owner from strong evidence; from weak evidence | 6/6 | 1/2 |
-| doc-author | Write a how-to; rewrite a reference page | 5/6 | 1/2 |
+| documentation-author | Write a how-to; rewrite a reference page | 5/6 | 1/2 |
 | documentation-review | Ten planted defects; two clean pages | 6/6 | 0/2 |
 | peer-code-review | Eight planted defects; a clean change | 5/6 | 0/2 |
 

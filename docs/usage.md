@@ -21,7 +21,7 @@ In this page:
 | [backstage-catalog-builder](skills/backstage-catalog-builder.md) | "Use the backstage-catalog-builder skill to create a Backstage catalog for this repository." |
 | [peer-code-review](skills/peer-code-review.md) | "Review this pull request using the peer-code-review skill." |
 | [documentation-review](skills/documentation-review.md) | "Review this README with the documentation-review skill." |
-| [doc-author](skills/doc-author.md) | "Write the getting-started guide for this repository using the doc-author skill." |
+| [documentation-author](skills/documentation-author.md) | "Write the getting-started guide for this repository using the documentation-author skill." |
 
 The two review skills report findings and change nothing unless you ask. The
 rest of this page covers `backstage-catalog-builder`.

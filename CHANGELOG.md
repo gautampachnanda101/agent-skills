@@ -4,7 +4,16 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
-## [Unreleased]
+## [2.0.0] - 2026-11-26
+
+### Changed
+
+- **Breaking:** `doc-author` is renamed `documentation-author` (2.0.0), to
+  match `documentation-review` and the full-word names of the other skills.
+  Invoke it as `/documentation-author`, or `agent-skills:documentation-author`
+  through the plugin. Its behaviour is unchanged. `make update` installs the
+  new name and removes old `doc-author` copies that came from this
+  repository. `make status` lists any that remain.
 
 ### Fixed
 
@@ -49,7 +58,6 @@ skill's `metadata.version` field.
 - Eval results with Claude Opus 5.5, three runs per case: 22 of 24 runs
   pass with the skills, and 2 of 8 without them. Details are under
   [Verification](https://gautampachnanda101.github.io/agent-skills/verification/#run-the-skill-evals).
-
 
 ### Added (unreleased 1.1.3 work, shipped in 1.2.0)
 

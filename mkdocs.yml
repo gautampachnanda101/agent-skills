@@ -10,7 +10,7 @@ nav:
       - backstage-catalog-builder: skills/backstage-catalog-builder.md
       - peer-code-review: skills/peer-code-review.md
       - documentation-review: skills/documentation-review.md
-      - doc-author: skills/doc-author.md
+      - documentation-author: skills/documentation-author.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md

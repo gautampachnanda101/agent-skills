@@ -18,7 +18,7 @@ has been tested. The skills today:
 - [`documentation-review`](./skills/documentation-review/SKILL.md) — documentation
   quality reviews grounded in Diátaxis and the Google/Microsoft style
   guides.
-- [`doc-author`](./skills/doc-author/SKILL.md) — authors new pages and
+- [`documentation-author`](./skills/documentation-author/SKILL.md) — authors new pages and
   rewrites existing ones following Diátaxis and GOV.UK content design,
   with built-in lint-and-verify validation.
 

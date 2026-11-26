@@ -51,6 +51,12 @@ make update
 `make update` is equivalent to `make install FORCE=1`. Copies never update
 automatically, so re-run it whenever the source changes.
 
+When a skill is renamed, `make update` also removes the copy under its old
+name. It removes only a folder whose `SKILL.md` has the old name and this
+repository's author, so your own skill or a link with that name is kept.
+`make status` lists any old copies first. So far, one skill has been
+renamed: `doc-author` became `documentation-author` in 2.0.0.
+
 ## Installing as a Claude plugin
 
 Claude Code can also install the repository as a marketplace, which keeps

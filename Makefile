@@ -24,6 +24,12 @@ BACKSTAGE_ENV = node_bin=$$(sh "$(CURDIR)/scripts/backstage-node.sh"); \
 	PATH="$$BACKSTAGE_HOME/tools/bin:$$node_bin:$$PATH"; \
 	echo "Using Node $$(node -v) from $$node_bin"
 
+# Skills that were renamed, as old=new. install and update remove an old
+# copy only when it is a real directory whose SKILL.md carries the old name
+# and this repository's author, so a user's own skill of that name is kept.
+RENAMED_SKILLS = doc-author=documentation-author
+SKILL_AUTHOR = gautampachnanda101
+
 BACKSTAGE_HOME_ENV = BACKSTAGE_HOME=$$(node "$(CURDIR)/scripts/backstage-home.cjs" resolve "$$BACKSTAGE_HOME" "$(CURDIR)"); \
 	export BACKSTAGE_HOME
 
@@ -283,6 +289,16 @@ status:
 				fi; \
 			fi; \
 		done; \
+	done; \
+	IFS=" "; \
+	for pair in $(RENAMED_SKILLS); do \
+		old="$${pair%%=*}"; new="$${pair#*=}"; \
+		IFS=":"; \
+		for dest in $$dests; do \
+			[ -f "$$dest/$$old/SKILL.md" ] || continue; \
+			printf "%s: renamed to %s\n  %-46s old copy; make update removes it\n" "$$old" "$$new" "$$dest/$$old"; \
+		done; \
+		IFS=" "; \
 	done
 _install:
 	@set -eu; \
@@ -321,4 +337,20 @@ _install:
 			cp -R "$$skill" "$$dest/$$name"; \
 			printf 'Installed %s in %s\n' "$$name" "$$dest"; \
 		done; \
+	done; \
+	IFS=" "; \
+	for pair in $(RENAMED_SKILLS); do \
+		old="$${pair%%=*}"; new="$${pair#*=}"; \
+		[ -n "$$old" ] || continue; \
+		IFS=":"; \
+		for dest in $$DESTS; do \
+			copy="$$dest/$$old"; \
+			if [ -f "$$copy/SKILL.md" ] && [ ! -L "$$copy" ] && \
+				grep -qx "name: $$old" "$$copy/SKILL.md" && \
+				grep -qx "  author: $(SKILL_AUTHOR)" "$$copy/SKILL.md"; then \
+				rm -rf "$$copy"; \
+				printf 'Removed %s from %s: renamed to %s\n' "$$old" "$$dest" "$$new"; \
+			fi; \
+		done; \
+		IFS=" "; \
 	done

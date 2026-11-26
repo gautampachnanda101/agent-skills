@@ -60,3 +60,35 @@ test('global alias, fallback and explicit destinations retain their behavior', t
     /HOME must not be empty/,
   );
 });
+
+function oldCopy(dir, author = 'gautampachnanda101') {
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'SKILL.md'),
+    `---\nname: doc-author\ndescription: old\nmetadata:\n  author: ${author}\n  version: "1.2.0"\n---\n`);
+}
+
+test('update removes a renamed skill\'s old copy, and status reports it first', t => {
+  const { home, run } = setup(t);
+  const old = path.join(home, '.claude/skills/doc-author');
+  oldCopy(old);
+  assert.match(run('status').toString(), /doc-author: renamed to documentation-author\n.*old copy; make update removes it/);
+  const output = run('update').toString();
+  assert.match(output, /Removed doc-author from .*\.claude\/skills: renamed to documentation-author/);
+  assert.equal(fs.existsSync(old), false);
+  assert.equal(fs.existsSync(path.join(home, '.claude/skills/documentation-author/SKILL.md')), true);
+  assert.doesNotMatch(run('status').toString(), /renamed to/);
+});
+
+test('a user\'s own skill or link with a renamed skill\'s name is kept', t => {
+  const { home, run } = setup(t);
+  const own = path.join(home, '.claude/skills/doc-author');
+  oldCopy(own, 'someone-else');
+  const target = path.join(home, 'linked-skill');
+  oldCopy(target);
+  fs.mkdirSync(path.join(home, '.agents/skills'), { recursive: true });
+  fs.symlinkSync(target, path.join(home, '.agents/skills/doc-author'));
+  run('update');
+  assert.equal(fs.existsSync(path.join(own, 'SKILL.md')), true);
+  assert.equal(fs.lstatSync(path.join(home, '.agents/skills/doc-author')).isSymbolicLink(), true);
+  assert.equal(fs.existsSync(path.join(target, 'SKILL.md')), true);
+});
