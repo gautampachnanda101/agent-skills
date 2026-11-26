@@ -11,10 +11,15 @@
           "CODEOWNERS",
           "package.json"
         ],
-        "no_writes": true,
         "must_match": [
           "payments-platform",
           "(confirm|accept|correct|approve)"
+        ],
+        "writes_only": []
+      },
+      "allow": {
+        "write": [
+          "catalog-info.yaml"
         ]
       }
     },

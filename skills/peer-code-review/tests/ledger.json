@@ -83,7 +83,7 @@
     ],
     "match": [
       "pollOnce|retry",
-      "duplicat|copy|copies|repeat|same (?:logic|code|block)|mirror|reimplement|twice"
+      "duplicat|copy|copies|repeat|same (?:logic|code|block)|mirror|reimplement|twice|(?:exists|logic|code|implemented) in both|two (?:retry )?(?:paths|places|copies)|one retry path"
     ]
   }
 ]

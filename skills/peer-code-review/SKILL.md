@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and Git or Bash tools. Checklists are Markdown; commands such as tests and linters run only where authorized and available. No network access is required beyond fetching the change under review.
 metadata:
   author: gautampachnanda101
-  version: "1.3.1"
+  version: "1.3.2"
 ---
 
 # Peer code review

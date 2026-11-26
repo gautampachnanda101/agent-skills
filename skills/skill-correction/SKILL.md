@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools. Running eval cases needs the repository's eval runner and a model; without one, the skill grades a recorded transcript instead and says so.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Skill correction

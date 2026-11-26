@@ -223,3 +223,15 @@ test('keeps an unrecorded model only when its checksum matches', t => {
   const missing = pathToFileURL(path.join(dir, 'none.gguf')).href;
   assert.match(run(cache, file, { LLM_MODEL_URL: missing }), /Downloading model/);
 });
+
+test('a run clears the previous run\'s outputs and keeps everything else', t => {
+  const { dir, cache } = setup(t);
+  const stale = ['candidate-techdocs.yaml', 'candidate.yaml', 'result-mkdocs.yaml', 'response-descriptor-with_skill.json'];
+  for (const name of stale) fs.writeFileSync(path.join(cache, name), 'old\n');
+  fs.writeFileSync(path.join(cache, 'notes.txt'), 'keep\n');
+  run(cache, archive(dir, '.', '.'));
+  for (const name of stale) assert.equal(fs.existsSync(path.join(cache, name)), false, name);
+  assert.equal(fs.readFileSync(path.join(cache, 'notes.txt'), 'utf8'), 'keep\n');
+  assert.equal(fs.readFileSync(path.join(cache, 'model.gguf'), 'utf8'), MODEL);
+  assert.ok(fs.existsSync(path.join(cache, 'tool')));
+});

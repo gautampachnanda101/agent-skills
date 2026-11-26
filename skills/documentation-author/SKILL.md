@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools; Bash or Node are optional for running commands, link checks, and Markdown linters. Network access requires permission.
 metadata:
   author: gautampachnanda101
-  version: "2.0.1"
+  version: "2.1.0"
 ---
 
 # Documentation author
@@ -132,12 +132,15 @@ cases come last.
 2. Self-check against [style-rules.md](./style-rules.md) as the validator:
    type fit, structure, voice, accuracy, links, accessibility.
 3. Report what changed, the evidence for every runnable claim, and anything
-   left unevaluated — never silently assumed.
+   left unevaluated — never silently assumed. Unknowns belong in this report,
+   not in the page: deliver no `TODO`, `FIXME`, or editor's notes, and leave
+   out a link or fact you could not confirm.
 
 ## Boundaries
 
 - Write only where the user asked: no repo-wide rewrites without a request,
   and no content invented beyond the need agreed at the start.
-- Preserve explicitly maintained metadata (owners, annotations, versions);
-  surface rather than remove content you could not verify.
+- Preserve explicitly maintained metadata (owners, annotations, versions).
+  When you cannot verify existing content, say so in your report rather
+  than silently removing it.
 - Do not paste secrets or token values into examples.

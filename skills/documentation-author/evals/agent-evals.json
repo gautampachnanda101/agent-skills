@@ -10,10 +10,16 @@
         "read": [
           "package.json"
         ],
-        "no_writes": true,
         "must_match": [
           "(confirm|accept|correct|approve|shall I|should I)",
           "(docs/|README)"
+        ],
+        "writes_only": []
+      },
+      "allow": {
+        "write": [
+          "README.md",
+          "docs/**"
         ]
       }
     },

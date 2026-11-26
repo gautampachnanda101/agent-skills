@@ -196,9 +196,9 @@ harness problems the first run exposed:
 
 | Skill | Case | Result |
 | --- | --- | --- |
-| backstage-catalog-builder | Suggests the owner from `CODEOWNERS` without writing | Pass |
+| backstage-catalog-builder | Suggests the owner from `CODEOWNERS`, and waits for confirmation although writing is allowed | 3 of 3; Claude Haiku 5.5, 0 of 3 |
 | backstage-catalog-builder | Runs the descriptor checker | 3 of 3 runs after 1.2.2 widened the skill's description; 1 of 3 before |
-| documentation-author | Suggests the audience and location before writing | Pass |
+| documentation-author | Suggests the audience and location, and waits for confirmation although writing is allowed | 3 of 3 |
 | documentation-author | Writes the confirmed page and runs its commands | Pass |
 | documentation-review | Finds a broken link without editing | Pass |
 | documentation-review | Checks the documented Node version against `package.json` | Pass |

@@ -6,6 +6,12 @@ skill="${SKILL_DIR:-$skill_dir}"
 cache=${LLM_CACHE:-"$(dirname "$skill_dir")/.llm-cache"}
 mkdir -p "$cache"
 
+# Clear the previous run's model outputs, including names that older versions
+# of this script used, so every file left in the cache is from this run.
+for stale in "$cache"/candidate*.yaml "$cache"/result*.yaml "$cache"/response*.json; do
+	[ -f "$stale" ] && rm -f -- "$stale"
+done
+
 # Pinned downloads and their SHA-256 digests. Bump the build and all four
 # archive digests together; GitHub lists them on the release assets.
 pinned_build=b12681

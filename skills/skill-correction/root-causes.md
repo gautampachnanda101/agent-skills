@@ -27,6 +27,12 @@ loading to three of three.
 **Fix:** one instruction, in the step where the situation arises. Say what
 to do and why, in a sentence.
 
+**Example:** asked to rewrite a page whose onward link had no known target,
+`documentation-author` left `<!-- TODO: restore the onward link -->` in
+three of six finished pages. Nothing in the skill said where unknowns go. A
+sentence in its final step ("Unknowns belong in this report, not in the
+page") took the case from two of six passes to three of three.
+
 ## Buried instruction
 
 **Signs:** the rule exists, but in a different section, a guide that was not
@@ -43,6 +49,11 @@ not mean. A careful model is the most likely to take the strict reading.
 
 **Fix:** reword so only one reading is possible. Search the skill and its
 guides for the same phrase.
+
+**Example:** the same `documentation-author` correction had a second cause.
+Its boundary "surface rather than remove content you could not verify"
+reads as "leave a note in the page". It now says to report unverified
+content rather than silently remove it.
 
 **Example:** a permission note said "run only these commands: `node
 check-descriptors.mjs`". Opus read it as allowing the command with no
@@ -67,6 +78,14 @@ makes it worse for real users.
 - A built-in agent listed skills only in its system prompt, and a local
   model never loaded one. Adding a `use_skill` tool, as hosts with a skill
   tool have, let it load the right skill in four of eight cases.
+- A review was failed for missing duplicated retry logic that it had
+  reported, as "the backoff logic now exists in both `pollOnce` and
+  `retry()`". The answer key's pattern knew "duplicate" and "copy" but not
+  "exists in both". Read the failing reply before blaming the skill.
+- Telling the assistant "write no files" hides whether a skill waits for
+  confirmation, because the assistant stops for the wrong reason. A case
+  about a confirmation gate should allow the write and check that nothing
+  changed.
 
 ## Model capability
 
@@ -76,6 +95,12 @@ smaller model does not, even with the harness fixed.
 **Fix:** none in the skill. Record the result, with the model, so the skill
 is not bent to suit one model.
 
-**Example:** Qwen3 8B on llama.cpp loaded the right skill but stopped after
-one or two tool calls instead of following its steps. Claude Opus 5.5 passed
-the same cases.
+**Examples:**
+
+- Qwen3 8B on llama.cpp loaded the right skill but stopped after one or two
+  tool calls instead of following its steps. Claude Opus 5.5 passed the
+  same cases.
+- Claude Haiku 5.5 wrote `catalog-info.yaml` before asking in three of three
+  runs, two of them after loading `backstage-catalog-builder`, while Opus
+  asked first in three of three. Repeating the confirmation rule in the step
+  that writes changed nothing for Haiku, so the change was reverted.

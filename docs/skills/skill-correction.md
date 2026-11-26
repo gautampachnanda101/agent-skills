@@ -1,6 +1,6 @@
 # skill-correction
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/skill-correction/SKILL.md) · plugin name `agent-skills:skill-correction`**
+**Version 1.0.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/skill-correction/SKILL.md) · plugin name `agent-skills:skill-correction`**
 
 Turns a correction to a skill's behaviour into a failing eval case and the
 smallest fix to the skill, the way a regression is fixed in code. It reads

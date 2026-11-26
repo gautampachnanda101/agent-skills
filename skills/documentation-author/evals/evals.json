@@ -30,7 +30,8 @@
         "must_not_match": [
           "\\b(?:simply|just|obviously|easy|easily)\\b",
           "`relayctl (?!reload`)[^`]*`",
-          "^\\s*\\$?\\s*relayctl (?!reload\\b)"
+          "^\\s*\\$?\\s*relayctl (?!reload\\b)",
+          "\\b(?:TODO|FIXME|TBD|XXX)\\b"
         ]
       }
     },
@@ -59,7 +60,8 @@
         "must_not_match": [
           "click here",
           "^(?!\\s*<!--).*(?:maxAttempts|retry limit|attempts ceiling)",
-          "\\b(?:simply|just|obviously|easy|easily)\\b"
+          "\\b(?:simply|just|obviously|easy|easily)\\b",
+          "\\b(?:TODO|FIXME|TBD|XXX)\\b"
         ]
       }
     }

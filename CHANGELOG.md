@@ -54,6 +54,25 @@ skill's `metadata.version` field.
   Recorded transcripts are graded in the test suite with no model, and
   each contract clause is broken in turn to show it is enforced. Every
   skill gets a patch release for its new cases.
+- Three real corrections, worked through with `skill-correction`:
+  - `documentation-author` 2.1.0 delivers no `TODO`, `FIXME`, or editor's
+    notes: unknowns go in the report, and an unconfirmed link or fact is
+    left out. It left a `TODO` comment in three of six rewrites; after the
+    fix, three of three passed. Both of its reply cases now fail on `TODO`.
+  - `peer-code-review` 1.3.2: the answer key now accepts duplicated logic
+    described as "exists in both", which a correct review was failed for.
+    The skill itself was unchanged.
+  - The confirmation-gate behaviour cases (`backstage-catalog-builder`
+    owner evidence, `documentation-author` suggest first) now allow the
+    write and require that nothing changes. Telling the assistant it could
+    not write had hidden whether the skill waits for confirmation. Opus
+    passes both, three of three; Claude Haiku 5.5 wrote `catalog-info.yaml`
+    before asking in three of three runs, with or without the rule repeated
+    in the writing step, so the skill was left unchanged.
+  - `skill-correction` 1.0.1 adds these as examples in `root-causes.md`.
+- `backstage-catalog-builder` 1.2.3: `make skill-llm-verify` clears the
+  previous run's model outputs when it starts, including file names older
+  versions used, so every output in `.llm-cache/` is from the latest run.
 - `backstage-catalog-builder` 1.2.2: its description now says it checks
   and validates existing descriptors. In the behaviour evals, Opus skipped
   the skill for "check this catalog-info.yaml" in two of three runs.
