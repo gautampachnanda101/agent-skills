@@ -1,11 +1,11 @@
 ---
 name: backstage-catalog-builder
-description: Scan GitHub organizations, user accounts, or repositories and create or update evidence-based open-source Backstage catalog entities, catalog-info.yaml descriptors, locations, discovery providers, and app configuration, building on existing entity configuration. Also generates MkDocs TechDocs documentation. Use for Backstage onboarding, software-catalog modeling or ingestion validation, plugin wiring, or documentation generation.
+description: Scan GitHub organizations, user accounts, or repositories and create or update evidence-based open-source Backstage catalog entities, catalog-info.yaml descriptors, locations, discovery providers, and app configuration, building on existing entity configuration. Also generates MkDocs TechDocs documentation. Use for Backstage onboarding, software-catalog modeling, checking or validating an existing catalog-info.yaml, mkdocs.yml, or other entity descriptor, ingestion validation, plugin wiring, or documentation generation.
 license: Apache-2.0
 compatibility: Host assistant with file-read, Git or Bash tools, and network access for GitHub discovery, the Backstage plugin directory, MCP or catalog APIs. Node.js 20+ is required for the bundled structural checkers; a Python mkdocs install or a running Backstage instance is optional for deeper validation.
 metadata:
   author: gautampachnanda101
-  version: "1.2.1"
+  version: "1.2.2"
 ---
 
 # Backstage catalog builder

@@ -128,6 +128,14 @@ test('the built-in agent enforces paths, commands, and writes itself', async t =
   assert.deepEqual(textToolCalls('{"name": "read_file", "arguments": {"path": "README.md"}}').map(c => c.function.name), ['read_file']);
   assert.deepEqual(textToolCalls('<think>hm</think><tool_call>{"name":"list_files","arguments":{}}</tool_call>').map(c => c.function.name), ['list_files']);
   assert.deepEqual(textToolCalls('Here is my answer: 5'), []);
+  fs.mkdirSync(path.join(dir, '.agents', 'skills', 'demo'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.agents', 'skills', 'demo', 'SKILL.md'), '---\nname: demo\ndescription: Demo.\n---\nDo the demo.\n');
+  fs.writeFileSync(path.join(dir, '.agents', 'skills', 'demo', 'guide.md'), '# Guide\n');
+  const [loaded, text] = execute(dir, allow, 'use_skill', { name: 'demo' });
+  assert.deepEqual([loaded.kind, loaded.skill], ['skill', 'demo']);
+  assert.match(text, /Guides: \.agents\/skills\/demo\/guide\.md/);
+  assert.match(text, /Do the demo\./);
+  assert.ok(execute(dir, allow, 'use_skill', { name: 'nope' })[0].error);
 });
 
 test('the built-in agent runs a tool loop against an OpenAI-compatible server', async t => {
@@ -159,7 +167,9 @@ test('the built-in agent runs a tool loop against an OpenAI-compatible server', 
   assert.equal(result.failure, null);
   assert.equal(result.reply, 'The README says hello.');
   assert.deepEqual(result.events.map(e => [e.kind, e.denied]), [['read', false], ['write', true]]);
-  assert.match(seen[0].messages[0].content, /- demo \(\.agents\/skills\/demo\/SKILL\.md\): Demo skill\./);
+  assert.match(seen[0].messages[0].content, /- demo: Demo skill\./);
+  assert.equal(seen[0].tools[0].function.name, 'use_skill');
+  assert.deepEqual(seen[0].tools[0].function.parameters.properties.name.enum, ['demo']);
   assert.equal(fs.existsSync(path.join(dir, 'notes.txt')), false);
 });
 

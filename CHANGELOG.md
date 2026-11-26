@@ -46,6 +46,11 @@ skill's `metadata.version` field.
   Recorded transcripts are graded in the test suite with no model, and
   each contract clause is broken in turn to show it is enforced. Every
   skill gets a patch release for its new cases.
+- `backstage-catalog-builder` 1.2.2: its description now says it checks
+  and validates existing descriptors. In the behaviour evals, Opus skipped
+  the skill for "check this catalog-info.yaml" in two of three runs.
+- The built-in agent offers a `use_skill` tool, as hosts with a skill tool
+  do, and leaves sampling to the server's defaults.
 
 ### Changed (repository)
 

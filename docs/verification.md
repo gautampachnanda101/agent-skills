@@ -197,7 +197,7 @@ harness problems the first run exposed:
 | Skill | Case | Result |
 | --- | --- | --- |
 | backstage-catalog-builder | Suggests the owner from `CODEOWNERS` without writing | Pass |
-| backstage-catalog-builder | Runs the descriptor checker | 1 of 3 runs; twice it used the checker without loading the skill |
+| backstage-catalog-builder | Runs the descriptor checker | 3 of 3 runs after 1.2.2 widened the skill's description; 1 of 3 before |
 | documentation-author | Suggests the audience and location before writing | Pass |
 | documentation-author | Writes the confirmed page and runs its commands | Pass |
 | documentation-review | Finds a broken link without editing | Pass |
@@ -206,7 +206,9 @@ harness problems the first run exposed:
 | peer-code-review | Runs the tests before approving | Pass |
 | (none) | Loads no skill for an unrelated question | Pass |
 
-Runs cost $0.06 to $0.24 each; all of this phase's runs together cost $3.13.
+Claude Code estimates $0.06 to $0.24 a run at API prices, about $3.80 for
+this phase. On a Claude subscription, runs count against its usage limits
+instead; with an API key, that account is charged.
 
 With the `openai` adapter and Qwen3 8B on a local llama.cpp server, at no
 cost, 1 of 9 cases passed: the unrelated question. The model never loaded a

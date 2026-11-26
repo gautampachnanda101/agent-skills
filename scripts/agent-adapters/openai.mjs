@@ -3,14 +3,15 @@
  * OpenAI-compatible chat completions server: llama.cpp's llama-server,
  * Ollama, or a hosted endpoint (set OPENAI_API_KEY for one that needs it).
  *
- * It gives the model five tools (list_files, read_file, search, run_command,
- * write_file) and enforces the case's permissions itself:
+ * It gives the model six tools (use_skill, list_files, read_file, search,
+ * run_command, write_file) and enforces the case's permissions itself:
  *   - every path stays inside the repository
  *   - run_command runs only commands that start with an allowed prefix and
  *     contain no shell control characters, with a two-minute limit
  *   - write_file writes only files the case allows
  * Installed skills are advertised by name and description, as Agent Skills
- * hosts do; the model loads one by reading its SKILL.md.
+ * hosts do. Loading one is an explicit tool call, use_skill, as in hosts
+ * with a skill tool; reading its SKILL.md with read_file also counts.
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -30,6 +31,20 @@ export const TOOLS = [
   { name: 'write_file', description: 'Create or replace a file in the repository. Only some files are permitted.', parameters: { type: 'object', properties: { path: { type: 'string' }, content: { type: 'string' } }, required: ['path', 'content'] } },
 ].map(fn => ({ type: 'function', function: fn }));
 
+export function installedSkills(dir, skillsDir) {
+  const skillsRoot = path.join(dir, skillsDir);
+  if (!fs.existsSync(skillsRoot)) return [];
+  return fs.readdirSync(skillsRoot).filter(name => fs.existsSync(path.join(skillsRoot, name, 'SKILL.md'))).sort()
+    .map(name => ({ folder: name, file: `${skillsDir}/${name}/SKILL.md`, ...frontmatter(fs.readFileSync(path.join(skillsRoot, name, 'SKILL.md'), 'utf8')) }));
+}
+
+/** The tools for a run: use_skill names the installed skills. */
+export function toolsFor(skills) {
+  if (!skills.length) return TOOLS;
+  const useSkill = { name: 'use_skill', description: 'Load an installed skill\'s instructions. Call this before any other tool when the task matches a skill\'s description, then follow the instructions it returns.', parameters: { type: 'object', properties: { name: { type: 'string', enum: skills.map(skill => skill.name) } }, required: ['name'] } };
+  return [{ type: 'function', function: useSkill }, ...TOOLS];
+}
+
 function frontmatter(text) {
   const block = /^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '';
   const field = name => new RegExp(`^${name}:\\s*(.*)$`, 'm').exec(block)?.[1]?.trim();
@@ -37,18 +52,17 @@ function frontmatter(text) {
 }
 
 export function systemPrompt(dir, skillsDir) {
-  const skillsRoot = path.join(dir, skillsDir);
-  const skills = fs.existsSync(skillsRoot)
-    ? fs.readdirSync(skillsRoot).filter(name => fs.existsSync(path.join(skillsRoot, name, 'SKILL.md')))
-      .map(name => ({ file: `${skillsDir}/${name}/SKILL.md`, ...frontmatter(fs.readFileSync(path.join(skillsRoot, name, 'SKILL.md'), 'utf8')) }))
+  const skills = installedSkills(dir, skillsDir);
+  const catalogue = skills.length
+    ? ['Skills are installed. Before you call any other tool, decide whether one matches the task. If one does, call use_skill with its name first, then follow its instructions, and read any guide it links with read_file when that guide applies. If none matches, do not load one.',
+      ...skills.map(skill => `- ${skill.name}: ${skill.description}`), '']
     : [];
   return [
     'You are a coding assistant working in a repository; the current directory is its root.',
+    '',
+    ...catalogue,
     'Use the tools to inspect files and run permitted commands. A denied tool call is final: do not retry it, and say in your reply what you could not do.',
     'When you have finished, reply to the user without calling a tool.',
-    '',
-    'Agent Skills are installed in this repository. When the task matches a skill\'s description, read its SKILL.md with read_file before acting, follow it, and read any guide it links when that guide applies.',
-    ...skills.map(skill => `- ${skill.name} (${skill.file}): ${skill.description}`),
   ].join('\n');
 }
 
@@ -80,10 +94,20 @@ export function commandAllowed(command, prefixes) {
 }
 
 /** Runs one tool call; returns [event, output]. */
-export function execute(dir, allow, name, input) {
+export function execute(dir, allow, name, input, skillsDir = '.agents/skills') {
   const denied = (event, why) => [{ ...event, denied: true, error: true }, `Permission denied: ${why}`];
   const base = { tool: name, denied: false, error: false };
   try {
+    if (name === 'use_skill') {
+      const skill = installedSkills(dir, skillsDir).find(s => s.name === input.name);
+      const event = { ...base, kind: 'skill', skill: String(input.name ?? '') };
+      if (!skill) return [{ ...event, error: true }, `No installed skill named ${input.name}`];
+      const folder = path.join(dir, skillsDir, skill.folder);
+      const guides = fs.readdirSync(folder).filter(f => f !== 'SKILL.md' && f.endsWith('.md')).map(f => `${skillsDir}/${skill.folder}/${f}`);
+      const scripts = fs.existsSync(path.join(folder, 'scripts')) ? fs.readdirSync(path.join(folder, 'scripts')).map(f => `${skillsDir}/${skill.folder}/scripts/${f}`) : [];
+      const where = `This skill's folder is ${skillsDir}/${skill.folder}. Paths in it are relative to that folder.${guides.length ? ` Guides: ${guides.join(', ')}.` : ''}${scripts.length ? ` Scripts: ${scripts.join(', ')}.` : ''}`;
+      return [event, `${where}\n\n${fs.readFileSync(path.join(folder, 'SKILL.md'), 'utf8').slice(0, MAX_OUTPUT * 2)}`];
+    }
     if (name === 'list_files' || name === 'read_file' || name === 'search') {
       const target = inside(dir, input.path ?? '.');
       const kind = name === 'read_file' ? 'read' : 'search';
@@ -138,7 +162,7 @@ export function textToolCalls(content) {
     try {
       const value = JSON.parse(candidate);
       const name = value.name ?? value.function?.name;
-      if (!TOOLS.some(tool => tool.function.name === name)) return [];
+      if (name !== 'use_skill' && !TOOLS.some(tool => tool.function.name === name)) return [];
       const args = value.arguments ?? value.parameters ?? value.function?.arguments ?? {};
       calls.push({ id: `text-${calls.length}`, function: { name, arguments: typeof args === 'string' ? args : JSON.stringify(args) } });
     } catch {
@@ -185,13 +209,16 @@ export default {
   async run({ dir, prompt, allow, model, baseUrl }) {
     if (!baseUrl) return { events: [], reply: '', raw: '', failure: 'the openai adapter needs --base-url, for example http://127.0.0.1:8080/v1 for llama-server' };
     const messages = [{ role: 'system', content: systemPrompt(dir, '.agents/skills') }, { role: 'user', content: prompt }];
+    const tools = toolsFor(installedSkills(dir, '.agents/skills'));
     const events = [];
     const log = [];
     let reply = '';
     let failure = null;
     try {
       for (let turn = 0; turn < MAX_TURNS; turn++) {
-        const response = await chat(baseUrl, { model, messages, tools: TOOLS, temperature: 0 });
+        // Sampling is left to the server's defaults, which follow the model's
+        // own recommendations; greedy decoding degrades thinking models.
+        const response = await chat(baseUrl, { model, messages, tools });
         const message = response.choices?.[0]?.message ?? {};
         log.push(JSON.stringify(message));
         let calls = message.tool_calls ?? [];
