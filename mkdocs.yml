@@ -1,9 +1,8 @@
 site_name: agent-skills
-site_description: Reusable skills for coding assistants, including a Backstage catalog builder
 site_url: https://gautampachnanda101.github.io/agent-skills/
-repo_name: gautampachnanda101/agent-skills
+site_description: Reusable skills for coding assistants, including a Backstage catalog builder
 repo_url: https://github.com/gautampachnanda101/agent-skills
-
+repo_name: gautampachnanda101/agent-skills
 nav:
   - Home: index.md
   - Skills:
@@ -18,10 +17,8 @@ nav:
   - Verification: verification.md
   - Local Backstage: local-backstage.md
   - Contributing a skill: contributing.md
-
 theme:
   name: material
-  # Matches https://gautampachnanda101.github.io/homebrew-tap/
   palette:
     - media: '(prefers-color-scheme: light)'
       scheme: default
@@ -47,8 +44,5 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
-
 plugins:
   - techdocs-core
-  # Runs after techdocs-core, which resets the theme palette unconditionally.
-  - palette-restore

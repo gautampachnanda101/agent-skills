@@ -1,12 +1,12 @@
 # documentation-review
 
-**Version 1.3.2 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/SKILL.md) · plugin name `agent-skills:documentation-review`**
+**Version 1.4.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/SKILL.md) · plugin name `agent-skills:documentation-review`**
 
 Reviews documentation the way leading documentation engineers define
-quality: classify each page's type and audience first, check structure and
-navigation, apply style-guide voice rules, verify commands, code samples,
-and links, and report prioritized findings with evidence. Accessibility is
-reviewed as part of content quality, at WCAG 2.2 AA as GOV.UK applies it.
+quality. It classifies each page's form and audience, checks structure and
+navigation, applies style-guide rules, and verifies commands, samples, and
+links. Findings come with evidence, in order of risk to the reader.
+Accessibility is part of the review, at WCAG 2.2 AA as GOV.UK applies it.
 
 ## Grounded in
 
@@ -48,6 +48,6 @@ and exits 1. It checks structure, not whether the findings are right.
 
 > Review this README with the documentation-review skill.
 
-Findings are graded by reader risk (wrong instructions, then broken
-structure, then unverified commands, then voice), cite `file:line` evidence,
-and are reported without rewriting the pages unless asked.
+Findings are ordered by reader risk: wrong instructions, broken structure,
+unverified commands, then voice. Each cites `file:line` evidence. The skill
+reports without rewriting pages unless you ask.

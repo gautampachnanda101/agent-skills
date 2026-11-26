@@ -1,27 +1,53 @@
 {
   "skill_name": "peer-code-review",
+  "guides": [
+    "checklists.md"
+  ],
   "evals": [
     {
       "id": 1,
-      "prompt": "Review the change in tests/fixtures/planted-defects/README.md as a pull request using the peer-code-review skill: read the diff and the planted-defect ledger, run any declared mechanical checks, and produce the report the skill's report format prescribes.",
-      "expected_output": "A report whose verdict is request changes; a findings table covering all eight planted defects with severities matching the ledger; file:line evidence for every finding; the secret named as present but never quoted in full; no author-directed blame; a strengths section recording what genuinely works.",
+      "files": [
+        "tests/fixtures/pr-142.diff"
+      ],
+      "prompt": "Review the pull request in pr-142.diff against main. Its description reads: \"Make the queue consumer tolerate transient errors and simplify the health status.\" The review should block the merge if needed. The project declares ESLint, but nothing can be run here. Reply with only the report.",
+      "expected_output": "A report that requests changes, finds all eight planted defects at defensible severities with file:line evidence, flags the hardcoded token without quoting it, blames no one, and records what could not be run.",
       "assertions": [
-        "scripts/check-review-report.mjs passes the produced report",
-        "verdict is request changes",
-        "every ledger defect appears as a finding with the ledger's severity",
-        "the secret is flagged by presence, not quoted",
-        "the report contains no you-should-have-style blame"
-      ]
+        "scripts/check-review-report.mjs passes the report",
+        "the verdict is request changes",
+        "every defect in tests/ledger.json appears as a finding with an accepted severity",
+        "the token is named but never quoted"
+      ],
+      "checks": {
+        "grader": "scripts/check-review-report.mjs",
+        "ledger": "tests/ledger.json",
+        "must_match": [
+          "verdict[^a-z]*request changes",
+          "unevaluated|could not (?:be )?run|not run|did not run"
+        ],
+        "must_not_match": [
+          "ghp_[A-Za-z0-9]{8}"
+        ]
+      }
     },
     {
       "id": 2,
-      "prompt": "Apply the peer-code-review skill to the clean companion fixture described at the end of tests/fixtures/planted-defects/README.md. Produce a report with the correct verdict and no invented findings.",
-      "expected_output": "A report whose verdict is approve; zero major or blocker findings; strengths recorded; the grader passes.",
+      "files": [
+        "tests/fixtures/pr-143.diff"
+      ],
+      "prompt": "Review the pull request in pr-143.diff against main. Its description reads: \"Name the base retry delay and test that the delay doubles.\" The review should block the merge if needed. Nothing can be run here. Reply with only the report.",
+      "expected_output": "A report that approves, with no blocker or major findings.",
       "assertions": [
-        "scripts/check-review-report.mjs passes the produced report",
-        "verdict is approve",
-        "no major or blocker findings on the clean change (false positives beyond one nit are grader failures)"
-      ]
+        "scripts/check-review-report.mjs passes the report",
+        "the verdict is approve or approve with comments",
+        "no blocker or major findings on the clean change"
+      ],
+      "checks": {
+        "grader": "scripts/check-review-report.mjs",
+        "max_severity": "minor",
+        "must_match": [
+          "verdict[^a-z]*approve"
+        ]
+      }
     }
   ]
 }

@@ -6,8 +6,13 @@ skill="${SKILL_DIR:-$skill_dir}"
 cache=${LLM_CACHE:-"$(dirname "$skill_dir")/.llm-cache"}
 mkdir -p "$cache"
 
-LLAMA_BUILD=${LLAMA_BUILD:-b12681}
-default_model_url=https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf
+# Pinned downloads and their SHA-256 digests. Bump the build and all four
+# archive digests together; GitHub lists them on the release assets.
+pinned_build=b12681
+default_model_url=https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/9217f5db79a29953eb74d5343926648285ec7e67/qwen2.5-0.5b-instruct-q4_k_m.gguf
+default_model_sha256=74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db
+
+LLAMA_BUILD=${LLAMA_BUILD:-$pinned_build}
 LLM_MODEL_URL=${LLM_MODEL_URL:-$default_model_url}
 LLM_ATTEMPTS=${LLM_ATTEMPTS:-3}
 LLM_BASELINE=${LLM_BASELINE:-1}
@@ -16,18 +21,61 @@ LLM_CTX=${LLM_CTX:-8192}
 LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-300}
 LLM_PORT=${LLM_PORT:-8751}
 
+pinned_sha256=
 case "$(uname -s):$(uname -m)" in
-Linux:x86_64) llama_asset="llama-$LLAMA_BUILD-bin-ubuntu-x64.tar.gz" ;;
-Linux:aarch64) llama_asset="llama-$LLAMA_BUILD-bin-ubuntu-arm64.tar.gz" ;;
-Linux:arm64) llama_asset="llama-$LLAMA_BUILD-bin-ubuntu-arm64.tar.gz" ;;
-Darwin:arm64) llama_asset="llama-$LLAMA_BUILD-bin-macos-arm64.tar.gz" ;;
-Darwin:x86_64) llama_asset="llama-$LLAMA_BUILD-bin-macos-x64.tar.gz" ;;
+Linux:x86_64)
+	platform=ubuntu-x64
+	pinned_sha256=61f04060b691efc99708ff9ca59564a24de3073543f35b1c084e1b8cb73e6da0
+	;;
+Linux:aarch64 | Linux:arm64)
+	platform=ubuntu-arm64
+	pinned_sha256=87a742a9684ca153ee31d2835023890b6981487416fadfd24fc8287df0f8a884
+	;;
+Darwin:arm64)
+	platform=macos-arm64
+	pinned_sha256=7d1e633ba29c9c2171149ef5b8e9d0e4c13d3599388d7883169369c18f2e9c23
+	;;
+Darwin:x86_64)
+	platform=macos-x64
+	pinned_sha256=1e1afbe507aaaf080ba97a1afe2913657fc0e84510b49a3d764cc33326d4bdcb
+	;;
 *)
-	echo "Unsupported platform for llama.cpp binaries: $(uname -s):$(uname -m); set LLAMA_CPP_URL." >&2
-	exit 2
+	platform=
+	[ -n "${LLAMA_CPP_URL:-}" ] || {
+		echo "Unsupported platform for llama.cpp binaries: $(uname -s):$(uname -m); set LLAMA_CPP_URL." >&2
+		exit 2
+	}
 	;;
 esac
-llama_url=${LLAMA_CPP_URL:-"https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_BUILD/$llama_asset"}
+default_llama_url="https://github.com/ggml-org/llama.cpp/releases/download/$pinned_build/llama-$pinned_build-bin-$platform.tar.gz"
+llama_url=${LLAMA_CPP_URL:-"https://github.com/ggml-org/llama.cpp/releases/download/$LLAMA_BUILD/llama-$LLAMA_BUILD-bin-$platform.tar.gz"}
+
+# An explicit digest always wins; the pinned one applies only to the pinned URL.
+llama_sha256=${LLAMA_CPP_SHA256:-}
+[ -n "$llama_sha256" ] || [ "$llama_url" != "$default_llama_url" ] || llama_sha256=$pinned_sha256
+model_sha256=${LLM_MODEL_SHA256:-}
+[ -n "$model_sha256" ] || [ "$LLM_MODEL_URL" != "$default_model_url" ] || model_sha256=$default_model_sha256
+
+sha256_of() {
+	if command -v sha256sum >/dev/null 2>&1; then
+		sha256sum "$1"
+	else
+		shasum -a 256 "$1"
+	fi | cut -d ' ' -f 1
+}
+
+# verify FILE EXPECTED URL: refuses a mismatch; says so when nothing is pinned.
+verify() {
+	if [ -z "$2" ]; then
+		echo "No checksum is pinned for $3; the download is not verified." >&2
+		return 0
+	fi
+	actual=$(sha256_of "$1")
+	[ "$actual" = "$2" ] || {
+		echo "Checksum mismatch for $3: expected $2, got $actual." >&2
+		return 1
+	}
+}
 
 server_dir="$cache/tool"
 
@@ -59,7 +107,14 @@ else
 	staging="$cache/tool.new"
 	rm -rf "$staging"
 	mkdir -p "$staging"
-	curl -fL --retry 3 --retry-delay 5 "$llama_url" | tar -xzf - -C "$staging"
+	archive="$cache/llama.tar.gz.part"
+	curl -fL --retry 3 --retry-delay 5 -o "$archive" "$llama_url"
+	verify "$archive" "$llama_sha256" "$llama_url" || {
+		rm -f "$archive"
+		exit 1
+	}
+	tar -xzf "$archive" -C "$staging"
+	rm -f "$archive"
 	server_bin=$(find_server "$staging")
 	[ -n "$server_bin" ] || {
 		echo "llama-server not found in the archive." >&2
@@ -79,15 +134,21 @@ fi
 
 model_file="$cache/model.gguf"
 model_source="$model_file.source"
-# Caches written before sources were recorded hold the default model.
-if [ -f "$model_file" ] && [ ! -f "$model_source" ]; then
-	printf '%s\n' "$default_model_url" >"$model_source"
+# A model with no usable record is kept only if it is the one being asked for,
+# which avoids a large download for caches older than the record.
+if [ -f "$model_file" ] && [ -n "$model_sha256" ] && ! came_from "$model_source" "$LLM_MODEL_URL" &&
+	verify "$model_file" "$model_sha256" "$model_file" 2>/dev/null; then
+	printf '%s\n' "$LLM_MODEL_URL" >"$model_source"
 fi
 if [ -f "$model_file" ] && came_from "$model_source" "$LLM_MODEL_URL"; then
 	echo "Using cached model: $model_file" >&2
 else
 	echo "Downloading model from $LLM_MODEL_URL ..." >&2
 	curl -fL --retry 3 --retry-delay 5 -o "$model_file.part" "$LLM_MODEL_URL"
+	verify "$model_file.part" "$model_sha256" "$LLM_MODEL_URL" || {
+		rm -f "$model_file.part"
+		exit 1
+	}
 	mv "$model_file.part" "$model_file"
 	printf '%s\n' "$LLM_MODEL_URL" >"$model_source"
 fi

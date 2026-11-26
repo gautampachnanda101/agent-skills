@@ -2,10 +2,10 @@
 
 Reusable [Agent Skills](https://agentskills.io/) for coding assistants. Each
 directory under [`skills/`](https://github.com/gautampachnanda101/agent-skills/tree/main/skills)
-ships one skill with its own `SKILL.md` entry point, so
-assistants such as GitHub Copilot, Claude Code, OpenCode, Kiro, Codex, Gemini
-CLI, Cursor, Windsurf, and Cline can load it without depending on a particular
-editor, model, or operating system. Not every client has been tested; see
+ships one skill with its own `SKILL.md` entry point. Assistants such as
+GitHub Copilot, Claude Code, OpenCode, Kiro, Codex, Gemini CLI, Cursor,
+Windsurf, and Cline can load it without a particular editor, model, or
+operating system. Not every client has been tested; see
 [Boundaries to expect](usage.md#boundaries-to-expect).
 
 ## At a glance
@@ -13,12 +13,12 @@ editor, model, or operating system. Not every client has been tested; see
 - **Install once, use everywhere** — `make install` copies complete skill
   directories into the personal skills paths of every supported assistant.
 - **Evidence-based catalogs** — `backstage-catalog-builder` scans GitHub
-  organizations, user accounts, single repositories, or selected paths and
-  produces justified open-source Backstage entities, locations, discovery
-  configuration, and an expected-entity inventory.
-- **Extend what exists** — the builder accepts your current entity
-  configuration as its starting point: descriptor or app-config paths and
-  repositories, or a running Backstage endpoint with a securely held token.
+  organizations, accounts, repositories, or paths. It produces Backstage
+  entities, locations, and discovery configuration, each backed by evidence.
+- **Extend what exists** — the builder starts from your current entity
+  configuration: descriptor or app-config paths, or a running Backstage with
+  a securely held token. It reads your repository and suggests owners and
+  other values, and asks you to confirm them.
 - **TechDocs built in** — it also generates or updates MkDocs sites wired as
   TechDocs, including monorepo layouts.
 - **Verified output** — bundled zero-dependency checkers with `--json`

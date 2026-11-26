@@ -6,9 +6,10 @@
  * own rules, so a grader can verify them mechanically:
  *   - a classification statement (which Diátaxis form each reviewed page is)
  *   - a Findings table where every row carries a valid severity and, in its
- *     Location or Evidence column, a file:line location (or a file and a
- *     quote, for deleted files)
+ *     Location or Evidence column, the file it concerns (with a line where
+ *     the finding is about specific text)
  *   - risk-ordered reporting: no finding precedes a more severe one
+ *     (questions are not ranked)
  *   - an unevaluated/limitations statement (commands not run, links not
  *     fetched)
  *   - secrets never quoted in full
@@ -99,12 +100,10 @@ function findings(lines) {
   return rows;
 }
 
-// file:line, or a named file (a deleted one has no line) with a quote.
+// A page-level finding, such as a missing entry point, has no line to cite,
+// so a named file is enough evidence for a documentation finding.
 function hasEvidence(text) {
-  if (/[\w./-]+:\d+|\bline \d+|\bL\d+\b/i.test(text)) return true;
-  const file = /[\w./-]+\.[A-Za-z]\w*/;
-  const spans = text.match(/`[^`]+`|"[^"]+"/g) ?? [];
-  return file.test(text) && spans.some(span => !new RegExp(`^${file.source}$`).test(span.slice(1, -1)));
+  return /[\w./-]+:\d+|\bline \d+|\bL\d+\b/i.test(text) || /[\w./-]+\.[A-Za-z]\w*/.test(text);
 }
 
 function checkFindings(text, local) {
@@ -151,7 +150,7 @@ function checkReport(file, text) {
 
   const rows = checkFindings(text, local);
   findingRows += rows.length;
-  const order = rows.map(row => SEVERITIES.indexOf(row.severity)).filter(rank => rank >= 0);
+  const order = rows.map(row => SEVERITIES.indexOf(row.severity)).filter(rank => rank >= 0 && SEVERITIES[rank] !== 'question');
   if (order.some((rank, i) => i > 0 && rank < order[i - 1])) {
     local.push('findings were not reported in reader-risk order (blocker/major first, nit last)');
   }

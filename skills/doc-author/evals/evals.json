@@ -1,5 +1,8 @@
 {
   "skill_name": "doc-author",
+  "guides": [
+    "style-rules.md"
+  ],
   "evals": [
     {
       "id": 1,
@@ -12,7 +15,24 @@
         "Requirement wording is deliberate (must/need/can) with no simply, just, obviously, or easy",
         "The error string config rejected: backoff_seconds out of range appears so operators find the page by the failure they see",
         "No field, value, or prerequisite appears beyond the supplied evidence"
-      ]
+      ],
+      "checks": {
+        "unwrap_fence": true,
+        "must_match": [
+          "^# .*(?:retr|configur)",
+          "^\\s*1\\. ",
+          "config rejected: backoff_seconds out of range",
+          "relayctl reload",
+          "max_attempts",
+          "86400",
+          "config reloaded"
+        ],
+        "must_not_match": [
+          "\\b(?:simply|just|obviously|easy|easily)\\b",
+          "`relayctl (?!reload`)[^`]*`",
+          "^\\s*\\$?\\s*relayctl (?!reload\\b)"
+        ]
+      }
     },
     {
       "id": 2,
@@ -24,7 +44,24 @@
         "Type, range, and default are visible per parameter, with max_attempts' default stated directly",
         "A minimal yaml example sits beside the parameters it illustrates",
         "Link text, if present, describes its destination; the page preserves every given fact and invents none"
-      ]
+      ],
+      "checks": {
+        "unwrap_fence": true,
+        "must_match": [
+          "^\\|.*max_attempts.*\\b5\\b",
+          "^\\|.*backoff_seconds.*\\b60\\b",
+          "^\\|.*endpoint",
+          "^\\|.*verify_tls.*true",
+          "```yaml",
+          "https://example\\.com/hooks",
+          "relayctl reload"
+        ],
+        "must_not_match": [
+          "click here",
+          "^(?!\\s*<!--).*(?:maxAttempts|retry limit|attempts ceiling)",
+          "\\b(?:simply|just|obviously|easy|easily)\\b"
+        ]
+      }
     }
   ]
 }

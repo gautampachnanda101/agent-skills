@@ -21,19 +21,22 @@ In this page:
 make install
 ```
 
-One run copies every skill directory — `SKILL.md`, guides, and scripts — into
-all four destination groups: the shared `~/.agents/skills/` path (GitHub
-Copilot in VS Code and CLI, OpenCode, Codex, Gemini CLI, Cursor, Windsurf) and
-the personal paths of Kiro (`~/.kiro/skills/`), Claude Code
-(`~/.claude/skills/`), and Cline (`~/.cline/skills/`). No assistants are
-discovered first, nothing project-local is written, and no administrator
-permissions are required.
+One run copies every skill directory into four destinations:
+
+| Destination | Used by |
+| --- | --- |
+| `~/.agents/skills/` | GitHub Copilot in VS Code and CLI, OpenCode, Codex, Gemini CLI, Cursor, Windsurf |
+| `~/.kiro/skills/` | Kiro |
+| `~/.claude/skills/` | Claude Code |
+| `~/.cline/skills/` | Cline |
+
+It writes nothing project-local and needs no administrator permissions.
 
 Copies match the source and are validated against the
 [Agent Skills specification](https://agentskills.io/specification.md) in the
-repository tests. What each assistant does with them is documented by that
-assistant: discovery behavior differs per product, some assistants only read
-project-local paths, and cloud sessions may ignore personal directories.
+repository tests. Each assistant documents what it does with them. Discovery differs per
+product: some assistants read only project-local paths, and cloud sessions
+may ignore personal directories.
 
 ## Updating installed copies
 
@@ -98,10 +101,9 @@ VS Code's local agent and OpenCode produces
 `.agents/skills/backstage-catalog-builder/SKILL.md`. To use it in Kiro too,
 copy it separately to `.kiro/skills/backstage-catalog-builder/`.
 
-Avoid keeping multiple copies with the same name in locations one assistant
-searches: assistants such as OpenCode read both `~/.agents/skills/` and
-`~/.claude/skills/`, so a duplicate is possible; remove one if the assistant
-reports it.
+Avoid two copies of a skill in places one assistant searches. OpenCode, for
+example, reads both `~/.agents/skills/` and `~/.claude/skills/`. If an
+assistant reports a duplicate, remove one copy.
 
 ## Manual copying
 

@@ -22,9 +22,9 @@ In this page:
 - Include a lowercase, hyphen-separated `name` and a non-empty `description`.
   Describe both what the skill does and when to use it.
 - Follow the full [Agent Skills specification](https://agentskills.io/specification.md)
-  frontmatter: `license`, `compatibility` (at most 500 characters, only for
-  real environment requirements), and `metadata` (`author`, semantic
-  `version`) are expected for published skills. The
+  frontmatter. Published skills need `license`, `metadata.author`, and a
+  semantic `metadata.version`. Add `compatibility`, at most 500 characters,
+  only for real environment requirements. The
   `tests/skills-spec.test.cjs` suite enforces these constraints in pre-commit
   and CI; the official `skills-ref` validator is demonstration-only upstream,
   so the repository tests encode the spec instead.
@@ -55,14 +55,16 @@ directories, plus this repository's convention of naming the optional bits:
 
 Template rules from the
 [best-practices guide](https://agentskills.io/skill-creation/best-practices.md)
-and the specification: keep `SKILL.md` under 500 lines and 5,000 tokens and
-move detail to supporting guides; state when each file should load (our
-guides live one level deep from `SKILL.md`, which matches the
-specification's file-reference rule, and the guides table in
-`SKILL.md` names each trigger); make `scripts/` dependency-free so the skill
-runs anywhere; ship eval prompts in `evals/evals.json`; and keep the
-skill's own tests and fixtures inside its `tests/` directory so they run in
-CI wherever the folder sits.
+and the specification:
+
+- Keep `SKILL.md` under 500 lines and 5,000 tokens, and move detail to
+  supporting guides one level deep.
+- Say when each guide loads, in a table in `SKILL.md`.
+- Keep `scripts/` free of dependencies so the skill runs anywhere.
+- Ship eval prompts in `evals/evals.json`. Add `checks` so
+  `make skill-evals` can grade them; see [Verification](verification.md#run-the-skill-evals).
+- Keep the skill's tests and fixtures in its own `tests/` directory, so they
+  run in CI wherever the folder sits.
 
 Repository-root-only concerns: the cross-skill conformance tests
 (`tests/skills-spec.test.cjs`, `tests/claude-plugin.test.cjs`), installer
@@ -126,11 +128,14 @@ User-visible repository changes follow a versioned release:
 
 1. Bump `version` in `.claude-plugin/plugin.json` using
    [Semantic Versioning](https://semver.org/); the git tag follows this
-   version. Bump `metadata.version` in the `SKILL.md` of every skill whose
-   content changed in the same release, and the version at the top of that
-   skill's page under `docs/skills/`.
-2. Add a CHANGELOG.md entry describing the change.
-3. Check that `v<version>` is not already a tag or a release.
-4. Push, wait for a green `Verify` run (it validates the plugin manifests
-   with `claude plugin validate --strict .`), then tag `v<version>` and
-   create the GitHub Release for it.
+   version.
+2. Bump `metadata.version` in the `SKILL.md` of every skill whose content
+   changed. Update the version at the top of that skill's page under
+   `docs/skills/`.
+3. Add a CHANGELOG.md entry describing the change.
+4. Check that `v<version>` is not already a tag or a release.
+5. Run `make skill-evals` for each skill you changed, and record the pass
+   rate in the changelog entry.
+6. Push and wait for a green `Verify` run. It also validates the plugin
+   manifests with `claude plugin validate --strict .`.
+7. Tag `v<version>` and create the GitHub Release for it.

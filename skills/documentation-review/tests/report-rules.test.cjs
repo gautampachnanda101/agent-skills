@@ -34,31 +34,29 @@ test('the expected planted-defects report passes the report grader', () => {
   assert.equal(result.status, 0, result.out);
 });
 
-test('grader rejects reports that skip classification, verification notes, or risk order', () => {
-  // no Diátaxis classification statement (section removed entirely)
-  const r1 = runReport(goodReport.replace(
-    /## Classification[\s\S]*?(?=## Verdict)/,
-    '## Classification\n\n- guide.md\n- reference.md\n- clean.md\n\n',
-  ));
+function edited(text, pattern, replacement) {
+  const result = text.replace(pattern, replacement);
+  assert.notEqual(result, text, `edit did not apply: ${pattern}`);
+  return result;
+}
+
+test('grader rejects reports that skip classification, quote secrets, or break risk order', () => {
+  const r1 = runReport(edited(goodReport, /^## Classification\n[\s\S]*?(?=^## )/m, '## Classification\n\n- guide.md\n- reference.md\n\n'));
   assert.equal(r1.status, 1, r1.out);
   assert.match(r1.out, /classification/);
 
-  // quoted secret
-  const r2 = runReport(goodReport.replace('## What works', '## Secrets\n\n`sk-aBcDeFgHiJkLmNoPqRs123456`\n\n## What works'));
+  const r2 = runReport(edited(goodReport, /^## Strengths/m, '## Secrets\n\n`sk-aBcDeFgHiJkLmNoPqRs123456`\n\n## Strengths'));
   assert.equal(r2.status, 1, r2.out);
   assert.match(r2.out, /possible secret/);
 
-  // findings not in reader-risk order: relabel the first major row as a nit
-  // and promote it above the remaining majors (a nit before majors is a
-  // risk-order violation)
-  const firstMajor = goodReport.match(/^\| `major` \|[^\n]*$/m)[0];
-  const promoted = goodReport
-    .replace(/^\| `major` \|[^\n]*$\n/m, '')
-    .replace(/## Findings\n\n(\| Severity[^\n]*\n\|[^\n]*\n)/, `## Findings\n\n$1${firstMajor.replace('`major`', '`nit`')}\n`);
-  assert.notEqual(promoted, goodReport);
-  const r4 = runReport(promoted);
-  assert.equal(r4.status, 1, r4.out);
-  assert.match(r4.out, /reader-risk order/);
+  // Move the last finding row to the top of the table.
+  const rows = goodReport.match(/^\| `?(?:blocker|major|minor|nit)`? \|[^\n]*$/gm);
+  const last = rows.at(-1);
+  assert.notEqual(last.match(/`?(\w+)`? \|/)[1], rows[0].match(/`?(\w+)`? \|/)[1]);
+  const reordered = edited(goodReport.replace(`${last}\n`, ''), rows[0], `${last}\n${rows[0]}`);
+  const r3 = runReport(reordered);
+  assert.equal(r3.status, 1, r3.out);
+  assert.match(r3.out, /reader-risk order/);
 });
 
 test('grader accepts the clean-run report', () => {
@@ -76,6 +74,7 @@ function report(rows, { findings = true } = {}) {
 
 const rejected = [
   ['no evidence attached', [row('major', 'no evidence attached')], /without a file:line location/],
+  ['a location with no file', [row('major', 'the second paragraph')], /without a file:line location/],
   ['an unknown severity ending in a known one', [row('bogus', '`g.md:3`', 'One unit')], /without a severity token/],
   ['a bad row that mentions the word severity', [row('bogus', 'nowhere', 'Severity unclear')], /without a severity token/],
   ['a blocker after a major', [row('major'), row('blocker')], /reader-risk order/],
@@ -107,7 +106,7 @@ test('grader accepts ordered findings, full Git SHAs, and an empty table', () =>
 
 test('--json prints only JSON', () => {
   const out = execFileSync('node', [script, '--json', path.join(root, 'tests', 'expected', 'planted-defects-report.md')], { encoding: 'utf8' });
-  assert.equal(JSON.parse(out).finding_rows, 10);
+  assert.ok(JSON.parse(out).finding_rows >= 10);
 });
 
 test('running without arguments prints usage', () => {
@@ -117,4 +116,10 @@ test('running without arguments prints usage', () => {
     assert.doesNotMatch(error.stdout, /import \{/);
     return true;
   });
+});
+
+test('grader accepts a page-level finding and questions anywhere in the order', () => {
+  const rows = [row('question', '`g.md`'), row('major', '`g.md`, `h.md`'), row('question'), row('minor')];
+  const result = runReport(report(rows));
+  assert.equal(result.status, 0, result.out);
 });

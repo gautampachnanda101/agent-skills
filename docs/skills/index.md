@@ -2,8 +2,7 @@
 
 Each directory under [`skills/`](https://github.com/gautampachnanda101/agent-skills/tree/main/skills)
 ships one independent skill: a `SKILL.md` entry point plus the guides,
-scripts, eval cases, and test suites it needs, portable across assistants,
-editors, models, and operating systems.
+scripts, eval cases, and tests it needs.
 
 ## Install them all
 

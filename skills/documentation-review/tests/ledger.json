@@ -1,0 +1,111 @@
+[
+  {
+    "defect": "No outcome in the opening; project history first",
+    "severity": [
+      "major"
+    ],
+    "match": [
+      "guide\\.md",
+      "outcome|preamble|history|first two sentences"
+    ]
+  },
+  {
+    "defect": "Theory inside a how-to",
+    "severity": [
+      "major",
+      "minor"
+    ],
+    "match": [
+      "guide\\.md",
+      "theory|explanation|replication|mix"
+    ]
+  },
+  {
+    "defect": "Simply before an instruction",
+    "severity": [
+      "minor",
+      "nit"
+    ],
+    "match": [
+      "guide\\.md",
+      "simply"
+    ]
+  },
+  {
+    "defect": "Colour and position are the only identification",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "guide\\.md",
+      "\\bred\\b|colou?r|on the right|position"
+    ]
+  },
+  {
+    "defect": "Vague link text",
+    "severity": [
+      "major"
+    ],
+    "match": [
+      "guide\\.md",
+      "\\bhere\\b|link text"
+    ]
+  },
+  {
+    "defect": "Must on an optional setting",
+    "severity": [
+      "blocker",
+      "major",
+      "minor"
+    ],
+    "match": [
+      "reference\\.md",
+      "must"
+    ]
+  },
+  {
+    "defect": "Image without alt text",
+    "severity": [
+      "major"
+    ],
+    "match": [
+      "reference\\.md",
+      "\\balt\\b"
+    ]
+  },
+  {
+    "defect": "Stale version contradicted by the changelog",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "reference\\.md",
+      "1\\.2",
+      "4\\.0"
+    ]
+  },
+  {
+    "defect": "Paragraph duplicated across both pages",
+    "severity": [
+      "major",
+      "minor"
+    ],
+    "match": [
+      "duplicat|verbatim|same sentence|twice"
+    ]
+  },
+  {
+    "defect": "Reference table lacks types and defaults",
+    "severity": [
+      "blocker",
+      "major",
+      "minor"
+    ],
+    "match": [
+      "reference\\.md",
+      "default|type|incomplete"
+    ]
+  }
+]

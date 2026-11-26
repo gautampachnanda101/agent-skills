@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools; Bash and Node are optional for verifying commands, links, and MkDocs/TechDocs structure. Fetching external network evidence requires host and user permission.
 metadata:
   author: gautampachnanda101
-  version: "1.3.2"
+  version: "1.4.0"
 ---
 
 # Documentation review
@@ -31,6 +31,11 @@ publish only what meets it. When reviewing, name the need each page serves;
 content that serves no need is a finding even when it is well written. This
 sharpens the audience step below: `tutorial` pages need a learning outcome,
 `reference` pages need complete lookup, `how-tos` need task completion.
+
+Read the repository before asking about the audience or scope. The README,
+navigation, issues, and the product itself usually show who reads the docs.
+State the audience you inferred and its evidence at the top of the report,
+so the user can correct it.
 
 ## Classify each page before judging it
 
@@ -171,17 +176,26 @@ here:
   factually wrong), `major` (broken navigation, wrong type for the audience,
   untested copy-paste failure), `minor` (style-guide violations), `nit`
   (wording), `question`.
-- Report as: findings table, then strengths worth keeping (genuine ones),
-  then suggested diffs for small fixes. Do not return whole rewritten pages
+- Report under these headings: `Classification` (each page and its form),
+  `Findings` (a table with columns Severity, Location, Evidence, and
+  Suggested fix; Location names every file it concerns, with `:line` when
+  the finding is about specific text, never just "both pages"), `Strengths` (genuine ones), `Suggested diffs` for small
+  fixes, and `Unevaluated`. Do not return whole rewritten pages
   unless asked; propose the change where you found it.
 - Order the report by the reader's risk: wrong instructions, then broken
-  structure, then missing verification, then voice.
+  structure, then missing verification, then voice. Within the table, no
+  finding comes before a more severe one.
+- When Node.js 20+ is available, save the report and run
+  `scripts/check-review-report.mjs <report.md>` from this skill. It checks
+  the report's structure, not whether the findings are right.
 
 ## Review with history
 
 Docs rot silently, so use Git as evidence: last-modified dates identify
-staleness, and an un-owned page (no author, no maintenance) is a finding —
-assign an owner or mark the page for retirement. Freshness findings cite the
+staleness, and an un-owned page (no author, no maintenance) is a finding.
+Suggest an owner from evidence (`CODEOWNERS`, recent substantive commits,
+the README's maintainer or support section), with that evidence, or suggest
+retiring the page. Do not just ask who owns it. Freshness findings cite the
 last substantive commit, not the calendar.
 
 ## Boundaries

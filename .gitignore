@@ -2,3 +2,4 @@
 gcse-revision-assistant/
 gcse-revision-*/
 .llm-cache/
+.eval-results/

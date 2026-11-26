@@ -1,12 +1,13 @@
 # doc-author
 
-**Version 1.1.2 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) · plugin name `agent-skills:doc-author`**
+**Version 1.2.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/doc-author/SKILL.md) · plugin name `agent-skills:doc-author`**
 
-Writes new documentation and rewrites existing pages with the discipline a
-[documentation-review](documentation-review.md) pass will later demand:
-state the user need first, choose the Diátaxis form, structure for the
-reader's work, write in plain English with deliberate requirement wording,
-and verify every command, link, and lint check before delivery.
+Writes new documentation and rewrites existing pages to the standard a
+[documentation-review](documentation-review.md) pass will check. It states
+the user need first, chooses the Diátaxis form, and writes in plain English
+with deliberate requirement wording. It verifies every command, link, and
+lint check before delivery, and suggests the need, audience, and placement
+from your repository before it asks.
 
 ## Grounded in
 
@@ -30,10 +31,9 @@ and verify every command, link, and lint check before delivery.
 
 ## Mechanical pass built in
 
-Before asking for human review it runs what the project declares —
-`markdownlint`, `vale`, link checkers, or the repository's zero-dependency
-TechDocs checker — in a fix-and-verify loop, and reports anything it could
-not evaluate rather than assuming clean.
+Before asking for human review, it runs what the project declares:
+`markdownlint`, `vale`, link checkers, or the repository's TechDocs checker.
+It fixes what they find, and reports anything it could not check.
 
 ## Use it
 

@@ -1,5 +1,8 @@
 {
   "skill_name": "backstage-catalog-builder",
+  "guides": [
+    "suggest-from-evidence.md"
+  ],
   "evals": [
     {
       "id": 1,
@@ -26,6 +29,58 @@
         "every nav page resolves against the actual docs/ directory",
         "repo_url is https://github.com/acme/inventory-notifier"
       ]
+    },
+    {
+      "id": 3,
+      "prompt": "Prepare to create catalog-info.yaml for this repository. Nobody has answered any question yet. Evidence from reading it:\n\n- Repository: acme/ledger-sync, owned by the GitHub organization acme.\n- An existing catalog-info.yaml has spec.owner: group:default/catalog-test and spec.lifecycle: experimental.\n- CODEOWNERS line 1: `* @acme/payments-platform`.\n- The catalog already has a Group entity named payments-platform, in org.yaml at line 12.\n- README.md line 3: \"ledger-sync has run in production since 2024.\"\n- Nothing says which Backstage app configuration should load the descriptor.\n\nWrite only the single message you would send the user before writing any file.",
+      "expected_output": "One message that suggests group:default/payments-platform as owner and production as lifecycle, each with its evidence, flags catalog-test as a placeholder to replace, asks about the app configuration, and writes no descriptor.",
+      "assertions": [
+        "suggests the payments-platform group as owner, citing CODEOWNERS",
+        "flags catalog-test as a test or placeholder owner",
+        "suggests production as lifecycle, citing the README",
+        "asks which app configuration should load the descriptor",
+        "writes no descriptor"
+      ],
+      "checks": {
+        "must_match": [
+          "group:default/payments-platform|group:payments-platform",
+          "CODEOWNERS",
+          "catalog-test",
+          "placeholder|test[- ]only|test owner",
+          "production",
+          "README",
+          "\\?",
+          "app[- ]config|configuration"
+        ],
+        "must_not_match": [
+          "```ya?ml[\\s\\S]*kind:\\s*Component"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "prompt": "Prepare to create catalog-info.yaml for this repository. Nobody has answered any question yet. Evidence from reading it:\n\n- Repository: jdoe/dotfiles-sync, owned by the GitHub user jdoe.\n- No CODEOWNERS, MAINTAINERS, or existing descriptor.\n- git shortlog -sn shows one committer: jdoe.\n- No deployment files or release tags; README.md line 1 says \"Personal scripts, work in progress.\"\n\nWrite only the single message you would send the user before writing any file.",
+      "expected_output": "One message that suggests user:default/jdoe as a weak owner suggestion, notes the User entity must exist, suggests experimental as lifecycle from the README, and asks for confirmation without writing a descriptor.",
+      "assertions": [
+        "suggests user:default/jdoe and labels the evidence weak",
+        "says the User entity must exist",
+        "suggests experimental lifecycle citing the README",
+        "asks for confirmation",
+        "writes no descriptor"
+      ],
+      "checks": {
+        "must_match": [
+          "user:(?:default/)?jdoe",
+          "weak",
+          "exist",
+          "experimental",
+          "README",
+          "\\?"
+        ],
+        "must_not_match": [
+          "```ya?ml[\\s\\S]*kind:\\s*Component"
+        ]
+      }
     }
   ]
 }

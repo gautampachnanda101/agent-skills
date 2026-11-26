@@ -4,11 +4,43 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
-## [1.1.3] - 2026-11-25
+## [1.2.0] - 2026-11-25
 
 ### Added
 
-- `doc-author` 1.1.2 ships `evals/evals.json` alongside its sibling skills:
+- Every skill reads the repository before it asks, then sends one batch of
+  suggestions, each with its evidence, for the user to accept or correct.
+  `backstage-catalog-builder` 1.1.0 adds `suggest-from-evidence.md`: owner
+  signals ranked by strength (descriptors, `CODEOWNERS`, catalog groups,
+  maintainers, the account, committers), placeholder owners such as
+  `group:default/catalog-test` flagged for replacement, and a single
+  confirmation message. `doc-author` 1.2.0 suggests the need, audience, and
+  placement; `documentation-review` 1.4.0 states the inferred audience and
+  suggests owners for unowned pages; `peer-code-review` 1.3.0 suggests the
+  diff and base branch.
+- `make skill-evals` grades every skill against its evals with any model
+  command (`SKILL_EVAL_CMD`). Answer keys are never sent to the model.
+- Real eval inputs for the review skills: a pull-request diff with eight
+  planted defects and a clean companion, and two documentation pages with ten
+  planted defects and two clean companions. The v1.1.2 fixtures showed only
+  part of the change and put the answer key in the model's input, so their
+  published recall figures did not measure the skills.
+- `make skill-llm-verify` checks SHA-256 digests for the pinned llama.cpp
+  archives and model, and the model is pinned to a revision. CI runs it on
+  Linux x64 and arm64, and macOS arm64 and Intel.
+
+### Changed
+
+- The review skills name their report headings and table columns, agree the
+  verdict with the findings, and point to their graders.
+- Eval results with Claude Opus 5.5, three runs per case: 22 of 24 runs
+  pass with the skills, and 2 of 8 without them. Details are under
+  [Verification](https://gautampachnanda101.github.io/agent-skills/verification/#run-the-skill-evals).
+
+
+### Added (unreleased 1.1.3 work, shipped in 1.2.0)
+
+- `doc-author` ships `evals/evals.json` alongside its sibling skills:
   two prompt scenarios — authoring a missing how-to from described evidence
   and rewriting a narrative page into a reference form — with assertions
   covering the user-need opener, Diátaxis form discipline, expected-outcome

@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and Git or Bash tools. Checklists are Markdown; commands such as tests and linters run only where authorized and available. No network access is required beyond fetching the change under review.
 metadata:
   author: gautampachnanda101
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # Peer code review
@@ -40,8 +40,11 @@ Three findings from that research shape everything below:
   ticket, the base branch. A finding made without this context is
   speculation about intent.
 - Fetch the diff with the host's Git or Bash tools. If the scope is
-  unclear, ask once, in a single batch: which diff or pull request, which
-  base branch, and whether this review should block or only advise.
+  unclear, read before asking: the current branch, its upstream, an open
+  pull request, and the repository's default branch usually answer it.
+  Suggest the diff and base branch you found, with that evidence, and ask
+  once, in a single batch, for anything left: what to review, against
+  which base, and whether the review should block or only advise.
 - Fagan's inspections call this "preparation": run whatever is available
   and authorized — tests, linters, builds — before reading line by line.
   The compiler and the test suite find the mechanical failures for free.
@@ -119,14 +122,22 @@ missing semicolon per line.
 
 ## The report
 
-End with a verdict the author can act on in one read:
+End with a verdict the author can act on in one read, under these
+headings:
 
-1. Verdict: `approve`, `approve with comments`, `request changes`, or
-   `split before review`.
-2. Findings table: severity, location, evidence, suggested direction.
-3. Strengths worth keeping — genuine ones only.
-4. Deferred items: what should become a ticket instead of blocking this
-   change.
+1. `Verdict`: a line `Verdict: <value>`, where the value is `approve`,
+   `approve with comments`, `request changes`, or `split before review`.
+   It must agree with the findings: no approval while a blocker or major is
+   open, and no `request changes` without one.
+2. `Findings`: a table with columns Severity, Location, Evidence, and
+   Direction, most severe first. Location is `file:line`.
+3. `Strengths`: genuine ones only.
+4. `Deferred`: what should become a ticket instead of blocking this change.
+5. `Unevaluated`: checks that could not run.
+
+When Node.js 20+ is available, save the report and run
+`scripts/check-review-report.mjs <report.md>` from this skill. It checks the
+report's structure, not whether the findings are right.
 
 ## Follow up and close
 

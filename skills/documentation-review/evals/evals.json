@@ -1,25 +1,48 @@
 {
   "skill_name": "documentation-review",
+  "guides": [
+    "review-checklists.md"
+  ],
   "evals": [
     {
       "id": 1,
-      "prompt": "Review the two defective documentation pages in tests/fixtures/planted-defects/README.md (guide.md and reference.md) with the documentation-review skill: classify each page, run the mechanical pass where tooling allows, and produce the report the skill prescribes.",
-      "expected_output": "A report classifying guide.md as a how-to and reference.md as reference; all ten planted defects found with ledger severities; evidence quotes with page:line locations; risk-ordered findings; an unevaluated statement for anything not verifiable offline.",
+      "files": [
+        "tests/fixtures/planted/guide.md",
+        "tests/fixtures/planted/reference.md",
+        "tests/fixtures/planted/CHANGELOG.md"
+      ],
+      "prompt": "Review guide.md and reference.md. CHANGELOG.md is evidence, not a page to review. The audience is operators of the sync CLI. Nothing can be run or fetched here, and no linter is configured. Reply with only the report.",
+      "expected_output": "A report that classifies guide.md as a how-to and reference.md as reference, finds all ten planted defects at defensible severities with page:line evidence in reader-risk order, and records what could not be evaluated.",
       "assertions": [
-        "scripts/check-review-report.mjs passes the produced report",
-        "every ledger defect appears as a finding with the ledger's severity",
-        "guide.md is classified as a how-to and reference.md as reference",
-        "findings are reported in reader-risk order"
-      ]
+        "scripts/check-review-report.mjs passes the report",
+        "every defect in tests/ledger.json appears as a finding with an accepted severity",
+        "guide.md is classified as a how-to and reference.md as reference"
+      ],
+      "checks": {
+        "grader": "scripts/check-review-report.mjs",
+        "ledger": "tests/ledger.json",
+        "must_match": [
+          "guide\\.md[^\\n]*how-to",
+          "reference\\.md[^\\n]*reference"
+        ]
+      }
     },
     {
       "id": 2,
-      "prompt": "Apply the documentation-review skill to the clean how-to page described at the end of tests/fixtures/planted-defects/README.md. Produce the correct report without inventing findings.",
-      "expected_output": "A report with zero findings beyond at most one nit, a classification statement, and an unevaluated statement where needed; the grader passes.",
+      "files": [
+        "tests/fixtures/clean/sync-data.md",
+        "tests/fixtures/clean/sync-settings.md"
+      ],
+      "prompt": "Review sync-data.md and sync-settings.md. The audience is operators of the sync CLI. Nothing can be run or fetched here, and no linter is configured. Reply with only the report.",
+      "expected_output": "A report with a classification, no blocker or major findings, and an unevaluated statement.",
       "assertions": [
-        "scripts/check-review-report.mjs passes the produced report",
-        "no major findings on the clean page (false positives beyond one nit are grader failures)"
-      ]
+        "scripts/check-review-report.mjs passes the report",
+        "no blocker or major findings on the clean pages"
+      ],
+      "checks": {
+        "grader": "scripts/check-review-report.mjs",
+        "max_severity": "minor"
+      }
     }
   ]
 }

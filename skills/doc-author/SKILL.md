@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools; Bash or Node are optional for running commands, link checks, and Markdown linters. Network access requires permission.
 metadata:
   author: gautampachnanda101
-  version: "1.1.2"
+  version: "1.2.0"
 ---
 
 # Documentation author
@@ -27,8 +27,13 @@ their goal, so structure and terminology must make the scent strong.
 GOV.UK's rule comes first: identify the user need in one sentence — `As a
 <reader>, I need <information or action> so that <outcome>` — and publish
 only what meets it. If a page cannot state its need, the writing task is
-scoping, not drafting; ask one batched question set for the missing need,
-audience, and placement before writing.
+scoping, not drafting.
+
+Read the repository before asking. The README, existing pages, navigation,
+issues, error strings in the code, and `CODEOWNERS` usually suggest the
+need, the audience, where the page belongs, and who maintains it. Send one
+batch: each suggestion with its evidence for the user to accept or correct,
+then the questions nothing answered. Do not write until the user confirms.
 
 ## Choose the form before the words
 

@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -7,6 +8,9 @@ const { pathToFileURL } = require('node:url');
 const test = require('node:test');
 
 const script = path.resolve(__dirname, '..', 'scripts', 'skill-llm-verify.sh');
+
+const MODEL = 'model';
+const sha256 = data => crypto.createHash('sha256').update(data).digest('hex');
 
 // Stands in for llama-server: like the real binary it needs a versioned
 // library symlink at a path relative to itself. It answers --version and then
@@ -36,7 +40,7 @@ function setup(t) {
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   const cache = path.join(dir, 'cache');
   fs.mkdirSync(cache);
-  fs.writeFileSync(path.join(cache, 'model.gguf'), '');
+  fs.writeFileSync(path.join(cache, 'model.gguf'), MODEL);
   return { dir, cache };
 }
 
@@ -59,7 +63,13 @@ function run(cache, archiveFile, env = {}) {
   const result = spawnSync('sh', [script], {
     encoding: 'utf8',
     timeout: 60_000,
-    env: { ...cleanEnv, LLM_CACHE: cache, LLAMA_CPP_URL: pathToFileURL(archiveFile).href, ...env },
+    env: {
+      ...cleanEnv,
+      LLM_CACHE: cache,
+      LLAMA_CPP_URL: pathToFileURL(archiveFile).href,
+      LLM_MODEL_SHA256: sha256(MODEL),
+      ...env,
+    },
   });
   assert.equal(result.error, undefined);
   return result.stderr;
@@ -154,7 +164,7 @@ test('LLM_MODEL_URL replaces a model that came from another URL', t => {
   const file = archive(dir, '.', '.');
   const model = path.join(dir, 'other.gguf');
   fs.writeFileSync(model, 'other model');
-  const env = { LLM_MODEL_URL: pathToFileURL(model).href };
+  const env = { LLM_MODEL_URL: pathToFileURL(model).href, LLM_MODEL_SHA256: '' };
   assert.match(run(cache, file, env), /Downloading model/);
   assert.equal(fs.readFileSync(path.join(cache, 'model.gguf'), 'utf8'), 'other model');
   assert.match(run(cache, file, env), /Using cached model/);
@@ -165,4 +175,51 @@ test('a failed model download keeps the existing model', t => {
   fs.writeFileSync(path.join(cache, 'model.gguf'), 'kept');
   run(cache, archive(dir, '.', '.'), { LLM_MODEL_URL: pathToFileURL(path.join(dir, 'none.gguf')).href });
   assert.equal(fs.readFileSync(path.join(cache, 'model.gguf'), 'utf8'), 'kept');
+});
+
+test('accepts an archive whose checksum matches', t => {
+  const { dir, cache } = setup(t);
+  const file = archive(dir, '.', '.');
+  const stderr = run(cache, file, { LLAMA_CPP_SHA256: sha256(fs.readFileSync(file)) });
+  assert.match(stderr, /fake server started/);
+  assert.doesNotMatch(stderr, /not verified/);
+});
+
+test('says when an archive has no pinned checksum', t => {
+  const { dir, cache } = setup(t);
+  assert.match(run(cache, archive(dir, '.', '.')), /not verified/);
+});
+
+test('rejects an archive whose checksum differs and keeps the cache', t => {
+  const { dir, cache } = setup(t);
+  writeCache(cache, path.join(dir, 'other.tar.gz'));
+  const stderr = run(cache, archive(dir, '.', '.'), { LLAMA_CPP_SHA256: sha256('other') });
+  assert.match(stderr, /Checksum mismatch/);
+  assert.doesNotMatch(stderr, /fake server started/);
+  assert.equal(fs.existsSync(path.join(cache, 'tool', 'llama-server')), true);
+  assert.equal(fs.existsSync(path.join(cache, 'llama.tar.gz.part')), false);
+});
+
+test('rejects a model whose checksum differs and keeps the existing model', t => {
+  const { dir, cache } = setup(t);
+  const model = path.join(dir, 'tampered.gguf');
+  fs.writeFileSync(model, 'tampered');
+  fs.writeFileSync(path.join(cache, 'model.gguf'), 'kept');
+  const stderr = run(cache, archive(dir, '.', '.'), {
+    LLM_MODEL_URL: pathToFileURL(model).href,
+    LLM_MODEL_SHA256: sha256('expected'),
+  });
+  assert.match(stderr, /Checksum mismatch/);
+  assert.equal(fs.readFileSync(path.join(cache, 'model.gguf'), 'utf8'), 'kept');
+  assert.equal(fs.existsSync(path.join(cache, 'model.gguf.part')), false);
+});
+
+test('keeps an unrecorded model only when its checksum matches', t => {
+  const { dir, cache } = setup(t);
+  const file = archive(dir, '.', '.');
+  assert.match(run(cache, file), /Using cached model/);
+  fs.rmSync(path.join(cache, 'model.gguf.source'));
+  fs.writeFileSync(path.join(cache, 'model.gguf'), 'unknown');
+  const missing = pathToFileURL(path.join(dir, 'none.gguf')).href;
+  assert.match(run(cache, file, { LLM_MODEL_URL: missing }), /Downloading model/);
 });

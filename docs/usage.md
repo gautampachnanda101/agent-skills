@@ -68,10 +68,9 @@ A fully specified prompt skips the interactive round of questions:
 > environment variable): dry-run the new locations, then register them.
 > Confirm the proposal once, then carry it through every selected repository.
 
-The token is referenced by name, never pasted. The skill asks for
-environment-variable names, credential-file paths, or the host's secret
-mechanism instead of token values — in a fast-path prompt, follow the same
-rule.
+The token is referenced by name, never pasted. The skill asks for an
+environment-variable name, a credential-file path, or the host's secret
+mechanism, never a token value. Follow the same rule in a fast-path prompt.
 
 ## What a complete result looks like
 

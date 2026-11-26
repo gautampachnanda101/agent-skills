@@ -1,12 +1,11 @@
 # peer-code-review
 
-**Version 1.2.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/SKILL.md) · plugin name `agent-skills:peer-code-review`**
+**Version 1.3.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/SKILL.md) · plugin name `agent-skills:peer-code-review`**
 
 Runs an evidence-based peer code review of a diff, commit series, or pull
-request: focused passes at review-research-informed pacing, findings graded
-by severity with `file:line` evidence, why-not-what explanations, and a
-verdict the author can act on. User-interface changes additionally get a
-WCAG 2.2 AA accessibility check.
+request. It reviews in focused passes, grades each finding by severity with
+`file:line` evidence, explains why, and ends with a verdict the author can
+act on. User-interface changes also get a WCAG 2.2 AA accessibility check.
 
 ## Grounded in
 
@@ -47,6 +46,7 @@ and exits 1. It checks structure, not whether the findings are right.
 
 > Review this pull request using the peer-code-review skill.
 
-The review produces a verdict (`approve`, `approve with comments`,
-`request changes`, `split before review`), a findings table, genuine
-strengths, and a deferred list — without ever pushing to the branch.
+The review produces a verdict, a findings table, genuine strengths, and a
+deferred list. The verdict is `approve`, `approve with comments`,
+`request changes`, or `split before review`. It never pushes to the
+branch.

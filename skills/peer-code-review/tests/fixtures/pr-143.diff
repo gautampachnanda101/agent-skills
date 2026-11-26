@@ -1,0 +1,63 @@
+diff --git a/src/queue/consumer.ts b/src/queue/consumer.ts
+index f0edd14..3d8e660 100644
+--- a/src/queue/consumer.ts
++++ b/src/queue/consumer.ts
+@@ -2,6 +2,7 @@ import { Queue, Event } from './queue';
+ import { Log } from '../log';
+ 
+ const MAX_ATTEMPTS = 5;
++const BASE_DELAY_MS = 100;
+ 
+ export class Consumer {
+   private attempts = 0;
+@@ -26,7 +27,7 @@ export class Consumer {
+       this.attempts = 0;
+       return;
+     }
+-    await this.queue.requeue(event, 2 ** this.attempts * 100);
++    await this.queue.requeue(event, 2 ** this.attempts * BASE_DELAY_MS);
+   }
+ 
+   private async handle(event: Event): Promise<void> {
+diff --git a/tests/consumer.test.ts b/tests/consumer.test.ts
+index 90f4b21..4eb3ae9 100644
+--- a/tests/consumer.test.ts
++++ b/tests/consumer.test.ts
+@@ -14,3 +14,11 @@ test('poll logs and requeues when processing fails', async () => {
+   expect(log.failures).toEqual(['a']);
+   expect(queue.requeued).toEqual(['a']);
+ });
++
++test('poll doubles the requeue delay after each failure', async () => {
++  const queue = fakeQueue([{ id: 'a' }], { failWith: new Error('boom') });
++  const consumer = new Consumer(queue, fakeLog());
++  await consumer.poll();
++  await consumer.poll();
++  expect(queue.delays).toEqual([200, 400]);
++});
+diff --git a/tests/helpers/queue.ts b/tests/helpers/queue.ts
+index 0495a69..c7665b6 100644
+--- a/tests/helpers/queue.ts
++++ b/tests/helpers/queue.ts
+@@ -8,15 +8,20 @@ export function fakeLog() {
+ export function fakeQueue(events: Event[], options: { failWith?: Error } = {}) {
+   const processed: string[] = [];
+   const requeued: string[] = [];
++  const delays: number[] = [];
+   return {
+     processed,
+     requeued,
++    delays,
+     fetch: async () => events[0],
+     process: async (event: Event) => {
+       if (options.failWith) throw options.failWith;
+       processed.push(event.id);
+     },
+-    requeue: async (event: Event) => { requeued.push(event.id); },
++    requeue: async (event: Event, delay: number) => {
++      requeued.push(event.id);
++      delays.push(delay);
++    },
+     deadLetter: async () => {},
+   };
+ }

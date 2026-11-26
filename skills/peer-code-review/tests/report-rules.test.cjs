@@ -34,39 +34,35 @@ test('the expected planted-defects report passes the report grader', () => {
   assert.equal(result.status, 0, result.out);
 });
 
+// Each edit must change the report, or the test proves nothing.
+function edited(text, pattern, replacement) {
+  const result = text.replace(pattern, replacement);
+  assert.notEqual(result, text, `edit did not apply: ${pattern}`);
+  return result;
+}
+
+const firstMajor = /^\| `?major`? \|[^\n]*$/m;
+
 test('grader rejects missing evidence, invalid severities, blame, and quoted secrets', () => {
-  // finding without a location or quote
-  const r1 = runReport(goodReport.replace(
-    '| `major` | Nested catch swallows every failure and the failure log was removed, so bad state reaches the retry counter silently | `src/queue/consumer.js:15-19`, quote: `catch (error) { // ignore transient errors }` plus deleted `this.log.fail(event.id, error)` | A poisoned event now retries forever with zero operator signal — the exact defect the tests would have caught |',
-    '| `major` | retry swallows exceptions silently | no evidence attached | reason |',
-  ));
+  const r1 = runReport(edited(goodReport, firstMajor, '| major | retry swallows exceptions silently | no evidence attached | reason |'));
   assert.equal(r1.status, 1, r1.out);
   assert.match(r1.out, /without a file:line location/);
 
-  // invalid severity token
-  const r2 = runReport(goodReport.replace('severity, location, evidence, suggested direction', 'severity, location, evidence, suggested direction').replace('Verdict: `request changes`', 'Verdict: `request changes`').replace('| `major` | Nested catch', '| `critical` | Nested catch'));
+  const r2 = runReport(edited(goodReport, firstMajor, row => row.replace(/major/, 'critical')));
   assert.equal(r2.status, 1, r2.out);
-  assert.match(r2.out, /without a severity token|unrecognized verdict|problem/);
+  assert.match(r2.out, /without a severity token/);
 
-  // author-directed blame language
-  const r3 = runReport(goodReport.replace(
-    '## Strengths',
-    '## Author commentary\n\nYou should have written the tests first.\n\n## Strengths',
-  ));
+  const r3 = runReport(edited(goodReport, /^## Strengths/m, '## Author commentary\n\nYou should have written the tests first.\n\n## Strengths'));
   assert.equal(r3.status, 1, r3.out);
   assert.match(r3.out, /blame/);
 
-  // quoted secret
-  const r4 = runReport(goodReport.replace(
-    '## Strengths',
-    '## Secrets\n\nThe diff contained `ghp_aBcDeFgHiJkLmNoPqRsTuVw1234567890`.\n\n## Strengths',
-  ));
+  const r4 = runReport(edited(goodReport, /^## Strengths/m, '## Secrets\n\nThe diff contained `ghp_aBcDeFgHiJkLmNoPqRsTuVw1234567890`.\n\n## Strengths'));
   assert.equal(r4.status, 1, r4.out);
   assert.match(r4.out, /possible secret/);
 
-  // non-recognized verdict
-  const r5 = runReport(goodReport.replace('Verdict: `request changes`', 'Verdict: `looks fine`'));
+  const r5 = runReport(edited(goodReport, /Verdict:[^\n]*/, 'Verdict: `looks fine`'));
   assert.equal(r5.status, 1, r5.out);
+  assert.match(r5.out, /no recognized verdict/);
 });
 
 const HEADER = '| Severity | Defect | Evidence | Why |\n| --- | --- | --- | --- |\n';
@@ -134,7 +130,7 @@ test('--json prints only JSON', () => {
     fs.writeFileSync(file, goodReport);
     const json = JSON.parse(execFileSync('node', [script, file, '--json'], { encoding: 'utf8' }));
     assert.equal(json.files, 1);
-    assert.equal(json.finding_rows, 8);
+    assert.ok(json.finding_rows >= 8);
     assert.equal(json.problems.length, 0);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });

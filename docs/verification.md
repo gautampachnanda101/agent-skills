@@ -9,6 +9,7 @@ In this page:
 
 - [Check descriptors and TechDocs](#check-descriptors-and-techdocs)
 - [Run the local-model check](#run-the-local-model-check)
+- [Run the skill evals](#run-the-skill-evals)
 - [Check a review report](#check-a-review-report)
 
 ## Check descriptors and TechDocs
@@ -101,6 +102,55 @@ token use, and durations to `.llm-cache/benchmark.json`:
 
 The delta shows what the skill adds for its token cost. Only the with-skill
 runs must pass; a baseline failure is a result, not an error.
+
+## Run the skill evals
+
+Grade every skill against its `evals/evals.json` with a capable model:
+
+```sh
+SKILL_EVAL_CMD='<command>' make skill-evals
+```
+
+Set `SKILL_EVAL_CMD` to any command that reads a prompt on standard input and
+prints the model's reply. Each prompt holds the skill, its guides, the case's
+input files with line numbers, and the task. Answer keys are never sent. Add
+`SKILL=<name>` to run one skill, or `RUNS=3` to repeat each case.
+
+For example, with Claude Code installed:
+
+```sh
+SKILL_EVAL_CMD='claude -p --tools "" --setting-sources "" --no-session-persistence' \
+  make skill-evals RUNS=3
+```
+
+Each run ends with a line such as `30/30 runs passed`, and writes every
+reply and its grade to `.eval-results/`. A case passes when the reply
+meets its checks:
+
+| Check | Meaning |
+| --- | --- |
+| `grader` | The skill's report grader passes the reply |
+| `ledger` | Every planted defect appears as a finding, at an accepted severity |
+| `max_severity` | No finding on a clean input is more severe than this |
+| `must_match` / `must_not_match` | Required and forbidden content |
+
+The review skills' planted-defect inputs are real: a pull-request diff and
+two documentation pages, each with a clean companion. CI does not run these
+evals, because they need a model account.
+
+Results for release 1.2.0, with Claude Opus 5.5, three runs per case with
+the skill and one without:
+
+| Skill | Cases | With the skill | Without |
+| --- | --- | --- | --- |
+| backstage-catalog-builder | Suggest an owner from strong evidence; from weak evidence | 6/6 | 1/2 |
+| doc-author | Write a how-to; rewrite a reference page | 5/6 | 1/2 |
+| documentation-review | Ten planted defects; two clean pages | 6/6 | 0/2 |
+| peer-code-review | Eight planted defects; a clean change | 5/6 | 0/2 |
+
+The two failures: one rewrite left a `TODO` comment in the page, and one
+review raised the duplicated retry logic only as a question. Without the
+skill, the review replies had no findings table to grade.
 
 ## Check a review report
 

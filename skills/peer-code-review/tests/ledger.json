@@ -1,0 +1,89 @@
+[
+  {
+    "defect": "Failures are swallowed and the failure log was removed",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "consumer\\.ts",
+      "swallow|ignor|empty catch|silent|discard|drop"
+    ]
+  },
+  {
+    "defect": "The failure-path test was deleted",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "consumer\\.test\\.ts",
+      "delet|remov|coverage"
+    ]
+  },
+  {
+    "defect": "Lint suppression without a reason",
+    "severity": [
+      "minor",
+      "major"
+    ],
+    "match": [
+      "eslint-disable|suppress"
+    ]
+  },
+  {
+    "defect": "Health type widened to any",
+    "severity": [
+      "minor",
+      "major"
+    ],
+    "match": [
+      "status\\.tsx",
+      "\\bany\\b"
+    ]
+  },
+  {
+    "defect": "Status conveyed by colour alone in a non-semantic element",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "status\\.tsx",
+      "colou?r|accessib|wcag|semantic|screen.reader"
+    ]
+  },
+  {
+    "defect": "Hardcoded token in a test helper",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "helpers/queue\\.ts",
+      "token|secret|credential"
+    ]
+  },
+  {
+    "defect": "Unrelated reformatting of theme.ts",
+    "severity": [
+      "minor",
+      "nit"
+    ],
+    "match": [
+      "theme\\.ts",
+      "format|churn|reorder|unrelated"
+    ]
+  },
+  {
+    "defect": "Retry logic duplicated in pollOnce",
+    "severity": [
+      "minor",
+      "major"
+    ],
+    "match": [
+      "pollOnce|retry",
+      "duplicat|copy|copies|repeat|same (?:logic|code|block)|mirror|reimplement|twice"
+    ]
+  }
+]

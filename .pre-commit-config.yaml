@@ -8,6 +8,8 @@ repos:
       - id: check-merge-conflict
       - id: check-added-large-files
       - id: trailing-whitespace
+        # Unified diffs mark blank context lines with a single space.
+        exclude: '\.diff$'
       - id: end-of-file-fixer
   - repo: local
     hooks:

@@ -107,9 +107,14 @@ jobs:
           done
 
   skill-llm:
-    name: Local model applies the skill
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
+    name: Local model applies the skill (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        # Linux x64 and arm64, macOS arm64 and Intel: every pinned archive.
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -119,13 +124,13 @@ jobs:
         with:
           node-version: '24'
 
-      # llama.cpp CPU binary (~23 MB) plus the ~400 MB quantized model; the
+      # llama.cpp binary (~20 MB) plus the ~490 MB quantized model; the
       # restore keeps later runs to a few minutes of compute.
       - name: Cache llama.cpp and model
         uses: actions/cache@v4
         with:
           path: .llm-cache
-          key: skill-llm-b12681-qwen2.5-0.5b-v3
+          key: skill-llm-${{ matrix.os }}-b12681-qwen2.5-0.5b-v4
 
       - name: Verify the skill with a local model
         run: make skill-llm-verify

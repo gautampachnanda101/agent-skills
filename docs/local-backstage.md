@@ -15,9 +15,11 @@ In this page:
 - [Connect through MCP](#connect-through-mcp)
 
 The first run scaffolds the app with `@backstage/create-app` and installs
-dependencies, which takes a few minutes. Open the UI at
-`http://localhost:3000` and the catalog API at
-`http://localhost:7007/api/catalog`.
+dependencies, which takes a few minutes. If `yarn install` stops with a
+network error, run the command again; setup resumes where it stopped. Open
+the UI at `http://localhost:3000` and the catalog API at
+`http://localhost:7007/api/catalog`. Both need the token when
+`BACKSTAGE_TOKEN` is set.
 
 ## Backstage options
 
@@ -37,9 +39,10 @@ Other behaviors worth knowing:
 - `app-config.local.yaml` is regenerated on each run; the demo's random-joke
   home widget, which calls an external API, is disabled.
 - `make backstage-backend` starts only the backend.
-- `make backstage-clean` removes the local app and its clones only when the
-  directory carries the managed marker from a successful setup — it rejects
-  the filesystem root, home, repository root, and their ancestors.
+- `make backstage-clean` removes the local app and its clones. It runs only
+  when the directory carries the marker from a successful setup, and it
+  refuses the filesystem root, your home directory, the repository, and
+  their parents.
 
 ## Test a cloned repository
 
@@ -71,10 +74,10 @@ To test a repository you have cloned:
    dependencies, API definitions, and processing errors.
 
 Keep identities distinct across repositories and do not recreate the
-`catalog-test` group in each one. Relative Location targets resolve from their
-descriptor file and must exist on the backend's filesystem; API definitions in
-file locations should be inline, because Backstage does not apply
-`$text`/`$yaml` placeholders there.
+`catalog-test` group in each one. Relative Location targets resolve from their descriptor file, and the files
+must exist on the backend's filesystem. Put API definitions inline in file
+locations, because Backstage does not apply `$text`/`$yaml` placeholders
+there.
 
 ## GitHub organization discovery
 
@@ -110,10 +113,10 @@ enumeration rather than an organization provider. See
 
 ## Connect through MCP
 
-The scaffold registers the open-source MCP Actions Backend, and this
+The scaffold registers the open-source MCP Actions Backend. This
 repository's [VS Code MCP configuration](https://github.com/gautampachnanda101/agent-skills/blob/main/.vscode/mcp.json)
-connects to `http://localhost:7007/api/mcp-actions/v1` using a secure prompt —
-not a stored token:
+connects to `http://localhost:7007/api/mcp-actions/v1`. It asks for the
+token in a secure prompt instead of storing it:
 
 1. Create a token in the environment:
 
@@ -138,10 +141,9 @@ not a stored token:
 
 Other MCP-capable assistants can use the same HTTP endpoint with their own
 secret-aware authorization; update the client URL if the backend port changes.
-A saved connection config alone proves nothing — initialization plus a
-successful tool call is the connectivity evidence. The skill's
+A saved connection config alone proves nothing: initialization plus a
+successful tool call is the evidence. The skill's
 [mcp-workflow.md](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/mcp-workflow.md)
-covers catalog-model discovery, per-entity server validation, paginated
-inspection, safe registration, and coverage reconciliation: it treats
-transport success and tool-result errors separately, and never mistakes a
-file location for a URL upload.
+covers catalog-model discovery, validation, paginated inspection, safe
+registration, and coverage checks. It treats transport errors and tool
+errors separately.

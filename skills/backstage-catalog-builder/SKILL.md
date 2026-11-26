@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read, Git or Bash tools, and network access for GitHub discovery, the Backstage plugin directory, MCP or catalog APIs. Node.js 20+ is required for the bundled structural checkers; a Python mkdocs install or a running Backstage instance is optional for deeper validation.
 metadata:
   author: gautampachnanda101
-  version: "1.0.4"
+  version: "1.1.0"
 ---
 
 # Backstage catalog builder
@@ -33,6 +33,7 @@ assistant's file or resource tools; a link alone is not auto-resolved.
 | Evaluating, installing, or wiring any plugin or capability | [plugin-integration.md](./plugin-integration.md) |
 | Organization/account scope, evidence mapping, or discovery providers | [scope-and-modeling.md](./scope-and-modeling.md) |
 | Generating or updating MkDocs documentation (TechDocs), including monorepo documentation layouts | [techdocs-mkdocs.md](./techdocs-mkdocs.md) |
+| Suggesting owners, lifecycles, systems, and other decisions from repository data | [suggest-from-evidence.md](./suggest-from-evidence.md) |
 
 ## End-user outcome
 
@@ -61,6 +62,14 @@ points and the approved Backstage configuration.
   evidence of a fully configured account.
 
 ## Gather context
+
+Read before you ask. Turn each open decision into a suggestion backed by
+repository evidence, following
+[suggest-from-evidence.md](./suggest-from-evidence.md), and send one batch:
+suggestions to accept or correct, then questions with no evidence. A
+suggestion is not a decision: write nothing the user has not confirmed. A
+test-only or placeholder owner, such as `group:default/catalog-test`, is a
+suggestion to replace, not a value to keep.
 
 1. Ask the user for the repository path if it is not already clear. In the same
    batch, ask what existing Backstage entity configuration they can already
@@ -91,8 +100,9 @@ points and the approved Backstage configuration.
    asked for if endpoint access was not already confirmed in the previous step.
    For app configuration, confirm the file to modify and the location target
    and type. Do not assume the Backstage app is in the scanned repository.
-3. Ask for the owning Backstage entity and lifecycle if they cannot be established
-   from existing descriptors or other reliable project evidence. Confirm other
+3. Suggest the owning Backstage entity and lifecycle from existing
+   descriptors, CODEOWNERS, and other project evidence, with that evidence;
+   ask outright only when none exists. Confirm other
    ambiguous component boundaries, names, namespaces, or relationships before
    writing them. Batch questions when practical; if the user cannot provide a
    required value, report the blocker instead of inventing one.

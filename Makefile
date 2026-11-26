@@ -27,7 +27,7 @@ BACKSTAGE_ENV = node_bin=$$(sh "$(CURDIR)/scripts/backstage-node.sh"); \
 BACKSTAGE_HOME_ENV = BACKSTAGE_HOME=$$(node "$(CURDIR)/scripts/backstage-home.cjs" resolve "$$BACKSTAGE_HOME" "$(CURDIR)"); \
 	export BACKSTAGE_HOME
 
-.PHONY: help install install-global update status _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify hooks-install hooks-check
+.PHONY: help install install-global update status _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify skill-evals hooks-install hooks-check
 
 help:
 	@set -eu; \
@@ -56,6 +56,7 @@ help:
 	entry 'skill-smoke' 'Run the bundled descriptor and TechDocs checkers over fixtures and this repository.'; \
 	entry 'skill-techdocs' 'Run the bundled TechDocs/MkDocs checker over fixtures and this repository.'; \
 	entry 'skill-llm-verify' 'Run the skill evals with a local llama.cpp model and a without-skill baseline benchmark.'; \
+	entry 'skill-evals' 'Grade every skill against its evals with the model in SKILL_EVAL_CMD.'; \
 	heading 'Local Backstage'; \
 	entry 'backstage' 'Set up if needed, then start the UI and backend. Ctrl+C stops them.'; \
 	entry 'backstage-backend' 'Start only the backend and catalog API.'; \
@@ -230,6 +231,9 @@ skill-techdocs:
 
 skill-llm-verify:
 	@LLM_CACHE="$(CURDIR)/.llm-cache" sh "$(CURDIR)/skills/backstage-catalog-builder/scripts/skill-llm-verify.sh"
+
+skill-evals:
+	@node "$(CURDIR)/scripts/skill-evals.mjs" $(if $(SKILL),--skill $(SKILL)) $(if $(RUNS),--runs $(RUNS))
 
 install:
 	@set -eu; \

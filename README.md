@@ -4,10 +4,10 @@
 [![Docs](https://github.com/gautampachnanda101/agent-skills/actions/workflows/docs.yml/badge.svg?branch=main)](https://gautampachnanda101.github.io/agent-skills/)
 
 Reusable [Agent Skills](https://agentskills.io/) for coding assistants. Each
-[skills/](./skills/) subdirectory is one independent skill — a `SKILL.md`,
-guides, scripts, and tests — designed to be portable across assistants,
-editors, models, and operating systems. Not every client has been tested. The
-skills today:
+[skills/](./skills/) subdirectory is one independent skill: a `SKILL.md`,
+guides, scripts, and tests. The skills are designed to work across
+assistants, editors, models, and operating systems, though not every client
+has been tested. The skills today:
 
 - [`backstage-catalog-builder`](./skills/backstage-catalog-builder/SKILL.md) —
   scans GitHub repositories and builds evidence-based open-source Backstage
@@ -31,10 +31,10 @@ built from [docs/](./docs/) and attached to the
 ## How Agent Skills work
 
 Assistants load skills by
-[progressive disclosure](https://agentskills.io/specification.md): a session
-starts with only each skill's `name` and `description` (about 100 tokens),
-the full `SKILL.md` is read when a task matches, and every other file loads
-only when the workflow calls for it. Per the
+[progressive disclosure](https://agentskills.io/specification.md). A session
+starts with only each skill's `name` and `description`, about 100 tokens.
+The assistant reads the full `SKILL.md` when a task matches, and loads other
+files only when the workflow calls for them. Per the
 [specification](https://agentskills.io/specification.md), a skill is one
 folder whose only required file is the `SKILL.md`:
 
@@ -49,8 +49,7 @@ skill-name/
 ```
 
 In this repository, each [skills/](./skills/) subdirectory is one such skill.
-The folder is the source of truth — browse the skill directories to see what
-any skill actually contains — and the
+Each folder is the source of truth for what its skill contains. The
 [Skills section](https://gautampachnanda101.github.io/agent-skills/skills/)
 of the site describes each one.
 
@@ -77,9 +76,9 @@ notes: [Installing the skills](https://gautampachnanda101.github.io/agent-skills
 
 ## Use
 
-Open a repository and ask for a skill by name, for example: *"Use the
+Open a repository and ask for a skill by name. For example: *"Use the
 backstage-catalog-builder skill to create a Backstage catalog for this
-repository"* or *"Review this pull request using the peer-code-review
+repository."* or *"Review this pull request using the peer-code-review
 skill."*
 
 Prompts for every skill, an account-wide catalog run, and a fast path that
@@ -87,13 +86,11 @@ skips the interactive questions: [Using the skills](https://gautampachnanda101.g
 
 ## Documentation
 
-The complete documentation — installing (including the Claude plugin route),
-prompt patterns, verification with the bundled checkers and a local Backstage
-instance, and the contribution and release process — lives in the
-[TechDocs site](https://gautampachnanda101.github.io/agent-skills/), whose
-[home page](https://gautampachnanda101.github.io/agent-skills/) is the table
-of contents. To preview locally, run `pip install -r docs/requirements.txt`,
-then `mkdocs serve`.
+The [TechDocs site](https://gautampachnanda101.github.io/agent-skills/)
+covers installation, prompts for each skill, verification, a local
+Backstage, and contributing. Its home page is the table of contents. To
+preview it locally, run `pip install -r docs/requirements.txt`, then
+`mkdocs serve`.
 
 ## Contributing
 
