@@ -1,0 +1,11 @@
+{
+  "name": "report-builder",
+  "version": "2.1.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "node --test"
+  }
+}

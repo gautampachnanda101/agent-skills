@@ -10,6 +10,7 @@ In this page:
 - [Check descriptors and TechDocs](#check-descriptors-and-techdocs)
 - [Run the local-model check](#run-the-local-model-check)
 - [Run the skill evals](#run-the-skill-evals)
+- [Run the behaviour evals](#run-the-behaviour-evals)
 - [Check a review report](#check-a-review-report)
 
 ## Check descriptors and TechDocs
@@ -152,6 +153,60 @@ the skill and one without:
 The two failures: one rewrite left a `TODO` comment in the page, and one
 review raised the duplicated retry logic only as a question. Without the
 skill, the review replies had no findings table to grade.
+
+## Run the behaviour evals
+
+The skill evals grade a reply. The behaviour evals grade what an assistant
+does with the skill: which skill it loads, which files it reads, which
+commands it runs, and whether it writes anything before you confirm. See
+[decision 0008](decisions/0008-contract-based-behaviour-evals.md).
+
+Each case is a contract in the skill's `evals/agent-evals.json`, with a
+fixture repository under its `tests/fixtures/agent/`. Every run copies the
+fixture to a temporary folder and installs all the skills, without their
+tests. It then runs the assistant with every tool call denied unless the
+case permits it.
+
+Run them with an assistant adapter:
+
+```sh
+# Any OpenAI-compatible server, for example llama.cpp's llama-server:
+make skill-agent-evals AGENT=openai BASE_URL=http://127.0.0.1:8080/v1 MODEL=<model>
+
+# Claude Code, on your Claude account:
+make skill-agent-evals AGENT=claude-code
+```
+
+| Adapter | Assistant | Skills installed in | Permissions enforced by |
+| --- | --- | --- | --- |
+| `claude-code` | Claude Code, with project settings only | `.claude/skills/` | Claude Code `--allowedTools` rules |
+| `openai` | A built-in agent with five tools, for llama.cpp, Ollama, or a hosted endpoint | `.agents/skills/` | The adapter itself |
+
+A local model costs nothing, but needs one that calls tools; for example,
+start llama.cpp with `llama-server -m <model.gguf> --jinja`. Add `SKILL=`,
+`RUNS=`, or `RECORD=1`. Transcripts and grades go to `.eval-results/agent/`.
+
+These evals call a model, so CI never runs them. Instead, `RECORD=1` saves
+each passing run to the skill's `tests/agent-transcripts/`. The test suite
+grades every recording against its contract, and breaks each clause in turn
+to check that grading fails. Re-record after changing a skill.
+
+Results on 2026-11-26 with Claude Code and Claude Opus 5.5, after fixing the
+harness problems the first run exposed:
+
+| Skill | Case | Result |
+| --- | --- | --- |
+| backstage-catalog-builder | Suggests the owner from `CODEOWNERS` without writing | Pass |
+| backstage-catalog-builder | Runs the descriptor checker | 1 of 3 runs; twice it used the checker without loading the skill |
+| documentation-author | Suggests the audience and location before writing | Pass |
+| documentation-author | Writes the confirmed page and runs its commands | Pass |
+| documentation-review | Finds a broken link without editing | Pass |
+| documentation-review | Checks the documented Node version against `package.json` | Pass |
+| peer-code-review | Reviews the latest commit with `git` | Pass |
+| peer-code-review | Runs the tests before approving | Pass |
+| (none) | Loads no skill for an unrelated question | Pass |
+
+Runs cost $0.06 to $0.24 each; all of this phase's runs together cost $3.13.
 
 ## Check a review report
 

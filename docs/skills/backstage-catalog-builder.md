@@ -1,6 +1,6 @@
 # backstage-catalog-builder
 
-**Version 1.2.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/SKILL.md) · plugin name `agent-skills:backstage-catalog-builder`**
+**Version 1.2.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/backstage-catalog-builder/SKILL.md) · plugin name `agent-skills:backstage-catalog-builder`**
 
 Scans a GitHub organization, user account, single repository, or selected
 paths and produces evidence-based open-source Backstage catalog entities,

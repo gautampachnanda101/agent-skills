@@ -63,10 +63,12 @@ repository, so this comes first.
 
 **Deliver:**
 
-- A `--agent` mode for `make skill-evals`. Each run copies a fixture
-  repository to a temporary folder, installs only the skill under test, and
-  runs an assistant with tools. Claude Code with `--output-format
-  stream-json` records every tool call.
+- `make skill-agent-evals`. Each run copies a fixture repository to a
+  temporary folder, installs every skill, and runs an assistant with tools
+  through an adapter: `claude-code`, or `openai`, a built-in agent for
+  llama.cpp, Ollama, or any OpenAI-compatible server.
+- Assistant-neutral contracts, and recorded transcripts that the test suite
+  grades with no model, so CI never pays for a model call.
 - Graders for the transcript and the folder afterwards: which files were
   read, which commands ran, which files changed, and in what order.
 - Cases for the four existing skills:
@@ -226,7 +228,7 @@ covered by an existing skill, linked to elsewhere, or not built.
 | Phase | Status |
 | --- | --- |
 | 0. Foundations | Done in 2.0.0 |
-| 1. Behaviour evals | In progress |
+| 1. Behaviour evals | Contracts, both adapters, and recordings done; local-model results and an OpenCode adapter to follow |
 | 2. Lifecycle map | Not started |
 | 3. Inception | Not started |
 | 4. Verification | Not started |

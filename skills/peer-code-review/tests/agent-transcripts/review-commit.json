@@ -1,0 +1,54 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "recorded": "2026-11-26",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "peer-code-review"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show HEAD"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/peer-code-review/checklists.md"
+    },
+    {
+      "tool": "Grep",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "",
+      "pattern": "deliver|retry|attempt"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    }
+  ],
+  "reply": "# Review of 5ef30e7, \"Retry deliveries until they succeed\"\n\nThe commit changes 6 lines in `src/queue.js`. It replaces \"try up to 3 times, then throw\" with \"retry forever and ignore every error\". The diff is small and easy to follow, but the new behaviour is unsafe.\n\n## Verdict\n\nVerdict: request changes\n\n## Findings\n\n| Severity | Location | Evidence | Direction |\n|---|---|---|---|\n| blocker | `src/queue.js:3` | `while (true) {` | Nothing stops the loop. If a message can never be delivered (bad payload, revoked credentials, deleted endpoint), `deliver` never resolves. Whatever awaits it stalls, so one bad message can stop the outbox queue for good. Keep a cap on attempts, or a deadline, and when it is used up, raise the error or send the message to a dead-letter path. |\n| blocker | `src/queue.js:6-7` | `} catch (error) { // ignore and try again` | Every error is thrown away without being logged or checked. Errors that will never succeed on retry, like a 400 or 401 or a `TypeError` from a bug, get the same endless treatment as a brief network failure. No caller can ever see them, so failures stay hidden. Retry only errors that are known to be temporary and raise the rest right away. At the very least, log each failure with the attempt number. |\n| major | `src/queue.js:3-8` | `return await send(message);` retried with no pause | There is no wait between attempts, so a failing `send` gets called again immediately. That hammers the downstream service while it's down and keeps the CPU busy. Wait between tries with exponential backoff plus jitter. |\n| major | `src/queue.js` (whole change) | no test files in the repository | The retry behaviour changed and nothing tests it. Before merge, add tests for: success on the first try, success after N failures, giving up after the cap, and an error that should not be retried being raised right away. A fake `send` makes these quick and repeatable. |\n| question | commit message | \"Retry deliveries until they succeed\" | What problem led to this change? Was it a flaky network, or a cap of 3 that was too low? If the cap was the issue, raising it and adding backoff would fix that without the risks above. |\n| minor | `README.md:3` | \"Sends notifications from the outbox queue.\" | Nothing documents how many times a delivery is retried or what happens when it finally fails. Once that's settled, add a line to the README. |\n\n## Strengths\n\n- The commit updates the comment on line 1 to match the new behaviour, so the comment stays accurate.\n\n## Deferred\n\n- Retrying \"until it succeeds\" is a real requirement for an outbox. It is usually done by leaving the message in the outbox and retrying it on later runs, not by blocking inside `deliver`. That design change is worth its own ticket.\n\n## Unevaluated\n\n- **Tests, linters and build:** none exist in the repository, and this session only allowed read-only git commands, so nothing was run.\n- **Report format check:** the skill's `check-review-report.mjs` didn't run, because running Node and saving files weren't allowed.\n- **Callers of `deliver`:** none exist in the repository, so I couldn't confirm how much a hang would affect other code.",
+  "changed": [],
+  "files": {}
+}

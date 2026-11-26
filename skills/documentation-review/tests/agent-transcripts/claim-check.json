@@ -1,0 +1,53 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "recorded": "2026-11-26",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "documentation-review"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/main.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/documentation-review/review-checklists.md"
+    }
+  ],
+  "reply": "I reviewed the project documentation: `README.md`, checked against `package.json` and `src/main.js`. I left out the `.claude/skills/` files because they are agent tooling, not docs for this project. I didn't run any commands or edit any files.\n\n**Audience (inferred):** developers who clone `report-builder` and run it locally with Node.js. The only evidence is the npm scripts and the README's \"Build\" section. There is no other documentation, issue tracker or user-facing site.\n\nThe quick start is wrong in two places: it gives the wrong Node.js version, and the first command doesn't exist.\n\n## Classification\n\n| Page | Intended form | Actual form | Notes |\n| --- | --- | --- | --- |\n| `README.md` | Landing page with a quick start (how-to) | A one-line summary plus a two-command how-to | It's the only page. It has no links to other docs, and none exist. |\n\n## Findings\n\n| Severity | Location | Evidence | Suggested fix |\n| --- | --- | --- | --- |\n| blocker | `README.md:7`, `package.json:5` | The README says \"Node.js 18 or later\". `package.json` declares `\"engines\": { \"node\": \">=22\" }`. Readers on Node 18 or 20 meet the requirement as written but fall outside the declared range. | Change the README to \"Node.js 22 or later\". Better still, say the version is set by `engines` in `package.json` so the two stay in step. |\n| blocker | `README.md:11`, `package.json:7-10` | The README says to run `npm run build`, but `package.json` has no `build` script (only `start` and `test`). npm would stop with `Missing script: \"build\"`. This is inferred from the manifest, not run. Readers fail at the first step. | Remove `npm run build`. If a build step is planned, add the script first. |\n| major | `README.md:3`, `src/main.js:1` | The README says the tool \"Builds weekly usage reports from the events table.\" `src/main.js` only runs `console.log('report');`. There is no data source, no \"events table\" and no weekly schedule. The README describes something the code doesn't do, and never says which database or table \"the events table\" is. | Describe what the tool does today. If a data source is planned, say what \"events table\" means, where it lives and how to configure the connection. |\n| major | `README.md:9-11` | The page says nothing about what `npm start` produces or where the report goes. Readers can't tell whether it worked. | Add an expected-output line (today it prints `report` to stdout) and say where real reports will be written. |\n| minor | `README.md:11` | The commands are inline in a sentence, not in a fenced block with a language tag, so they're harder to copy and scan. | Use a numbered list with one fenced `sh` block per step (see the suggested diff). |\n| minor | `README.md:9` | The heading \"Build\" doesn't match what the section does, which is run the tool. | Rename it to \"Run the report builder\". Guide headings should be verb phrases. |\n| minor | `README.md` (whole file), `package.json:9` | `npm test` exists but isn't documented. There's no install step (`npm install`), even though it's harmless with no dependencies today. | Add a short \"Run the tests\" section. Add `npm install` once dependencies exist. |\n| minor | `README.md` (whole file) | No owner, maintainer, support contact or licence is listed. The folder isn't a git repository, so there's no commit history to suggest an owner. | Add a \"Maintainers\" or \"Support\" section. Whoever publishes `report-builder` (version 2.1.0 in `package.json:3`) is the obvious owner. |\n| question | `README.md:3`, `package.json:3` | The package is at version 2.1.0, but the code is a stub. Is this README a placeholder for a real tool that lives elsewhere, or is the code incomplete? | Confirm which one is the source of truth before rewriting the summary. |\n\n## Strengths\n\n- The page has a single `H1` with a descriptive title.\n- The first sentence says what the tool does, so the page passes the three-second test (even though the claim is inaccurate).\n- Requirements come before the steps that need them.\n- It's short, uses plain English, and has no \"simply\" or \"just\" wording.\n\n## Suggested diffs\n\n```diff\n ## Requirements\n\n-- Node.js 18 or later\n+- Node.js 22 or later (set by `engines` in `package.json`)\n\n-## Build\n+## Run the report builder\n\n-Run `npm run build`, then `npm start`.\n+1. Start the report builder:\n+\n+   ```sh\n+   npm start\n+   ```\n+\n+   It prints the report to standard output.\n+\n+## Run the tests\n+\n+```sh\n+npm test\n+```\n```\n\n## Unevaluated\n\n- **Commands:** I didn't run `npm run build`, `npm start` or `npm test` because this session didn't allow commands. The \"Missing script\" finding comes from reading `package.json`.\n- **Linters:** I found no `markdownlint`, `vale` or link-checker config, and couldn't run any tools anyway. Markdown lint status is unknown.\n- **Links:** the README has none, so there was nothing to check.\n- **Freshness:** with no git history, I couldn't judge when the page last changed or who changed it.\n- **Report checker:** I didn't run this skill's `check-review-report.mjs` on this report, because writing files and running commands weren't allowed.\n- **Accessibility:** the page has no images, tables, colour references or link text, so most WCAG checks don't apply. The heading structure passes.",
+  "changed": [],
+  "files": {}
+}

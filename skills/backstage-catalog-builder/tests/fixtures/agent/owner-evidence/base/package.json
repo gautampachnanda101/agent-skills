@@ -1,0 +1,9 @@
+{
+  "name": "@acme/ledger-sync",
+  "version": "1.4.0",
+  "description": "Syncs ledger entries from the payments queue into the reporting warehouse.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  }
+}

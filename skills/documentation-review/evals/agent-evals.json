@@ -1,0 +1,39 @@
+{
+  "skill_name": "documentation-review",
+  "evals": [
+    {
+      "id": "broken-link",
+      "fixture": "tests/fixtures/agent/broken-link",
+      "prompt": "Review this repository's documentation. Report your findings only; don't edit anything.",
+      "checks": {
+        "skill": "documentation-review",
+        "read": [
+          "README.md",
+          "docs/setup.md"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "configuration\\.md",
+          "(missing|broken|does not exist|doesn't exist|no such|not found)"
+        ]
+      }
+    },
+    {
+      "id": "claim-check",
+      "fixture": "tests/fixtures/agent/claim-check",
+      "prompt": "Review this repository's documentation. Report your findings only; don't edit anything.",
+      "checks": {
+        "skill": "documentation-review",
+        "read": [
+          "README.md",
+          "package.json"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "(Node(\\.js)? 18|>=\\s*22|22)",
+          "build"
+        ]
+      }
+    }
+  ]
+}

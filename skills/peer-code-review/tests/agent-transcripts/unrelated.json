@@ -1,0 +1,17 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "recorded": "2026-11-26",
+  "events": [
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/math.js"
+    }
+  ],
+  "reply": "`add(2, 3)` returns `5`, because `src/math.js:2` is just `return a + b;`.",
+  "changed": [],
+  "files": {}
+}

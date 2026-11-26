@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools; Bash and Node are optional for verifying commands, links, and MkDocs/TechDocs structure. Fetching external network evidence requires host and user permission.
 metadata:
   author: gautampachnanda101
-  version: "1.4.0"
+  version: "1.4.1"
 ---
 
 # Documentation review

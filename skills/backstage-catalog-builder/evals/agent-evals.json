@@ -1,0 +1,47 @@
+{
+  "skill_name": "backstage-catalog-builder",
+  "evals": [
+    {
+      "id": "owner-evidence",
+      "fixture": "tests/fixtures/agent/owner-evidence",
+      "prompt": "Prepare a Backstage catalog-info.yaml for this repository.",
+      "checks": {
+        "skill": "backstage-catalog-builder",
+        "read": [
+          "CODEOWNERS",
+          "package.json"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "payments-platform",
+          "(confirm|accept|correct|approve)"
+        ]
+      }
+    },
+    {
+      "id": "check-descriptor",
+      "fixture": "tests/fixtures/agent/check-descriptor",
+      "prompt": "Check this repository's catalog-info.yaml for problems. Report what you find; do not change any files.",
+      "allow": {
+        "run": [
+          "node {{skills}}/backstage-catalog-builder/scripts/check-descriptors.mjs",
+          "node {{root}}/{{skills}}/backstage-catalog-builder/scripts/check-descriptors.mjs"
+        ]
+      },
+      "checks": {
+        "skill": "backstage-catalog-builder",
+        "read": [
+          "catalog-info.yaml"
+        ],
+        "ran": [
+          "check-descriptors\\.mjs"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "owner",
+          "name"
+        ]
+      }
+    }
+  ]
+}

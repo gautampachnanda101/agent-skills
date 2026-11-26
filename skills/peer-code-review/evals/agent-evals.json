@@ -1,0 +1,78 @@
+{
+  "skill_name": "peer-code-review",
+  "evals": [
+    {
+      "id": "review-commit",
+      "fixture": "tests/fixtures/agent/review-commit",
+      "git": {
+        "message": "Retry deliveries until they succeed"
+      },
+      "prompt": "Review the latest commit on this branch.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git status"
+        ]
+      },
+      "checks": {
+        "skill": "peer-code-review",
+        "ran": [
+          "git (show|diff|log)"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "queue\\.js",
+          "(swallow|ignor|silent|infinite|unbounded|forever|while \\(true\\))"
+        ]
+      }
+    },
+    {
+      "id": "runs-tests",
+      "fixture": "tests/fixtures/agent/runs-tests",
+      "git": {
+        "message": "Simplify the discount calculation"
+      },
+      "prompt": "Review the latest commit before I merge it.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git status",
+          "npm test",
+          "node --test"
+        ]
+      },
+      "checks": {
+        "skill": "peer-code-review",
+        "ran": [
+          "(npm test|node --test)"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "request changes",
+          "(round|cents|fail)"
+        ]
+      }
+    },
+    {
+      "id": "unrelated",
+      "fixture": "tests/fixtures/agent/unrelated",
+      "prompt": "What does add(2, 3) return in src/math.js? Answer in one line.",
+      "checks": {
+        "no_skill": [
+          "peer-code-review",
+          "documentation-review",
+          "documentation-author",
+          "backstage-catalog-builder"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "\\b5\\b"
+        ]
+      }
+    }
+  ]
+}

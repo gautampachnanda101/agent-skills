@@ -1,0 +1,13 @@
+{
+  "name": "tiny-sum",
+  "version": "0.3.0",
+  "description": "Adds numbers safely, rejecting non-numeric input.",
+  "type": "module",
+  "main": "src/sum.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

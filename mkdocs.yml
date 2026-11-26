@@ -27,6 +27,7 @@ nav:
       - 0005 Releases: decisions/0005-a-person-publishes-releases.md
       - 0006 Skill names: decisions/0006-skill-names.md
       - 0007 Protecting main: decisions/0007-protect-main-without-requiring-pull-requests.md
+      - 0008 Behaviour evals: decisions/0008-contract-based-behaviour-evals.md
       - Template: decisions/template.md
 theme:
   name: material

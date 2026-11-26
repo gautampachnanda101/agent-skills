@@ -1,6 +1,6 @@
 # documentation-review
 
-**Version 1.4.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/SKILL.md) · plugin name `agent-skills:documentation-review`**
+**Version 1.4.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-review/SKILL.md) · plugin name `agent-skills:documentation-review`**
 
 Reviews documentation the way leading documentation engineers define
 quality. It classifies each page's form and audience, checks structure and

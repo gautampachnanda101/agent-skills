@@ -37,6 +37,15 @@ skill's `metadata.version` field.
   must be linked from its `SKILL.md`.
 - Decision records in `docs/decisions/` for the eval design, the local
   model in CI, pinning, releases, skill names, and protecting `main`.
+- Behaviour evals (`make skill-agent-evals`) run an assistant with tools in
+  a fixture repository and grade what it does: which skill loads, which
+  files it reads, which commands it runs, and whether it writes before
+  confirmation. Each case is an assistant-neutral contract in the skill's
+  `evals/agent-evals.json`. Adapters: `claude-code`, and `openai`, a
+  built-in agent for llama.cpp, Ollama, or any OpenAI-compatible server.
+  Recorded transcripts are graded in the test suite with no model, and
+  each contract clause is broken in turn to show it is enforced. Every
+  skill gets a patch release for its new cases.
 
 ### Changed (repository)
 

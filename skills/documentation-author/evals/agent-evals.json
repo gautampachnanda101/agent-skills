@@ -1,0 +1,55 @@
+{
+  "skill_name": "documentation-author",
+  "evals": [
+    {
+      "id": "suggest-first",
+      "fixture": "tests/fixtures/agent/suggest-first",
+      "prompt": "Write a getting-started guide for this project.",
+      "checks": {
+        "skill": "documentation-author",
+        "read": [
+          "package.json"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "(confirm|accept|correct|approve|shall I|should I)",
+          "(docs/|README)"
+        ]
+      }
+    },
+    {
+      "id": "verified-write",
+      "fixture": "tests/fixtures/agent/verified-write",
+      "prompt": "Write a getting-started guide for new contributors at docs/getting-started.md. I confirm the audience (new contributors) and the location, so go ahead and write it. Check every command you include before you finish.",
+      "allow": {
+        "run": [
+          "npm test",
+          "node --test",
+          "node --version",
+          "npm --version"
+        ],
+        "write": [
+          "docs/getting-started.md"
+        ]
+      },
+      "checks": {
+        "skill": "documentation-author",
+        "read": [
+          "package.json"
+        ],
+        "ran": [
+          "(npm test|node --test)"
+        ],
+        "writes_only": [
+          "docs/getting-started.md"
+        ],
+        "files": {
+          "docs/getting-started.md": [
+            "^# ",
+            "npm test"
+          ]
+        }
+      }
+    }
+  ]
+}

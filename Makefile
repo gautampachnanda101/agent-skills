@@ -33,7 +33,7 @@ SKILL_AUTHOR = gautampachnanda101
 BACKSTAGE_HOME_ENV = BACKSTAGE_HOME=$$(node "$(CURDIR)/scripts/backstage-home.cjs" resolve "$$BACKSTAGE_HOME" "$(CURDIR)"); \
 	export BACKSTAGE_HOME
 
-.PHONY: help install install-global update status _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify skill-evals hooks-install hooks-check
+.PHONY: help install install-global update status _install backstage-setup backstage-config backstage backstage-backend backstage-clean backstage-github skill-smoke skill-techdocs skill-llm-verify skill-evals skill-agent-evals hooks-install hooks-check
 
 help:
 	@set -eu; \
@@ -63,6 +63,7 @@ help:
 	entry 'skill-techdocs' 'Run the bundled TechDocs/MkDocs checker over fixtures and this repository.'; \
 	entry 'skill-llm-verify' 'Run the skill evals with a local llama.cpp model and a without-skill baseline benchmark.'; \
 	entry 'skill-evals' 'Grade every skill against its evals with the model in SKILL_EVAL_CMD.'; \
+	entry 'skill-agent-evals' 'Run behaviour evals with an assistant: AGENT=claude-code|openai [MODEL=] [BASE_URL=].'; \
 	heading 'Local Backstage'; \
 	entry 'backstage' 'Set up if needed, then start the UI and backend. Ctrl+C stops them.'; \
 	entry 'backstage-backend' 'Start only the backend and catalog API.'; \
@@ -240,6 +241,11 @@ skill-llm-verify:
 
 skill-evals:
 	@node "$(CURDIR)/scripts/skill-evals.mjs" $(if $(SKILL),--skill $(SKILL)) $(if $(RUNS),--runs $(RUNS))
+
+# Behaviour evals run an assistant with tools, so they call a model: run them
+# locally, never in CI. AGENT=openai works with llama.cpp or Ollama for free.
+skill-agent-evals:
+	@node "$(CURDIR)/scripts/agent-evals.mjs" --agent "$(AGENT)" $(if $(MODEL),--model "$(MODEL)") $(if $(BASE_URL),--base-url "$(BASE_URL)") $(if $(SKILL),--skill $(SKILL)) $(if $(RUNS),--runs $(RUNS)) $(if $(RECORD),--record)
 
 install:
 	@set -eu; \
