@@ -211,10 +211,15 @@ this phase. On a Claude subscription, runs count against its usage limits
 instead; with an API key, that account is charged.
 
 With the `openai` adapter and Qwen3 8B on a local llama.cpp server, at no
-cost, 1 of 9 cases passed: the unrelated question. The model never loaded a
-skill. In the review cases it listed the files and then reviewed the skills'
-own guides instead of the project's pages. A local model of this size can
-exercise the harness for free, but it does not follow the skills.
+cost, 1 of 9 cases passed: the unrelated question.
+
+- With skills listed only in the system prompt, it loaded none of them.
+- With a `use_skill` tool, it loaded the right skill in 4 of the 8 cases that
+  need one, then stopped after one or two tool calls instead of following
+  the skill's steps.
+
+A model of this size can pick a skill, but does not yet carry out a
+multi-step procedure. It still tests the harness for free.
 
 ## Check a review report
 
