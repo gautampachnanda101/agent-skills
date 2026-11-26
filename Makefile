@@ -305,7 +305,8 @@ status:
 			printf "%s: renamed to %s\n  %-46s old copy; make update removes it\n" "$$old" "$$new" "$$dest/$$old"; \
 		done; \
 		IFS=" "; \
-	done
+	done; \
+	if command -v node >/dev/null 2>&1; then node "$(CURDIR)/scripts/agent-evals.mjs" --stale; fi
 _install:
 	@set -eu; \
 	if [ -z "$$DESTS" ]; then \

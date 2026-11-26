@@ -51,6 +51,13 @@ skill's `metadata.version` field.
   the skill for "check this catalog-info.yaml" in two of three runs.
 - The built-in agent offers a `use_skill` tool, as hosts with a skill tool
   do, and leaves sampling to the server's defaults.
+- Ownership is checked: every skill has its own `.github/CODEOWNERS` line,
+  a `metadata.author`, and a row in the *Levels and owners* table naming
+  the same owner. The table gives each skill's level and who checks its
+  output.
+- Recordings store the skill version they were made with, and `make status`
+  lists any that are older than their skill. Changing a recording needs no
+  version bump.
 
 ### Changed (repository)
 

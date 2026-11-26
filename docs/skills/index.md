@@ -26,6 +26,20 @@ the Claude plugin route.
 - [documentation-author](documentation-author.md) — authors new pages and rewrites existing
   ones with the same rules the review skill enforces.
 
+## Levels and owners
+
+A skill can serve one person, a team, or a business process; see
+[the plan](../plan.md#three-levels-of-use). Each skill's owner is the person
+asked to review changes to it, from
+[`.github/CODEOWNERS`](https://github.com/gautampachnanda101/agent-skills/blob/main/.github/CODEOWNERS).
+
+| Skill | Level | Who checks its output | Owner |
+| --- | --- | --- | --- |
+| [backstage-catalog-builder](backstage-catalog-builder.md) | Team; registering in a live catalog is process level | The person running it, and the catalog's owner before registration | @gautampachnanda101 |
+| [documentation-author](documentation-author.md) | Personal | The person who asked for the page | @gautampachnanda101 |
+| [documentation-review](documentation-review.md) | Personal | The page's author | @gautampachnanda101 |
+| [peer-code-review](peer-code-review.md) | Team | The change's author, and whoever decides to merge | @gautampachnanda101 |
+
 CI checks every skill against the specification and runs the tests a skill
 ships. `backstage-catalog-builder` also gets structural checks and a
 local-model check. See [Verification](../verification.md).

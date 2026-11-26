@@ -1,6 +1,7 @@
 {
   "agent": "claude-code",
   "model": "claude-opus-5-5",
+  "skill_version": null,
   "recorded": "2026-11-26",
   "events": [
     {

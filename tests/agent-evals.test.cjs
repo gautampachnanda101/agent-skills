@@ -189,3 +189,15 @@ test('paths are matched across /private, and recordings hold no machine paths', 
     }
   }
 });
+
+test('a recording is stale when it is missing, untracked, or older than its skill', async () => {
+  const { staleness, staleRecordings, skillVersion } = await load();
+  assert.equal(staleness('1.2.0', '1.2.0'), null);
+  assert.equal(staleness('1.2.0', '1.3.0'), 'recorded with 1.2.0; the skill is 1.3.0');
+  assert.match(staleness(null, '1.3.0'), /before versions were tracked/);
+  assert.equal(staleness(undefined, '1.3.0', false), 'no recording');
+  for (const { skill, eval: id, why } of staleRecordings()) {
+    const stored = recording(skill, id);
+    assert.equal(why, staleness(stored?.skill_version, skillVersion(skill), Boolean(stored)));
+  }
+});

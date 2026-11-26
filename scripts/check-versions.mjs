@@ -8,7 +8,9 @@
  *   - the newest released CHANGELOG.md section is the plugin version
  *
  * Against a base, for what changed since it:
- *   - a skill with any changed file has a higher version than at the base
+ *   - a skill with any changed file has a higher version than at the base,
+ *     except recorded transcripts (tests/agent-transcripts/), which record
+ *     evidence about a version rather than change the skill
  *   - no skill or plugin version decreases
  *   - a changed skill or plugin version comes with a CHANGELOG.md change
  *
@@ -79,7 +81,8 @@ export function check({ skills, read, base, changed }) {
   if (!changed) return problems;
   let needsChangelog = false;
   for (const skill of skills) {
-    if (!changed.some(file => file.startsWith(`skills/${skill}/`))) continue;
+    const own = changed.filter(file => file.startsWith(`skills/${skill}/`) && !file.startsWith(`skills/${skill}/tests/agent-transcripts/`));
+    if (!own.length) continue;
     needsChangelog = true;
     const before = skillVersion(base(`skills/${skill}/SKILL.md`));
     const after = skillVersion(read(`skills/${skill}/SKILL.md`));

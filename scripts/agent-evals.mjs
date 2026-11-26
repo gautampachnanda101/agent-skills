@@ -39,6 +39,7 @@
  *     [--base-url <url>] [--skill <name>] [--eval <id>] [--runs <n>]
  *     [--out <dir>] [--keep] [--record]
  *   node scripts/agent-evals.mjs --grade <skill> <eval-id> <record.json>
+ *   node scripts/agent-evals.mjs --stale   recordings older than their skill
  *
  * --record saves each passing run as skills/<skill>/tests/agent-transcripts/
  * <eval-id>.json. The test suite grades those recordings against their
@@ -68,6 +69,34 @@ function option(name, fallback) {
   const value = process.argv[i + 1];
   if (value === undefined || value.startsWith('--')) usageError(`${name} needs a value`);
   return value;
+}
+
+export function skillVersion(skill) {
+  const text = fs.readFileSync(path.join(root, 'skills', skill, 'SKILL.md'), 'utf8');
+  return /^metadata:\n(?:[ \t]+.*\n)*?[ \t]+version:[ \t]*["']?([^"'\s]+)/m.exec(text)?.[1] ?? null;
+}
+
+/** Why a recording needs re-recording, or null when it is current. */
+export function staleness(recordingVersion, currentVersion, exists = true) {
+  if (!exists) return 'no recording';
+  if (!recordingVersion) return `recorded before versions were tracked; the skill is ${currentVersion}`;
+  if (recordingVersion !== currentVersion) return `recorded with ${recordingVersion}; the skill is ${currentVersion}`;
+  return null;
+}
+
+/** Every case whose recorded transcript is missing or older than its skill. */
+export function staleRecordings() {
+  const stale = [];
+  for (const skill of fs.readdirSync(path.join(root, 'skills')).filter(name => loadCases(name)).sort()) {
+    const current = skillVersion(skill);
+    for (const evalCase of loadCases(skill).evals) {
+      const file = path.join(root, 'skills', skill, 'tests', 'agent-transcripts', `${evalCase.id}.json`);
+      const stored = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
+      const why = staleness(stored?.skill_version, current, Boolean(stored));
+      if (why) stale.push({ skill, eval: evalCase.id, why });
+    }
+  }
+  return stale;
 }
 
 export function loadCases(skill) {
@@ -310,6 +339,15 @@ export function validateCase(skill, evalCase) {
 }
 
 async function main() {
+  if (process.argv.includes('--stale')) {
+    const stale = staleRecordings();
+    if (!stale.length) console.log('Behaviour-eval recordings: all current.');
+    else {
+      console.log(`Behaviour-eval recordings to re-record (${stale.length}); run make skill-agent-evals RECORD=1:`);
+      for (const { skill, eval: id, why } of stale) console.log(`  ${skill}#${id}: ${why}`);
+    }
+    return;
+  }
   const gradeArgs = process.argv.indexOf('--grade');
   if (gradeArgs !== -1) {
     const [skill, id, file] = process.argv.slice(gradeArgs + 1);
@@ -363,7 +401,7 @@ async function main() {
         if (recordDir && graded.passed) {
           const file = path.join(root, 'skills', skill, 'tests', 'agent-transcripts', `${evalCase.id}.json`);
           fs.mkdirSync(path.dirname(file), { recursive: true });
-          fs.writeFileSync(file, JSON.stringify({ agent, model: settings.model, recorded: new Date().toISOString().slice(0, 10), ...result }, null, 2) + '\n');
+          fs.writeFileSync(file, JSON.stringify({ agent, model: settings.model, skill_version: skillVersion(skill), recorded: new Date().toISOString().slice(0, 10), ...result }, null, 2) + '\n');
         }
         if (!keep) fs.rmSync(dir, { recursive: true, force: true });
         const seconds = Math.round((Date.now() - started) / 1000);

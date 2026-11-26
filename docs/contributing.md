@@ -83,11 +83,23 @@ enumerates skills:
 
 1. Add the skill to the list in the repository `README.md`.
 2. Add a page for it under `docs/skills/`, including its version.
-3. Add it to the inventory in [Skills](skills/index.md).
-4. Add its page to `nav` in `mkdocs.yml`.
-5. Add an example prompt to [Using the skills](usage.md#a-prompt-for-each-skill).
-6. If the skill bundles verification assets, extend `make skill-llm-verify`
+3. Add it to the inventory in [Skills](skills/index.md), and to its
+   *Levels and owners* table with its level, who checks its output, and its
+   owner.
+4. Give it its own line in `.github/CODEOWNERS`, naming the same owner.
+   `tests/ownership.test.cjs` fails if the line, the table row, or the
+   skill's `metadata.author` is missing.
+5. Add its page to `nav` in `mkdocs.yml`.
+6. Add an example prompt to [Using the skills](usage.md#a-prompt-for-each-skill).
+7. Add behaviour evals in `evals/agent-evals.json`, run them with
+   `make skill-agent-evals RECORD=1`, and commit the recordings. See
+   [Verification](verification.md#run-the-behaviour-evals).
+8. If the skill bundles verification assets, extend `make skill-llm-verify`
    or add a task-specific check rather than assuming generic coverage.
+
+`make status` lists recordings made with an older version of their skill.
+Re-record them before a release. Recordings are evidence about a version,
+so changing one needs no version bump.
 
 `make install` copies every directory under `skills/` that contains a
 `SKILL.md`, so the installer needs no change. If the skill adds descriptor

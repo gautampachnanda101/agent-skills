@@ -108,3 +108,8 @@ test('the pre-commit mode checks the staged change in a real repository', t => {
   assert.equal(check('--base', '0000000000000000000000000000000000000000').status, 0, 'a new branch has no base');
   assert.equal(check('--base', 'no-such-ref').status, 2);
 });
+
+test('re-recording a transcript needs no version bump', async () => {
+  assert.deepEqual(await run({ changed: ['skills/demo/tests/agent-transcripts/case.json'] }), []);
+  assert.match((await run({ changed: ['skills/demo/tests/agent-transcripts/case.json', 'skills/demo/SKILL.md'] })).join('\n'), /must increase/);
+});
