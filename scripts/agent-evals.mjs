@@ -30,7 +30,8 @@
  *   read             files that must be read before the reply (path suffixes)
  *   ran              commands that must run (patterns), not only be attempted
  *   no_writes        no write may be attempted, and no file may change
- *   writes_only      only these paths may change
+ *   writes_only      only these paths may change (a folder/** allows
+ *                    anything inside the folder, here and in allow.write)
  *   files            path -> patterns the file must contain afterwards
  *   must_match / must_not_match   reply patterns (multiline, ignore case)
  *
@@ -171,6 +172,12 @@ export function changedFiles(before, after) {
 
 const norm = file => String(file ?? '').replace(/\\/g, '/');
 
+/** A write rule is a path, or a folder ending in /** for anything inside it. */
+export function writeAllowed(rules, file) {
+  const target = norm(file).replace(/^\.\//, '');
+  return rules.some(rule => (rule.endsWith('/**') ? target.startsWith(rule.slice(0, -2)) : target === rule));
+}
+
 export function relativeTo(dir, file) {
   // macOS reports the same temporary folder as /var/... and /private/var/...
   const value = norm(file).replace(/^\/private\//, '/');
@@ -260,7 +267,7 @@ export function grade(evalCase, run) {
     if (changed.length) failures.push(`changed files: ${changed.join(', ')}`);
   }
   if (checks.writes_only) {
-    const stray = changed.filter(file => !checks.writes_only.includes(norm(file)));
+    const stray = changed.filter(file => !writeAllowed(checks.writes_only, file));
     if (stray.length) failures.push(`changed files outside ${checks.writes_only.join(', ')}: ${stray.join(', ')}`);
   }
   for (const [file, patterns] of Object.entries(checks.files ?? {})) {
@@ -332,7 +339,8 @@ export function validateCase(skill, evalCase) {
     if (!allowed) problems.push(`${where}: /${pattern}/ must run, but no allowed command matches it`);
   }
   for (const file of [...(checks.writes_only ?? []), ...Object.keys(checks.files ?? {})]) {
-    if (!(evalCase.allow?.write ?? []).includes(file)) problems.push(`${where}: ${file} is checked but not allowed to be written`);
+    const rules = evalCase.allow?.write ?? [];
+    if (!rules.includes(file) && !writeAllowed(rules, file)) problems.push(`${where}: ${file} is checked but not allowed to be written`);
   }
   if (checks.no_writes && (evalCase.allow?.write ?? []).length) problems.push(`${where}: no_writes contradicts allow.write`);
   return problems;

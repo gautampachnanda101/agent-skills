@@ -11,6 +11,7 @@ nav:
       - peer-code-review: skills/peer-code-review.md
       - documentation-review: skills/documentation-review.md
       - documentation-author: skills/documentation-author.md
+      - skill-correction: skills/skill-correction.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md

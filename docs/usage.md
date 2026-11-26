@@ -22,6 +22,7 @@ In this page:
 | [peer-code-review](skills/peer-code-review.md) | "Review this pull request using the peer-code-review skill." |
 | [documentation-review](skills/documentation-review.md) | "Review this README with the documentation-review skill." |
 | [documentation-author](skills/documentation-author.md) | "Write the getting-started guide for this repository using the documentation-author skill." |
+| [skill-correction](skills/skill-correction.md) | "The peer-code-review skill approved a change with failing tests; here is the transcript. Fix the skill with skill-correction." |
 
 The two review skills report findings and change nothing unless you ask. The
 rest of this page covers `backstage-catalog-builder`.

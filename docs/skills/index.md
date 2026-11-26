@@ -25,6 +25,8 @@ the Claude plugin route.
   grounded in Diátaxis, style guides, and GOV.UK accessibility.
 - [documentation-author](documentation-author.md) — authors new pages and rewrites existing
   ones with the same rules the review skill enforces.
+- [skill-correction](skill-correction.md) — turns a correction to a skill's
+  behaviour into a failing eval case and the smallest fix.
 
 ## Levels and owners
 
@@ -39,6 +41,7 @@ asked to review changes to it, from
 | [documentation-author](documentation-author.md) | Personal | The person who asked for the page | @gautampachnanda101 |
 | [documentation-review](documentation-review.md) | Personal | The page's author | @gautampachnanda101 |
 | [peer-code-review](peer-code-review.md) | Team | The change's author, and whoever decides to merge | @gautampachnanda101 |
+| [skill-correction](skill-correction.md) | Team | The skill's owner, before the case and fix are written | @gautampachnanda101 |
 
 CI checks every skill against the specification and runs the tests a skill
 ships. `backstage-catalog-builder` also gets structural checks and a

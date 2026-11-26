@@ -1,0 +1,34 @@
+{
+  "skill_name": "skill-correction",
+  "guides": [
+    "root-causes.md"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "A team reports a problem with one of their skills. The skill and the report are below. Find the root cause and propose the eval case and the smallest fix. Do not write any files yet; this is the proposal for confirmation.",
+      "files": [
+        "tests/fixtures/reply/selection/csv-cleaner-SKILL.md",
+        "tests/fixtures/reply/selection/report.md"
+      ],
+      "expected_output": "Classifies the cause as selection (the skill never loaded), proposes a case whose prompt uses the users' own words without naming the skill and checks that csv-cleaner loads, and proposes changing only the description to include dedupe, duplicate lines, and spreadsheet wording, then asks for confirmation.",
+      "assertions": [
+        "Names the root cause as selection",
+        "Places the fix in the description, not in the steps",
+        "The new case's prompt uses the users' words and does not name the skill",
+        "Asks for confirmation before writing"
+      ],
+      "checks": {
+        "must_match": [
+          "selection",
+          "description",
+          "(dedupe|duplicate|repeated)",
+          "(confirm|approve|go ahead|shall I|should I)"
+        ],
+        "must_not_match": [
+          "^#+ .*Root cause.*\\n+.*missing instruction"
+        ]
+      }
+    }
+  ]
+}

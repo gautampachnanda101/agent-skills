@@ -1,0 +1,62 @@
+{
+  "skill_name": "skill-correction",
+  "evals": [
+    {
+      "id": "proposes-first",
+      "fixture": "tests/fixtures/agent/proposes-first",
+      "prompt": "Our greeter skill overwrote a message someone had saved; transcripts/greeter-overwrite.md has the details. Fix the skill so this doesn't happen again.",
+      "checks": {
+        "skill": "skill-correction",
+        "read": [
+          "transcripts/greeter-overwrite.md",
+          "skills/greeter/SKILL.md",
+          "skills/greeter/evals/agent-evals.json"
+        ],
+        "no_writes": true,
+        "must_match": [
+          "missing instruction",
+          "greeting\\.txt",
+          "(confirm|approve|go ahead|shall I|should I)"
+        ]
+      }
+    },
+    {
+      "id": "writes-confirmed",
+      "fixture": "tests/fixtures/agent/writes-confirmed",
+      "prompt": "Our greeter skill overwrote a message someone had saved; transcripts/greeter-overwrite.md has the details. I confirm the approach: add a behaviour eval case with the id asks-before-overwriting, with a fixture where greeting.txt already exists, and make the smallest fix to skills/greeter/SKILL.md. Go ahead and write them. There is no model to run the evals here, so check the new case by reading it against the transcript instead.",
+      "allow": {
+        "write": [
+          "skills/greeter/SKILL.md",
+          "skills/greeter/evals/agent-evals.json",
+          "skills/greeter/tests/**"
+        ]
+      },
+      "checks": {
+        "skill": "skill-correction",
+        "read": [
+          "transcripts/greeter-overwrite.md",
+          "skills/greeter/SKILL.md"
+        ],
+        "writes_only": [
+          "skills/greeter/SKILL.md",
+          "skills/greeter/evals/agent-evals.json",
+          "skills/greeter/tests/**"
+        ],
+        "files": {
+          "skills/greeter/evals/agent-evals.json": [
+            "\"asks-before-overwriting\"",
+            "writes-message"
+          ],
+          "skills/greeter/SKILL.md": [
+            "(already exists|exists|overwrit|replac)",
+            "version: \"1\\.(0\\.[1-9]|[1-9]\\.\\d+)\""
+          ]
+        },
+        "must_match": [
+          "missing instruction",
+          "(not run|could not run|didn't run|did not run|no model)"
+        ]
+      }
+    }
+  ]
+}

@@ -17,6 +17,14 @@ skill's `metadata.version` field.
 
 ### Added
 
+- A fifth skill, `skill-correction` 1.0.0: it turns a correction to a
+  skill's behaviour into a failing eval case and the smallest fix. It reads
+  the skill, its evals, and the evidence; classifies the root cause
+  (selection, a missing or buried instruction, ambiguity, the harness, or
+  model capability) with `root-causes.md`; writes a minimal fixture and
+  contract that fail on the observed behaviour; proposes the smallest
+  change; and re-runs the skill's cases. It writes nothing before the
+  correction, case, and fix are confirmed.
 - Repository checks on every commit and in CI: markdownlint for Markdown,
   shellcheck for shell scripts, zizmor for workflow security, and gitleaks
   for secrets. CI also scans the full history. Reviewed false positives

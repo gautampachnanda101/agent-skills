@@ -21,6 +21,9 @@ has been tested. The skills today:
 - [`documentation-author`](./skills/documentation-author/SKILL.md) — authors new pages and
   rewrites existing ones following Diátaxis and GOV.UK content design,
   with built-in lint-and-verify validation.
+- [`skill-correction`](./skills/skill-correction/SKILL.md) — turns a
+  correction to a skill's behaviour into a failing eval case and the
+  smallest fix, then re-runs the skill's cases.
 
 This README is the landing page; the complete documentation lives in
 [the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),

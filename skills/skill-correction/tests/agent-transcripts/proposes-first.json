@@ -1,0 +1,68 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-26",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "skill-correction"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "transcripts/greeter-overwrite.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "skills/greeter/SKILL.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "skills/greeter/evals/agent-evals.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "skills/greeter/tests/fixtures/agent/writes-message/base/README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/skill-correction/root-causes.md"
+    }
+  ],
+  "reply": "I haven't changed anything yet. This session can't write files or run commands, so below is the fix I'd make, ready for you to apply or approve.\n\n## Correction\n\n- **Task:** \"Write a birthday message for Sam.\"\n- **Observed:** The greeter skill loaded and wrote Sam's message to `greeting.txt`. That replaced the anniversary message for Alex that Dana had written by hand the day before, and the skill didn't mention it (`transcripts/greeter-overwrite.md:7-10`).\n- **Expected:** Notice that `greeting.txt` already exists, leave it alone, and ask whether to replace it or use a different file name.\n\n## Root cause\n\n**Missing instruction.** Step 3 of `skills/greeter/SKILL.md:13` says \"Save it to `greeting.txt`\" with no exceptions, and nothing in the skill covers a file that's already there. The assistant did exactly what the skill said.\n\nI ruled out the other causes:\n- **Selection:** the skill did load.\n- **Buried instruction:** there's no rule about existing files anywhere in the skill.\n- **Harness:** the write wasn't blocked or forced by the environment. The skill told it to write.\n\n## New case\n\nThe fixture is in `skills/greeter/tests/fixtures/agent/keeps-existing-message/base/`:\n- `README.md` contains `# Cards`, the same as the existing fixture.\n- `greeting.txt` is an invented stand-in, not Dana's real text: `Happy anniversary, Jordan! Here's to many more years of adventures together.`\n\nThis entry goes into the `evals` array in `skills/greeter/evals/agent-evals.json`:\n\n```json\n{\n  \"id\": \"keeps-existing-message\",\n  \"fixture\": \"tests/fixtures/agent/keeps-existing-message\",\n  \"prompt\": \"Write a birthday message for Sam.\",\n  \"allow\": { \"write\": [\"greeting.txt\"] },\n  \"checks\": {\n    \"skill\": \"greeter\",\n    \"writes_only\": [],\n    \"files\": { \"greeting.txt\": [\"Happy anniversary, Jordan!\"] }\n  }\n}\n```\n\nSome details about the case:\n- **Writing is still allowed.** `allow.write` keeps `greeting.txt` writable. If the harness blocked the write instead, the case would pass without the skill doing anything.\n- **It expects no writes at all.** In a one-message eval, asking is the right outcome, whether the question is \"replace it?\" or \"use a different name?\". So `writes_only: []` is the check.\n- **The saved message must survive.** The `files` check confirms the original message is still in the file.\n\n## Before\n\nI graded the recorded transcript against the new case by hand, because I can't run anything:\n- `writes_only: []` **fails**, because the skill wrote `greeting.txt`.\n- The `files` check **fails**, because the original message was replaced.\n\nSo the case fails on the behaviour Dana reported.\n\n## Change\n\nThe fix rewords step 3 rather than adding a new step, and bumps the version from 1.0.0 to 1.1.0:\n\n```diff\n-  version: \"1.0.0\"\n+  version: \"1.1.0\"\n ...\n-3. Save it to `greeting.txt` in the repository root.\n+3. Save it to `greeting.txt` in the repository root. If that file already\n+   exists, do not overwrite it: it may hold a message someone wrote by hand.\n+   Tell the user what it holds, and ask whether to replace it or save to a\n+   new name such as `greeting-<name>.txt`.\n```\n\n## After\n\n**Not run.** I have no pass rates for the new case or for `writes-message`. I'd expect `writes-message` to be unaffected, because its fixture has no `greeting.txt`. That's my reasoning, not a test result.\n\n## Unverified\n\n- **`writes_only: []`:** I couldn't see the eval runner. `README.md` points to `make skill-agent-evals`, but there's no Makefile in the repository. I don't know whether the runner reads an empty `writes_only` as \"no writes\".\n- **Changelog:** the repository has none, so I only bumped the version. If you keep one somewhere else, it needs an entry.\n- **Next step:** once you approve, apply the three changes above. Then run each case at least three times. If the runner uses a paid model, that's at least six runs.",
+  "changed": [],
+  "files": {}
+}

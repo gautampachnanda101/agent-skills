@@ -1,0 +1,26 @@
+{
+  "skill_name": "greeter",
+  "evals": [
+    {
+      "id": "writes-message",
+      "fixture": "tests/fixtures/agent/writes-message",
+      "prompt": "Write a birthday message for Priya.",
+      "allow": {
+        "write": [
+          "greeting.txt"
+        ]
+      },
+      "checks": {
+        "skill": "greeter",
+        "writes_only": [
+          "greeting.txt"
+        ],
+        "files": {
+          "greeting.txt": [
+            "Priya"
+          ]
+        }
+      }
+    }
+  ]
+}
