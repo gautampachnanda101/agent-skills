@@ -18,22 +18,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+          # The version check compares against the previous commit.
+          fetch-depth: 0
 
       # The repository test suite requires Node 24.15+; '24' resolves to the
       # latest 24.x release on the runner.
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.x'
 
       - name: Cache pre-commit environments
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
@@ -52,15 +56,50 @@ jobs:
       - name: Run skill smoke checks
         run: make skill-smoke COLOR=never
 
+      # A changed skill must raise its version and update the changelog.
+      # Pull requests compare with their base; pushes with the previous head.
+      - name: Check versions against the base
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node scripts/check-versions.mjs --base "${BASE:-HEAD~1}"
+
+  secrets:
+    name: Secret scan of the full history
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      # The same gitleaks release as the pre-commit hook, checked against
+      # its published SHA-256. Reviewed false positives are listed by
+      # fingerprint in .gitleaksignore.
+      - name: Install gitleaks
+        env:
+          VERSION: 8.30.1
+          SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/gitleaks.tar.gz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v$VERSION/gitleaks_${VERSION}_linux_x64.tar.gz"
+          echo "$SHA256  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP" gitleaks
+
+      - name: Scan every commit
+        run: '"$RUNNER_TEMP/gitleaks" git --no-banner --redact --verbose .'
+
   techdocs-public:
     name: TechDocs checker on public repositories
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
 
@@ -117,10 +156,12 @@ jobs:
         os: [ubuntu-24.04, ubuntu-24.04-arm, macos-15, macos-15-intel]
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '24'
 
@@ -129,7 +170,7 @@ jobs:
       # the script that pins the build, model, and checksums, so changing a
       # pin starts a fresh cache.
       - name: Cache llama.cpp and model
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: .llm-cache
           key: skill-llm-${{ matrix.os }}-${{ hashFiles('skills/backstage-catalog-builder/scripts/skill-llm-verify.sh') }}
@@ -142,14 +183,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       # The Claude Code CLI validates .claude-plugin/plugin.json and
       # marketplace.json; --strict turns manifest warnings into failures.
       # Pinned so a new CLI release cannot fail CI without a change here;
       # bump it deliberately.
       - name: Install the Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code@2.1.332
+        # An exact version stands in for a lockfile for this one global CLI.
+        run: npm install -g @anthropic-ai/claude-code@2.1.332 # zizmor: ignore[adhoc-packages]
 
       - name: Validate the plugin and marketplace manifests
         run: claude plugin validate --strict .

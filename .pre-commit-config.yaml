@@ -1,6 +1,8 @@
+# Each rev is a commit, with its release tag in the comment. Update them
+# deliberately with `pre-commit autoupdate --freeze`.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: cef0300fd0fc4d2a87a85fa2093c6b283ea36f4b  # frozen: v5.0.0
     hooks:
       - id: check-yaml
         args: [--allow-multiple-documents, --unsafe]
@@ -11,6 +13,30 @@ repos:
         # Unified diffs mark blank context lines with a single space.
         exclude: '\.diff$'
       - id: end-of-file-fixer
+  # Markdown structure: the same checks the documentation skills tell
+  # readers to run. Settings and exclusions are in .markdownlint-cli2.yaml.
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: d4df4cec471ce155946474590d7b95920f623ccb  # frozen: v0.24.2
+    hooks:
+      - id: markdownlint-cli2
+        # An exact Node release: left unset, pre-commit's download can pick
+        # a pre-release its installer cannot parse, and the hook's
+        # dependencies need Node 22.22.2+ or 24.15+.
+        language_version: 24.22.3
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: 745eface02aef23e168a8afb6b5737818efbea95  # frozen: v0.11.0.1
+    hooks:
+      - id: shellcheck
+  # Secrets in the staged change; CI also scans the full history.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: 83d9cd684c87d95d656c1458ef04895a7f1cbd8e  # frozen: v8.30.1
+    hooks:
+      - id: gitleaks
+  # GitHub Actions workflow security audit.
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: c7d31dc612dffdd4d3b2f2b88b9660d3ab057ee8  # frozen: v1.33.1
+    hooks:
+      - id: zizmor
   - repo: local
     hooks:
       - id: repository-tests
@@ -19,3 +45,9 @@ repos:
         language: system
         pass_filenames: false
         files: '^(Makefile|scripts/|tests/|skills/|\.claude-plugin/|\.githooks/|\.pre-commit-config\.yaml)'
+      - id: check-versions
+        name: Skill and plugin versions, and the changelog
+        entry: node scripts/check-versions.mjs
+        language: system
+        pass_filenames: false
+        always_run: true

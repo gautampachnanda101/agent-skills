@@ -1,0 +1,14 @@
+# Proposes updates to the GitHub Actions the workflows pin by commit. The
+# cooldown waits a week after a release, so a compromised or broken
+# release is usually caught before it is proposed here.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ['*']

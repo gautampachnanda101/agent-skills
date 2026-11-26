@@ -37,7 +37,7 @@ The smallest useful request:
 
 For an organization or user account, ask for the full scope up front:
 
-> Use backstage-catalog-builder for https://github.com/OWNER. Discover all
+> Use backstage-catalog-builder for `https://github.com/OWNER`. Discover all
 > eligible repositories, generate missing catalog entries from their files,
 > preserve existing metadata, and configure my local Backstage app. Include
 > supported APIs, infrastructure, ownership and documentation. Confirm scope
@@ -49,8 +49,8 @@ To build on configuration that already exists, point the skill at it:
 
 > Use backstage-catalog-builder against my existing entity configuration at
 > ./platform-catalog (descriptors plus the app-config catalog.locations), then
-> onboard repo https://github.com/OWNER/NEW-SERVICE and register the new
-> descriptors with my Backstage at https://backstage.example.com, reading the
+> onboard repo `https://github.com/OWNER/NEW-SERVICE` and register the new
+> descriptors with my Backstage at `https://backstage.example.com`, reading the
 > token from the BACKSTAGE_TOKEN environment variable.
 
 ## Fast path: one prompt, every decision
@@ -59,12 +59,12 @@ Each decision the skill would otherwise ask about can be supplied up front.
 A fully specified prompt skips the interactive round of questions:
 
 > Use backstage-catalog-builder. Sources: this repository plus
-> https://github.com/OWNER/ORG-CATALOG, which holds our existing descriptors
+> `https://github.com/OWNER/ORG-CATALOG`, which holds our existing descriptors
 > and the app-config with catalog.locations. Extend that configuration:
-> onboard any missing repos from https://github.com/OWNER, add justified APIs
+> onboard any missing repos from `https://github.com/OWNER`, add justified APIs
 > and ownership, and generate TechDocs for new services. Write the bundle to
 > ./platform-catalog and merge the locations into its app-config. My Backstage
-> runs at https://backstage.example.com (token in the BACKSTAGE_TOKEN
+> runs at `https://backstage.example.com` (token in the BACKSTAGE_TOKEN
 > environment variable): dry-run the new locations, then register them.
 > Confirm the proposal once, then carry it through every selected repository.
 

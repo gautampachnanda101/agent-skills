@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read, Git or Bash tools, and network access for GitHub discovery, the Backstage plugin directory, MCP or catalog APIs. Node.js 20+ is required for the bundled structural checkers; a Python mkdocs install or a running Backstage instance is optional for deeper validation.
 metadata:
   author: gautampachnanda101
-  version: "1.1.0"
+  version: "1.1.1"
 ---
 
 # Backstage catalog builder
@@ -262,6 +262,7 @@ the complete truth.
     lifecycle: production
     owner: group:payments-team
   ```
+
 - Use valid Backstage names and entity references, including namespaces when
   needed. Add `providesApis`, `dependsOn`, `system`, annotations, and links only
   when supported by evidence and applicable to the entity. Preserve explicitly

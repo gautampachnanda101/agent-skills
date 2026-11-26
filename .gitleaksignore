@@ -1,0 +1,9 @@
+# Reviewed gitleaks findings, one fingerprint each (commit:file:rule:line).
+# Old CI cache keys that look like API keys:
+63fd75f4d12cd77e364b9df452c1d41b4170be95:.github/workflows/verify.yml:generic-api-key:128
+0ec514db48e300035d706bf2b9f3ea10f9d7786b:.github/workflows/verify.yml:generic-api-key:128
+eb58d93f3dc29f709d206b802327006c34be7268:.github/workflows/verify.yml:generic-api-key:74
+# Fake tokens planted in the code-review fixtures on purpose:
+eb0495e3c7a747d5ec9251ce854d79457f42e190:skills/peer-code-review/tests/fixtures/pr-142.diff:generic-api-key:104
+0dd8566a00fb4f5bceaaad1fe24cdf398d2a26ef:skills/peer-code-review/tests/report-rules.test.cjs:generic-api-key:124
+4f4878760c0eebbceebeb8fafa68a49f1f23dd5a:skills/peer-code-review/tests/fixtures/planted-defects/README.md:generic-api-key:44

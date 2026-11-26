@@ -21,8 +21,11 @@ fi
 nvm_dir="${NVM_DIR:-$HOME/.nvm}"
 if [ -s "$nvm_dir/nvm.sh" ]; then
 	set +u
+	# nvm.sh reads --no-use from the positional parameters; POSIX sh
+	# does not pass arguments through the dot command, so set them first.
+	set -- --no-use
 	# shellcheck disable=SC1091
-	. "$nvm_dir/nvm.sh" --no-use
+	. "$nvm_dir/nvm.sh"
 	if ! nvm which "$want" >/dev/null 2>&1; then
 		echo "Installing Node $want with nvm..." >&2
 		nvm install "$want" >&2

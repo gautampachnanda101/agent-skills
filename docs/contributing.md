@@ -100,10 +100,19 @@ make hooks-install
 make hooks-check
 ```
 
-The hook checks YAML (including multi-document catalog files), JSON, merge
-conflicts, large added files, whitespace and final newlines. Changes to the Makefile,
-scripts, tests, skills, hooks or plugin manifests also run the regression
-tests. Hooks never install Node or start Backstage. Installation sets a repository-local hooks path, preserving
+The hooks check:
+
+| Check | Tool |
+| --- | --- |
+| YAML (including multi-document catalog files), JSON, merge conflicts, large files, whitespace, final newlines | pre-commit-hooks |
+| Markdown structure, with settings in `.markdownlint-cli2.yaml` | markdownlint-cli2 |
+| Shell scripts | shellcheck |
+| Secrets in the staged change; reviewed false positives are in `.gitleaksignore` | gitleaks |
+| Workflow security: pinned actions, permissions, credentials | zizmor |
+| Skill and plugin versions against the changelog | `scripts/check-versions.mjs` |
+| Regression tests, when the Makefile, scripts, tests, skills, hooks or plugin manifests change | `scripts/pre-commit-tests.cjs` |
+
+Every hook is pinned to a commit. Hooks never install Node or start Backstage. Installation sets a repository-local hooks path, preserving
 existing hooks by delegation/symlinks; global Git settings and the existing
 commit-message hook are not modified. At commit time pre-commit checks staged
 files and temporarily stashes unstaged tracked changes. Fixers may update
@@ -113,8 +122,11 @@ the pinned check environments.
 ## CI expectations
 
 The `Verify` GitHub Action runs on every push to `main` and on pull requests.
-Its jobs run pre-commit checks and `make skill-smoke`, the TechDocs checker on
-public repositories, `make skill-llm-verify`, and plugin manifest validation.
+Its jobs run pre-commit checks and `make skill-smoke`, the version check
+against the previous commit, a gitleaks scan of the full history, the
+TechDocs checker on public repositories, `make skill-llm-verify`, and plugin
+manifest validation. Every action is pinned to a commit, and Dependabot
+proposes updates a week after each release.
 Downloads for the model check are cached, so a run takes a few minutes.
 
 `main` has no branch protection, so a failing job does not block a push or a
@@ -124,18 +136,31 @@ MkDocs site and publishes it to
 
 ## Releases
 
-User-visible repository changes follow a versioned release:
+Every change to a skill raises that skill's `metadata.version` and updates
+`CHANGELOG.md`. `scripts/check-versions.mjs` enforces this before each commit
+and in CI. It also checks that each skill's page under `docs/skills/` states
+its version, and that the newest released changelog section is the plugin
+version. Record changes under `## [Unreleased]` until you release.
+
+To release:
 
 1. Bump `version` in `.claude-plugin/plugin.json` using
-   [Semantic Versioning](https://semver.org/); the git tag follows this
-   version.
-2. Bump `metadata.version` in the `SKILL.md` of every skill whose content
-   changed. Update the version at the top of that skill's page under
-   `docs/skills/`.
-3. Add a CHANGELOG.md entry describing the change.
-4. Check that `v<version>` is not already a tag or a release.
-5. Run `make skill-evals` for each skill you changed, and record the pass
+   [Semantic Versioning](https://semver.org/). The tag is `v<version>`.
+2. Rename `## [Unreleased]` to `## [<version>] - <date>`, and add an empty
+   `## [Unreleased]` above it.
+3. Run `make skill-evals` for each skill you changed, and record the pass
    rate in the changelog entry.
-6. Push and wait for a green `Verify` run. It also validates the plugin
+4. Optionally, write fuller notes in `.github/release-notes/v<version>.md`.
+   A first line `# <title>` becomes the release title. Without the file,
+   the notes are the version's changelog section.
+5. Push and wait for a green `Verify` run. It also validates the plugin
    manifests with `claude plugin validate --strict .`.
-7. Tag `v<version>` and create the GitHub Release for it.
+6. Check the notes, then publish:
+
+   ```sh
+   node scripts/release.mjs --dry-run
+   node scripts/release.mjs --target "$(git rev-parse HEAD)"
+   ```
+
+   It skips a version that is already released, and refuses a tag that
+   points at another commit.

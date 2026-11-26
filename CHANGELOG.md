@@ -15,8 +15,31 @@ skill's `metadata.version` field.
   new name and removes old `doc-author` copies that came from this
   repository. `make status` lists any that remain.
 
+### Added
+
+- Repository checks on every commit and in CI: markdownlint for Markdown,
+  shellcheck for shell scripts, zizmor for workflow security, and gitleaks
+  for secrets. CI also scans the full history. Reviewed false positives
+  are listed by fingerprint in `.gitleaksignore`.
+- `scripts/check-versions.mjs`: a changed skill must raise its version and
+  update the changelog, versions may not decrease, each skill's docs page
+  states its version, and the newest changelog release is the plugin
+  version.
+- `scripts/release.mjs` publishes the release for the plugin version, with
+  notes from `.github/release-notes/` or the changelog. It skips a version
+  already released.
+- Dependabot proposes GitHub Actions updates after a seven-day cooldown.
+
 ### Fixed
 
+- Lint findings: a code fence without blank lines in
+  `backstage-catalog-builder` (1.1.1), bare example URLs in the usage
+  guide, and shell warnings in `backstage-node.sh` and
+  `skill-llm-verify.sh`. `backstage-node.sh` now passes `--no-use` to nvm in
+  a way POSIX `sh` supports.
+- Every GitHub Action and pre-commit hook is pinned to a commit. Checkouts
+  no longer keep the token in `.git/config`, and only the Pages deploy job
+  can write to Pages.
 - `make skill-evals` no longer reports success when nothing ran: an
   unmatched `--skill` or `--eval` now exits 1. A bad `--runs` value, an
   unknown skill, an unknown `--grade` case, or a missing reply file exits 2
@@ -92,7 +115,7 @@ skill's `metadata.version` field.
 - The bundled checkers are documented as needing Node.js 20+; the skill said
   24+ and the site said 18+.
 
-### Changed
+### Changed (unreleased 1.1.3 work, shipped in 1.2.0)
 
 - Documentation review fixes: CI claims match the workflow, the contributor
   checklists list every place to update, all four skills have usage prompts,

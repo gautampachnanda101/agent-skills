@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-skill_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+skill_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 skill="${SKILL_DIR:-$skill_dir}"
 cache=${LLM_CACHE:-"$(dirname "$skill_dir")/.llm-cache"}
 mkdir -p "$cache"
@@ -246,6 +246,8 @@ try {
 
 Answer with only one fenced yaml block containing the final mkdocs.yml.'
 
+# Called as "validate_$key" in the candidate loop below.
+# shellcheck disable=SC2329
 validate_descriptor() {
 	candidate=$1
 	checker="$skill/scripts/check-descriptors.mjs"
@@ -260,6 +262,7 @@ validate_descriptor() {
 # entity and documentation pages beside it, then running both bundled checkers:
 # the generated site must carry the techdocs-core plugin, match the entity
 # name, and resolve every nav entry against the actual docs/ tree.
+# shellcheck disable=SC2329
 validate_mkdocs() {
 	generated=$1
 	site_dir="$cache/mkdocs-scenario-site"
@@ -353,6 +356,8 @@ fs.writeFileSync(process.argv[1], JSON.stringify(payload));
 		tokens=$(node -e 'let u=0;try{const r=JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8"));u=(r.usage&&r.usage.total_tokens)||0}catch{}process.stdout.write(String(u))' "$cache/response-$key-$config.json" 2>/dev/null || echo 0)
 		[ -n "$tokens" ] || tokens=0
 
+		# The JavaScript is literal; the shell must not expand it.
+		# shellcheck disable=SC2016
 		if ! node -e '
 const chunks = [];
 process.stdin.on("data", c => chunks.push(c));

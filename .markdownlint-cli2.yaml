@@ -1,0 +1,19 @@
+# markdownlint-cli2 settings for this repository's own Markdown.
+config:
+  default: true
+  # Prose wraps near 80 columns, but tables, links, and code run longer.
+  MD013: false
+  # Keep a Changelog repeats "Added", "Fixed", ... under each release.
+  MD024:
+    siblings_only: true
+  # Skill pages open with YAML frontmatter, then their title.
+  MD025:
+    front_matter_title: ''
+ignores:
+  # Eval fixtures and expected replies: the planted pages contain Markdown
+  # defects on purpose, and the replies are recorded model output.
+  - 'skills/*/tests/**'
+  - 'site/**'
+  - 'node_modules/**'
+  - '.llm-cache/**'
+  - '.eval-results/**'
