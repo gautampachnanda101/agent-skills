@@ -97,3 +97,20 @@ for (const dir of skillDirs) {
     }
   });
 }
+
+// A "Not for ...; use <skill>" clause steers the assistant to a sibling, so
+// every skill it names must exist.
+test('every skill a description points to exists', () => {
+  for (const dir of skillDirs) {
+    const text = fs.readFileSync(path.join(skillsDir, dir, 'SKILL.md'), 'utf8');
+    const description = /^description:\s*(.*)$/m.exec(text)?.[1] ?? '';
+    for (const clause of description.match(/Not for [^.]*\./g) ?? []) {
+      for (const [, name] of clause.matchAll(/\buse ([a-z0-9]+(?:-[a-z0-9]+)+)/g)) {
+        assert.ok(skillDirs.includes(name), `${dir}'s description points to ${name}, which is not a skill`);
+      }
+      for (const [, name] of clause.matchAll(/\bor ([a-z0-9]+(?:-[a-z0-9]+)+) for/g)) {
+        assert.ok(skillDirs.includes(name), `${dir}'s description points to ${name}, which is not a skill`);
+      }
+    }
+  }
+});

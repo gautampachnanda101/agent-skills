@@ -22,6 +22,9 @@
           "\\?",
           "(suggest|based on|because)",
           "(50,000|200,000|500 rows|page|filter)"
+        ],
+        "no_skill": [
+          "specification-review"
         ]
       }
     },
@@ -60,7 +63,10 @@
             "(analyst|admin)",
             "\\bR-1\\b"
           ]
-        }
+        },
+        "no_skill": [
+          "specification-review"
+        ]
       }
     }
   ]

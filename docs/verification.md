@@ -212,8 +212,9 @@ Claude Code estimates $0.06 to $0.24 a run at API prices, about $3.80 for
 this phase. On a Claude subscription, runs count against its usage limits
 instead; with an API key, that account is charged.
 
-Results for the skills added on 2026-11-27, with Claude Opus 5.5, one run
-per case. Reply cases ran with the skill and once without it:
+Results for the skills added on 2026-11-27, with Claude Opus 5.5. Reply
+cases ran with the skill and once without it. Every behaviour case has since
+passed three runs in three; see the steering results below.
 
 | Skill | Reply, with the skill | Without | Behaviour cases |
 | --- | --- | --- | --- |
@@ -230,6 +231,27 @@ fixed before these results: a prompt that asked to build instead of to
 specify, checks that matched too narrowly, a fixture name that hinted at the
 answer, and a "clean" specification that the review correctly found gaps in,
 three times.
+
+### Steering: choosing between siblings
+
+The skills that overlap say which sibling to use instead, in a "Not for ..."
+clause, and their behaviour cases fail if the sibling loads. With Claude Opus
+5.5, three runs per case, on 2026-11-27:
+
+| Skill | Runs passed |
+| --- | --- |
+| peer-code-review | 9 of 9 |
+| security-review, documentation-author, documentation-review, specification-author | 6 of 6 each |
+| specification-review | 6 of 6 |
+| test-plan-author | 6 of 6 |
+| decision-record-author, change-plan-author, release-notes-author, skill-correction | 3 of 3 per case |
+
+No run loaded the wrong sibling. Running each case three times found two
+eval problems that single runs had missed: the clean specification still
+had two real gaps, which the review found in two of three runs, and a check
+did not recognise "there's no open-dispute check" as reporting a
+disagreement. Both were fixed in the evals; no skill changed. These runs
+cost about $12 at API prices.
 
 With the `openai` adapter and Qwen3 8B on a local llama.cpp server, at no
 cost, 1 of 9 cases passed: the unrelated question.

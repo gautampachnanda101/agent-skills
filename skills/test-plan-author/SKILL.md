@@ -1,11 +1,11 @@
 ---
 name: test-plan-author
-description: Plan the tests that prove a change does what its specification says - every acceptance criterion mapped to unit, integration, or end-to-end tests, with negative, error, and boundary cases - and, when asked, write the failing tests first. Works from the specification or the stated acceptance criteria, never from the implementation, so the tests check what was asked for rather than what was built. Without a specification, it asks for the criteria first. Use when asked for a test plan, test cases, acceptance tests, coverage of a spec, or tests to write before fixing a bug or building a feature.
+description: Plan the tests that prove a change does what its specification says - every acceptance criterion mapped to unit, integration, or end-to-end tests, with negative, error, and boundary cases - and, when asked, write the failing tests first. Works from the specification or the stated acceptance criteria, never from the implementation, so the tests check what was asked for rather than what was built. Without a specification, it asks for the criteria first. Not for writing the specification or planning the code changes; use specification-author or change-plan-author for those. Use when asked for a test plan, test cases, acceptance tests, coverage of a spec, or tests to write before fixing a bug or building a feature.
 license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools; running tests needs the project's test command. Node.js 20+ is optional, for the bundled plan checker.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Test plan author

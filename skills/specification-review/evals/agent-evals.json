@@ -21,6 +21,9 @@
           "not ready",
           "(analyst|admin|403)",
           "200,000"
+        ],
+        "no_skill": [
+          "specification-author"
         ]
       }
     },
@@ -45,6 +48,9 @@
         "must_not_match": [
           "not ready",
           "\\|\\s*`?(blocker|major)`?\\s*\\|"
+        ],
+        "no_skill": [
+          "specification-author"
         ]
       }
     }

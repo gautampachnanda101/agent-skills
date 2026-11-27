@@ -1,11 +1,11 @@
 ---
 name: documentation-review
-description: Review documentation against leading documentation engineering practices — the Diátaxis framework by Daniele Procida, the Google Developers Style Guide and Microsoft Writing Style Guide, GOV.UK content design (user needs first, plain English, clear requirement wording), and WCAG 2.2 AA as adopted for GOV.UK content. Classifies each page's type and audience, checks structure, navigation, voice, and accessibility (link text, headings, tables, images, colour, contrast), verifies commands, code samples, and links, then reports prioritized findings with file:line evidence and suggested fixes. Use when asked to review, audit, or improve documentation, a README, tutorial, how-to, reference page, or documentation site, or to check docs accessibility.
+description: Review documentation against leading documentation engineering practices — the Diátaxis framework by Daniele Procida, the Google Developers Style Guide and Microsoft Writing Style Guide, GOV.UK content design (user needs first, plain English, clear requirement wording), and WCAG 2.2 AA as adopted for GOV.UK content. Classifies each page's type and audience, checks structure, navigation, voice, and accessibility (link text, headings, tables, images, colour, contrast), verifies commands, code samples, and links, then reports prioritized findings with file:line evidence and suggested fixes. Not for writing or rewriting pages; use documentation-author for that. Use when asked to review, audit, or improve documentation, a README, tutorial, how-to, reference page, or documentation site, or to check docs accessibility.
 license: Apache-2.0
 compatibility: Host assistant with file-read tools; Bash and Node are optional for verifying commands, links, and MkDocs/TechDocs structure. Fetching external network evidence requires host and user permission.
 metadata:
   author: gautampachnanda101
-  version: "1.4.1"
+  version: "1.4.2"
 ---
 
 # Documentation review

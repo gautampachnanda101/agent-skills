@@ -1,11 +1,11 @@
 ---
 name: specification-author
-description: Turn a rough request into a specification a team can build and test from - the need, the users, the scope and non-goals, numbered requirements with measurable targets, and Given/When/Then acceptance criteria that cover every requirement. Reads the repository and the request first, then asks three to five questions that change the outcome, each with a suggested answer from the evidence, and writes nothing until they are answered. Splits a large request into a first release and follow-ups. Use when asked to write a spec, requirements, user stories, acceptance criteria, a PRD, or to clarify what a feature should do before building it.
+description: Turn a rough request into a specification a team can build and test from - the need, the users, the scope and non-goals, numbered requirements with measurable targets, and Given/When/Then acceptance criteria that cover every requirement. Reads the repository and the request first, then asks three to five questions that change the outcome, each with a suggested answer from the evidence, and writes nothing until they are answered. Splits a large request into a first release and follow-ups. Not for reviewing an existing specification; use specification-review for that. Use when asked to write a spec, requirements, user stories, acceptance criteria, a PRD, or to clarify what a feature should do before building it.
 license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools. Node.js 20+ is optional, for the bundled specification checker.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Specification author

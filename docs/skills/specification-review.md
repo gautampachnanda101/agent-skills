@@ -1,6 +1,6 @@
 # specification-review
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/specification-review/SKILL.md) · plugin name `agent-skills:specification-review`**
+**Version 1.0.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/specification-review/SKILL.md) · plugin name `agent-skills:specification-review`**
 
 Reviews a specification before anyone builds from it, the way a developer
 and a tester would have to use it. It checks every claim against the

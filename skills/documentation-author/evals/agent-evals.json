@@ -14,7 +14,10 @@
           "(confirm|accept|correct|approve|shall I|should I)",
           "(docs/|README)"
         ],
-        "writes_only": []
+        "writes_only": [],
+        "no_skill": [
+          "documentation-review"
+        ]
       },
       "allow": {
         "write": [
@@ -54,7 +57,10 @@
             "^# ",
             "npm test"
           ]
-        }
+        },
+        "no_skill": [
+          "documentation-review"
+        ]
       }
     }
   ]

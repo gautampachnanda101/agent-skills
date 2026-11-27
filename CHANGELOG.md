@@ -17,6 +17,12 @@ skill's `metadata.version` field.
 
 ### Added
 
+- "Not for ..." clauses on the skills that overlap, so each says which
+  sibling to use instead: `peer-code-review` 1.3.3 and `security-review`
+  1.0.2, `documentation-author` 2.2.1 and `documentation-review` 1.4.2,
+  `specification-author` 1.0.1 and `specification-review` 1.0.1, and
+  `test-plan-author` 1.0.1. Their behaviour cases now also fail if the
+  sibling loads instead.
 - Role pages for product, architect, developer, QA, security, operations,
   and skill owners: each lists its skills, what they read and produce, and
   what the role approves. A test checks that every skill appears on one.

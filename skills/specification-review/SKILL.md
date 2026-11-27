@@ -1,11 +1,11 @@
 ---
 name: specification-review
-description: Review a specification before anyone builds from it - find ambiguous or untestable requirements, acceptance criteria missing Given, When, or Then, requirements no criterion covers, missing failure cases and non-goals, and claims that contradict the repository's code or docs. Checks every claim against the repository, rates each finding by what it would cost if built as written, and gives a verdict, without editing the spec. Use when asked to review, check, or sign off a spec, requirements, PRD, user stories, or acceptance criteria.
+description: Review a specification before anyone builds from it - find ambiguous or untestable requirements, acceptance criteria missing Given, When, or Then, requirements no criterion covers, missing failure cases and non-goals, and claims that contradict the repository's code or docs. Checks every claim against the repository, rates each finding by what it would cost if built as written, and gives a verdict, without editing the spec. Not for writing a specification; use specification-author for that. Use when asked to review, check, or sign off a spec, requirements, PRD, user stories, or acceptance criteria.
 license: Apache-2.0
 compatibility: Host assistant with file-read tools. Writes nothing; the review is the reply.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Specification review

@@ -1,11 +1,11 @@
 ---
 name: security-review
-description: Review a diff, commit, or pull request for security defects - injection, missing or broken authentication and authorization, path traversal, unsafe deserialization and eval, secrets and personal data in code or logs, weakened cryptography or token checks, and risky new dependencies. Runs the repository's own configured scanners first, then reads every changed line for what scanners miss, rates each finding by exploitability and impact, and reports with file and line evidence and a verdict. Never quotes a secret's value and never edits the code. Use when asked for a security review, a threat check of a change, or whether a pull request is safe to merge.
+description: Review a diff, commit, or pull request for security defects - injection, missing or broken authentication and authorization, path traversal, unsafe deserialization and eval, secrets and personal data in code or logs, weakened cryptography or token checks, and risky new dependencies. Runs the repository's own configured scanners first, then reads every changed line for what scanners miss, rates each finding by exploitability and impact, and reports with file and line evidence and a verdict. Never quotes a secret's value and never edits the code. Not for a general code review of design, tests, and readability; use peer-code-review for that. Use when asked for a security review, a threat check of a change, or whether a pull request is safe to merge.
 license: Apache-2.0
 compatibility: Host assistant with file-read tools and, for scanners and git history, a shell. Writes nothing; the review is the reply.
 metadata:
   author: gautampachnanda101
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Security review

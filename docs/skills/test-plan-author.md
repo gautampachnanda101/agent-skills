@@ -1,6 +1,6 @@
 # test-plan-author
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/test-plan-author/SKILL.md) · plugin name `agent-skills:test-plan-author`**
+**Version 1.0.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/test-plan-author/SKILL.md) · plugin name `agent-skills:test-plan-author`**
 
 Plans the tests that prove a change does what its specification says. Every
 acceptance criterion gets at least one test, with negative, error, and

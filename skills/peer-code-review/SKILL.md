@@ -1,11 +1,11 @@
 ---
 name: peer-code-review
-description: Run an evidence-based peer code review of a diff, commit series, or pull request using the documented practices of Google's eng-practices review guide, Fagan inspections, Karl Wiegers' peer-review research, and McConnell's checklists, with pacing rules from the peer-review literature. Reviews in small passes with a fixed checklist, reports prioritized findings with file:line evidence and severity, explains why instead of what, and for user-interface changes checks accessibility against WCAG 2.2 AA as GOV.UK applies it. Use when asked to review code, a pull request, a diff, a commit, or to define or improve a team's review process.
+description: Run an evidence-based peer code review of a diff, commit series, or pull request using the documented practices of Google's eng-practices review guide, Fagan inspections, Karl Wiegers' peer-review research, and McConnell's checklists, with pacing rules from the peer-review literature. Reviews in small passes with a fixed checklist, reports prioritized findings with file:line evidence and severity, explains why instead of what, and for user-interface changes checks accessibility against WCAG 2.2 AA as GOV.UK applies it. Not for a security-focused review; use security-review for that, alongside or instead. Use when asked to review code, a pull request, a diff, a commit, or to define or improve a team's review process.
 license: Apache-2.0
 compatibility: Host assistant with file-read and Git or Bash tools. Checklists are Markdown; commands such as tests and linters run only where authorized and available. No network access is required beyond fetching the change under review.
 metadata:
   author: gautampachnanda101
-  version: "1.3.2"
+  version: "1.3.3"
 ---
 
 # Peer code review

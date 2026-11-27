@@ -1,7 +1,7 @@
 {
   "agent": "claude-code",
   "model": "claude-opus-5-5",
-  "skill_version": "1.3.2",
+  "skill_version": "1.3.3",
   "recorded": "2026-11-27",
   "events": [
     {
@@ -16,7 +16,7 @@
       "denied": false,
       "error": false,
       "kind": "run",
-      "command": "git show --stat HEAD"
+      "command": "git show f2cdaad"
     },
     {
       "tool": "Read",
@@ -30,14 +30,14 @@
       "denied": false,
       "error": false,
       "kind": "run",
-      "command": "git show HEAD"
+      "command": "git show --stat --format= HEAD~1"
     },
     {
       "tool": "Bash",
       "denied": false,
       "error": false,
       "kind": "run",
-      "command": "git show HEAD --name-only --format= HEAD~1"
+      "command": "git status --short --ignored"
     },
     {
       "tool": "Read",
@@ -45,17 +45,9 @@
       "error": false,
       "kind": "read",
       "path": "README.md"
-    },
-    {
-      "tool": "Grep",
-      "denied": false,
-      "error": false,
-      "kind": "search",
-      "path": "",
-      "pattern": "deliver|retry|retries"
     }
   ],
-  "reply": "I reviewed commit `729561d`, \"Retry deliveries until they succeed\". It is a 6-line change to `src/queue.js`. The repository has no tests, no `package.json` and no linter config, and this session only allows `git` reads, so nothing could be run.\n\n## Verdict\n\nVerdict: request changes\n\nThe change swaps a three-try limit for an endless retry loop that hides every error. If a message can never be sent, `deliver` never returns and never fails, and nothing records why.\n\n## Findings\n\n| Severity | Location | Evidence | Direction |\n|---|---|---|---|\n| blocker | `src/queue.js:3` | `while (true) {` | There is no exit apart from success. If a message can never be delivered (bad payload, revoked credentials, deleted recipient), the caller's promise never settles. That message is stuck, and if the outbox handles messages one after another, every message behind it is stuck too. Add an upper limit: a maximum number of tries, a total time budget, or an `AbortSignal` the caller controls. When the limit is reached, throw the last error so the caller can send the message to a dead-letter queue. |\n| blocker | `src/queue.js:3-8` | `try { return await send(message); } catch (error) { }` | The retry runs again straight away with no delay. Against a downed or rate-limited endpoint it fires requests as fast as the event loop can turn, which piles more load on the failing service and keeps a CPU core busy. Wait between tries with exponential backoff plus jitter, and respect `Retry-After` if `send` exposes it. |\n| major | `src/queue.js:7` | `// ignore and try again` | Every error is thrown away, so a failing delivery looks exactly like a slow one: no log, no metric, no alert. It also retries errors that can never succeed, such as a 4xx validation error or a programming error like a `TypeError` inside `send`. Split errors into retryable and permanent, rethrow the permanent ones at once, and log or count each retry, including the attempt number. |\n| major | `src/queue.js:2` | `export async function deliver(send, message)` | Retrying until success means `send` can run several times for one message, for example when the send worked but the response timed out. That makes duplicate notifications more likely. Nothing in the change says whether `send` is idempotent. State that requirement, or pass an idempotency key with each send. |\n| major | `src/queue.js` (no tests) | no test files in the repo | This change alters behaviour on purpose but ships no tests. At minimum, cover: success on the first try, success after N failures, giving up once the limit is hit (rethrowing the last error), and a permanent error stopping the retries straight away. Use fake timers so the backoff tests run quickly and give the same result every time. |\n| question | commit message | \"Retry deliveries until they succeed\" | What problem caused this change? Were real messages being dropped after three tries? If the real cause was too few tries or no delay between them, raising the limit and adding backoff fixes it without the risk of hanging forever. |\n\n## Strengths\n\n- The header comment was updated to match the new behaviour, so the comment and the code agree.\n- The change is small and does one thing, which makes the problem easy to see.\n\n## Deferred\n\n- Dead-letter handling for messages that use up all their retries. This probably belongs in the outbox consumer, which isn't in this repository.\n- Making the retry policy (try count, base delay, max delay) configurable and documenting it in `README.md`.\n\n## Unevaluated\n\n- Tests, linter and build: none are set up in the repository, and this session doesn't allow running commands other than `git`.\n- The skill's `check-review-report.mjs` structure check, because this session can't write files or run Node.\n- How the outbox calls `deliver` (one at a time or in parallel). There's no calling code in the repository, so I couldn't confirm the head-of-line blocking described in the first finding.",
+  "reply": "I reviewed commit f2cdaad, \"Retry deliveries until they succeed\", and the change is not safe to merge as written. It replaces the three-attempt limit in `deliver` with a loop that never stops and never reports why a send failed.\n\nThe change touches one file, `src/queue.js` (3 lines added, 3 removed). The repository has no tests, linter config or `package.json`, so I ran no automated checks; this review comes from reading the code. The commit message only restates the title and there's no linked ticket, so I don't know why the limit was removed.\n\n## Verdict\n\nVerdict: request changes\n\n## Findings\n\n| Severity | Location | Evidence | Direction |\n|---|---|---|---|\n| blocker | `src/queue.js:3` | `while (true) {` | **A message that always fails is retried forever.** Some failures won't go away by retrying: a malformed message, a rejected request, an expired credential. For those, `deliver` never returns or throws, so whatever is waiting on it stalls for good. Before this change the caller got the error after three attempts and could deal with it. Put a limit back (a `maxAttempts` setting, perhaps) and throw the last error once it's reached. |\n| blocker | `src/queue.js:3-8` | `return await send(message);` … `// ignore and try again` | **A fast failure can freeze the whole process.** Nothing waits between attempts. If `send` fails immediately (for example, its connection is already closed), the loop keeps itself busy without ever letting timers, network events or other requests run. A single bad message can then lock up the service, and even when `send` fails slowly, the receiving service is retried with no pause. Wait between attempts, increasing the wait each time with some randomness (exponential backoff with jitter). That also gives the rest of the program room to run. |\n| major | `src/queue.js:7` | `// ignore and try again` | **Errors are thrown away without being logged.** If deliveries start failing, nobody can tell from logs or metrics, because the queue just looks slow. Log each failed attempt with the attempt number and the error. Ideally, retry only errors that are likely to be temporary (timeouts, overloaded servers) and fail straight away on permanent ones. |\n| major | `src/queue.js:2` | `export async function deliver(send, message)` | **The behaviour changed and no tests came with it.** This change makes the old \"give up after N tries\" behaviour easy to lose without anyone noticing. Add tests for: success on the first try, success after a few temporary failures, and the last error being thrown once the limit is reached. |\n| question | `src/queue.js:2` | `deliver` used to throw after the 3rd attempt | Is any code outside this repository relying on `deliver` throwing, for example to move a failed message to a dead-letter queue? Without the throw, that code never runs. |\n| minor | commit f2cdaad | `Retry deliveries until they succeed` | The commit message doesn't say why three attempts weren't enough. If messages were being dropped after brief outages, a higher limit with backoff fixes that without the risks above. Saying so in the message would help whoever reads this history later. |\n\n## Strengths\n\n- The header comment was updated to match the new behaviour, so the code and its comment agree.\n- The diff contains only this change, which makes it easy to read.\n\n## Deferred\n\n- If losing messages is the real problem, add a dead-letter queue for messages that are still failing at the limit. It belongs in its own ticket, not in this fix.\n\n## Unevaluated\n\n- **Tests:** none exist, so nothing could be run.\n- **Linting:** no linter is set up (no ESLint config or `package.json`).\n- **Code that calls `deliver`:** none is in this repository, so I couldn't see who depends on the old throw.\n- **Report format check:** I couldn't run the skill's script on this report because this session can't save files or run Node.js.",
   "changed": [],
   "files": {}
 }

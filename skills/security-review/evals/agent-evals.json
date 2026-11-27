@@ -30,6 +30,9 @@
           "request changes",
           "inject",
           "(requireRole|authoriz|role)"
+        ],
+        "no_skill": [
+          "peer-code-review"
         ]
       }
     },
@@ -62,6 +65,9 @@
         "must_match": [
           "CVE-2020-8203|prototype pollution",
           "4\\.17\\.(20|21)|upgrade"
+        ],
+        "no_skill": [
+          "peer-code-review"
         ]
       }
     }

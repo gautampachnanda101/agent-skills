@@ -32,9 +32,11 @@ pages, as one CSV file. The server builds the file through a new endpoint,
 - R-3: The file is UTF-8 without a byte-order mark, with LF line endings,
   quoted as in RFC 4180. The first line is the header, with the table's
   columns in order. Dates are written as `YYYY-MM-DD` in UTC.
-- R-4: A text cell whose value begins with `=`, `+`, `-`, or `@` is prefixed
-  with a single quote, so spreadsheets do not run it as a formula. Numeric
-  cells, including negative numbers, are never prefixed.
+- R-4: A cell in a text column (`date` and `team`, by the column types the
+  rows API declares) whose value begins with `=`, `+`, `-`, `@`, a tab, or a
+  carriage return is prefixed with a single quote, so spreadsheets do not
+  run it as a formula, as OWASP's CSV injection guidance advises. Cells in
+  numeric columns, including negative numbers, are never prefixed.
 - R-5: A request matching more than 50,000 rows gets 413 with the JSON body
   `{"error": "too_many_rows", "rowCount": <count>}`, and the page shows that count and asks the user to narrow the
   filters. A request matching no rows returns a file with only the header.
@@ -56,8 +58,9 @@ pages, as one CSV file. The server builds the file through a new endpoint,
   the same values, its first line is the header in table order, and every
   date matches `YYYY-MM-DD`. Cells prefixed under R-4 are compared without
   their prefix.
-- AC-6 (R-4): Given a text cell `=SUM(A1:A2)` and a numeric cell `-12`, when
-  exported, then the file holds `'=SUM(A1:A2)` and `-12`.
+- AC-6 (R-4): Given a team named `=SUM(A1:A2)`, a team named `-12`, and a
+  numeric cell `-12`, when exported, then the file holds `'=SUM(A1:A2)`,
+  `'-12`, and `-12`.
 - AC-7 (R-5): Given filters matching 50,001 rows, when the user selects
   Export CSV, then the endpoint responds 413 with `"rowCount": 50001`, no file
   downloads, and the page shows the count and asks them to narrow the

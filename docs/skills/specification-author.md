@@ -1,6 +1,6 @@
 # specification-author
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/specification-author/SKILL.md) · plugin name `agent-skills:specification-author`**
+**Version 1.0.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/specification-author/SKILL.md) · plugin name `agent-skills:specification-author`**
 
 Turns a rough request into a specification a team can build and test from.
 It reads the repository first, asks the three to five questions that would
