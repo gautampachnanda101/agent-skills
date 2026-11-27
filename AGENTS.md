@@ -18,7 +18,15 @@ independent of any one assistant, editor, model, or operating system.
 - Prefer portable instructions and standard tools. Declare dependencies and
   platform limitations; do not assume an assistant-specific tool is available.
 - Keep the skill list and installation guidance in [README.md](./README.md)
-  current when adding or changing skills.
+  current when adding or changing skills, and register a new skill
+  everywhere [Contributing a skill](./docs/contributing.md) lists, including
+  its `.github/CODEOWNERS` line and its row in the Levels table.
+- Read the repository before asking, suggest values with their evidence, and
+  write nothing the user has not confirmed.
+- Ship reply evals (`evals/evals.json`) and behaviour evals
+  (`evals/agent-evals.json`) with every skill, and enforce a rule that
+  matters with a bundled checker or an assistant setting rather than text
+  alone ([decision 0009](./docs/decisions/0009-enforce-rules-outside-the-model.md)).
 - Do not require secrets in files or examples. Ask for authorization before
   external or destructive actions, and surface failures rather than hiding them.
 

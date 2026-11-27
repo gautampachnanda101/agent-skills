@@ -1,8 +1,10 @@
 # Verification
 
-Run the bundled checkers on catalog descriptors and TechDocs sites, then test
-the skill end to end with a small local model. CI runs both in the `Verify`
-workflow. To see descriptors in a running catalog, use a
+Check the skills four ways: the bundled checkers, a small local model that
+applies `backstage-catalog-builder` end to end, reply evals, and behaviour
+evals. CI runs the checkers and the local model in the `Verify` workflow,
+and grades recorded behaviour runs; the reply and behaviour evals call a
+model, so you run them yourself. To see descriptors in a running catalog, use a
 [local Backstage](local-backstage.md), which CI does not run.
 
 In this page:

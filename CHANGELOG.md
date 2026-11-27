@@ -4,7 +4,7 @@ All notable changes to this repository's skills are documented here. Skill
 versions follow [Semantic Versioning](https://semver.org/) through each
 skill's `metadata.version` field.
 
-## [2.0.0] - 2026-11-26
+## [2.0.0] - 2026-11-27
 
 ### Changed
 

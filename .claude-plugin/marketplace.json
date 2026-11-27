@@ -1,6 +1,6 @@
 {
   "name": "gautampachnanda101-agent-skills",
-  "description": "Skills that build open-source Backstage catalogs: entity modeling, discovery, TechDocs generation, and structural validation",
+  "description": "Evidence-based Agent Skills for the development lifecycle, from specification to release, tested with reply and behaviour evals",
   "owner": {
     "name": "Gautam Pachnanda",
     "url": "https://github.com/gautampachnanda101"
@@ -9,7 +9,7 @@
     {
       "name": "agent-skills",
       "source": "./",
-      "description": "Evidence-based Agent Skills: Backstage catalog building, peer code review, and documentation review"
+      "description": "Twelve skills: specifications, decision records, change and test plans, code and security review, documentation, release notes, Backstage catalogs, and skill correction"
     }
   ]
 }

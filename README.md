@@ -9,28 +9,19 @@ guides, scripts, and tests. The skills are designed to work across
 assistants, editors, models, and operating systems, though not every client
 has been tested. The skills today:
 
-- [`backstage-catalog-builder`](./skills/backstage-catalog-builder/SKILL.md) —
-  scans GitHub repositories and builds evidence-based open-source Backstage
-  catalogs, including TechDocs generation and structural validation.
-- [`peer-code-review`](./skills/peer-code-review/SKILL.md) — evidence-based peer
-  code review grounded in Google's review guide, Fagan inspections, and the
-  peer-review literature.
-- [`documentation-review`](./skills/documentation-review/SKILL.md) — documentation
-  quality reviews grounded in Diátaxis and the Google/Microsoft style
-  guides.
-- [`documentation-author`](./skills/documentation-author/SKILL.md) — authors new pages and
-  rewrites existing ones following Diátaxis and GOV.UK content design,
-  with built-in lint-and-verify validation.
-- [`skill-correction`](./skills/skill-correction/SKILL.md) — turns a
-  correction to a skill's behaviour into a failing eval case and the
-  smallest fix, then re-runs the skill's cases.
-- [`decision-record-author`](./skills/decision-record-author/SKILL.md) — writes architecture decision records that follow the repository's own records, and supersedes rather than rewrites.
-- [`specification-author`](./skills/specification-author/SKILL.md) — turns a rough request into a specification with numbered requirements and Given/When/Then acceptance criteria, after asking the questions that change the outcome.
-- [`specification-review`](./skills/specification-review/SKILL.md) — reviews a specification before it is built: untestable requirements, incomplete criteria, uncovered requirements, and contradictions with the repository.
-- [`test-plan-author`](./skills/test-plan-author/SKILL.md) — plans tests from a specification's acceptance criteria, not from the code, with negative and boundary cases, and writes failing tests first when asked.
-- [`security-review`](./skills/security-review/SKILL.md) — reviews a change for injection, broken authorization, data exposure, weakened checks, and risky dependencies, after running the repository's own scanners.
-- [`change-plan-author`](./skills/change-plan-author/SKILL.md) — breaks a spec or request into small, ordered, independently reviewable changes, each with its files, check, and size.
-- [`release-notes-author`](./skills/release-notes-author/SKILL.md) — drafts release notes that lead with what readers must do: breaking changes with upgrade steps, migrations, and how to roll back.
+| For | Skills |
+| --- | --- |
+| Deciding what to build | [`specification-author`](./skills/specification-author/SKILL.md), [`specification-review`](./skills/specification-review/SKILL.md), [`decision-record-author`](./skills/decision-record-author/SKILL.md) |
+| Building and reviewing | [`change-plan-author`](./skills/change-plan-author/SKILL.md), [`peer-code-review`](./skills/peer-code-review/SKILL.md), [`security-review`](./skills/security-review/SKILL.md) |
+| Testing | [`test-plan-author`](./skills/test-plan-author/SKILL.md) |
+| Documentation | [`documentation-author`](./skills/documentation-author/SKILL.md), [`documentation-review`](./skills/documentation-review/SKILL.md) |
+| Releasing and cataloguing | [`release-notes-author`](./skills/release-notes-author/SKILL.md), [`backstage-catalog-builder`](./skills/backstage-catalog-builder/SKILL.md) |
+| Improving the skills | [`skill-correction`](./skills/skill-correction/SKILL.md) |
+
+Each skill works on its own. The [Roles](https://gautampachnanda101.github.io/agent-skills/roles/)
+pages show which skills each role uses, and the
+[Skills section](https://gautampachnanda101.github.io/agent-skills/skills/)
+describes each one.
 
 This README is the landing page; the complete documentation lives in
 [the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),
@@ -57,11 +48,6 @@ skill-name/
 └── ...           # any additional directories — in this repo: tests/ and
                   # evals/ — loaded on demand
 ```
-
-In this repository, each [skills/](./skills/) subdirectory is one such skill.
-Each folder is the source of truth for what its skill contains. The
-[Skills section](https://gautampachnanda101.github.io/agent-skills/skills/)
-of the site describes each one.
 
 ## Install
 
@@ -97,8 +83,9 @@ skips the interactive questions: [Using the skills](https://gautampachnanda101.g
 ## Documentation
 
 The [TechDocs site](https://gautampachnanda101.github.io/agent-skills/)
-covers installation, prompts for each skill, verification, a local
-Backstage, and contributing. Its home page is the table of contents. To
+covers installation, prompts for each skill, roles, how the skills are
+tested, how to make their rules hold with any model, a local Backstage, and
+contributing. Its home page is the table of contents. To
 preview it locally, run `pip install -r docs/requirements.txt`, then
 `mkdocs serve`.
 

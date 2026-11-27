@@ -48,6 +48,12 @@ active, which loosens permissions rather than tightening them.
 | `backstage-catalog-builder` | Valid descriptors and TechDocs sites | `check-descriptors.mjs` and `check-techdocs.mjs` in pre-commit or CI |
 | `documentation-author` | No placeholders, vague link text, or bare URLs | `check-page.mjs` in pre-commit |
 | `documentation-review`, `peer-code-review` | Report only; never edit, push, or merge | An ask rule for edits, and a deny rule for `git push` and merges |
+| `decision-record-author` | Complete records, and no rewrite of an accepted one | `check-decision-record.mjs --dir` in pre-commit, and review of changes to accepted records |
+| `specification-author` | Testable requirements, each covered by a criterion | `check-specification.mjs` in pre-commit or CI |
+| `specification-review`, `security-review` | Report only; never edit | An ask rule for edits |
+| `test-plan-author` | Every acceptance criterion has a test | `check-test-plan.mjs --spec` in CI |
+| `change-plan-author` | No step over the review limit, and no code written | `check-change-plan.mjs`, and an ask rule for edits outside the plan |
+| `release-notes-author` | Upgrade steps and a rollback for every breaking change; never publish | `check-release-notes.mjs`, and a deny rule for tagging and publishing commands |
 | `skill-correction` | Never weaken a check to make a case pass | Required review of eval changes by the skill's owner, through `CODEOWNERS` |
 | All | Never commit a secret | gitleaks in pre-commit and CI |
 

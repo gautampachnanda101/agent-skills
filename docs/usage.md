@@ -31,8 +31,11 @@ In this page:
 | [change-plan-author](skills/change-plan-author.md) | "Plan the work for the CSV export spec as a sequence of reviewable changes." |
 | [release-notes-author](skills/release-notes-author.md) | "Draft the release notes for orders-api 1.5.0." |
 
-The two review skills report findings and change nothing unless you ask. The
-rest of this page covers `backstage-catalog-builder`.
+The four review skills (`peer-code-review`, `security-review`,
+`documentation-review`, and `specification-review`) report findings and
+change nothing. The other skills read the repository, suggest what to do,
+and write only after you confirm. The rest of this page covers
+`backstage-catalog-builder`.
 
 ## Catalog a single repository
 

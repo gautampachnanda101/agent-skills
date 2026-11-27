@@ -1,7 +1,8 @@
 # Plan: skills for the whole development lifecycle
 
 This plan extends the repository from four skills to a set that covers the
-software lifecycle, from a rough idea to a reviewed release. Each skill is
+software lifecycle, from a rough idea to a reviewed release. Phases 1 to 7
+are done, with twelve skills; see [Progress](#progress). Each skill is
 one job with a checkable output, useful to one person on its own, and a
 person approves its result. It is for maintainers deciding what to build
 next and in what order.
@@ -64,8 +65,9 @@ These carry over from the work so far, and every phase must keep them:
   before release ([decision 0002](decisions/0002-grade-skill-replies-with-answer-keys.md)).
 - **Skills follow the Agent Skills spec and work in any assistant.** Roles
   and handoffs live in documentation, not in a new file format.
-- **One skill per release.** Each new skill is a minor plugin version with
-  its own eval results in the changelog.
+- **Each skill is released with its evidence.** A new skill gets its own
+  changelog entry and eval results. Several can share a release, as eight
+  did in 2.0.0.
 
 ## Phases at a glance
 
