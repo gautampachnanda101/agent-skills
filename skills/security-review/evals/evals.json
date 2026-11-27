@@ -17,7 +17,7 @@
       "checks": {
         "ledger": "tests/ledger.json",
         "must_match": [
-          "verdict[^\\n]*request changes"
+          "^[#*\\s]*verdict\\b[^\\n]*(?:\\n[ \\t]*)*[^\\n]*?request changes"
         ]
       }
     },
@@ -35,10 +35,10 @@
       "checks": {
         "max_severity": "minor",
         "must_match": [
-          "verdict[^\\n]*\\bapprove\\b"
+          "^[#*\\s]*verdict\\b[^\\n]*(?:\\n[ \\t]*)*[^\\n]*?\\bapprove\\b"
         ],
         "must_not_match": [
-          "verdict[^\\n]*request changes"
+          "^[#*\\s]*verdict\\b[^\\n]*(?:\\n[ \\t]*)*[^\\n]*?request changes"
         ]
       }
     }

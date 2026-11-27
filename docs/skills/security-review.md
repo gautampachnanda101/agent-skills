@@ -1,6 +1,6 @@
 # security-review
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/security-review/SKILL.md) · plugin name `agent-skills:security-review`**
+**Version 1.0.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/security-review/SKILL.md) · plugin name `agent-skills:security-review`**
 
 Reviews a diff, commit, or pull request for what an attacker could do with
 it. It runs the repository's own configured scanners first, then reads every

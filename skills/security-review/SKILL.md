@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools and, for scanners and git history, a shell. Writes nothing; the review is the reply.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Security review
