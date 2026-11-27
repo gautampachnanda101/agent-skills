@@ -1,0 +1,66 @@
+[
+  {
+    "defect": "Every user can export, but only analysts and admins may read reports",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "R-1|AC-1|every user|role",
+      "analyst|admin|403|routes"
+    ]
+  },
+  {
+    "defect": "\"Fast\" has no target",
+    "severity": [
+      "major",
+      "minor"
+    ],
+    "match": [
+      "R-2|fast",
+      "target|number|seconds|measur|untestable|vague"
+    ]
+  },
+  {
+    "defect": "AC-2 has no Then and \"works correctly\" cannot fail",
+    "severity": [
+      "major"
+    ],
+    "match": [
+      "AC-2",
+      "Then|works correctly|pass|fail|testable"
+    ]
+  },
+  {
+    "defect": "R-3 is covered by no acceptance criterion",
+    "severity": [
+      "major",
+      "minor"
+    ],
+    "match": [
+      "R-3",
+      "cover|criterion|criteria|no AC"
+    ]
+  },
+  {
+    "defect": "No non-goals section",
+    "severity": [
+      "minor",
+      "major"
+    ],
+    "match": [
+      "non-goal|out of scope"
+    ]
+  },
+  {
+    "defect": "\"Never exceeds 10,000 rows\" contradicts reports of 200,000 rows",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "R-4|10,000|limit",
+      "200,000|reports\\.md|docs"
+    ]
+  }
+]

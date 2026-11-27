@@ -1,0 +1,54 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "specification-review"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/csv-export.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/reports.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    }
+  ],
+  "reply": "**Verdict: not ready.** I found two blockers and three majors. The two blockers are places where the spec contradicts the repository.\n\n## Findings\n\n| Severity | Location | Evidence | Suggested direction |\n| --- | --- | --- | --- |\n| blocker | R-1, AC-1; `src/reports/routes.js:2,4`, `docs/reports.md:3-4`, `README.md:3` | Spec: \"Every user can export the report they are viewing.\" Code: \"Only users with the analyst or admin role may call it; others get 403\", `ROLES = ['analyst', 'admin']`. | Limit export to analyst and admin. Say what other roles see: a hidden button, or a 403 message. |\n| blocker | R-4; `docs/reports.md:4` | Spec: \"A report never exceeds 10,000 rows, so no limit is needed.\" Docs: \"Large reports can reach 200,000 rows.\" | Drop the false premise. Set a real row limit and say what happens above it: truncate with a warning, refuse, or run as a background job. |\n| major | R-2, AC-2 | \"The export must be fast.\" \"Given a large report … the export works correctly.\" There's no number, and the Then can't pass or fail. \"Large\" isn't defined. | Give a target with a row count, for example \"200,000 rows download within N seconds at p95\". Rewrite AC-2 so its Then can be measured. |\n| major | R-4; `src/reports/routes.js:1,3` | The spec wants \"every row of the filtered view\", but the only data endpoint is paged at `PAGE_SIZE = 500`. A 200,000-row report would be 400 requests. The spec doesn't say whether export uses the paged API, a new endpoint, or the server or client side. | Say where the CSV is built and how it gets every page. Add a criterion that the export holds all rows across pages, for example a 501-row report. |\n| major | R-3 (coverage) | No acceptance criterion covers R-3. Nothing checks UTF-8, the header row, or ISO 8601 dates. | Add a criterion that checks the encoding, the header columns, and the date format against a known report. |\n| minor | Failure cases (all) | Not covered: an empty report, an export that fails or times out partway, a session that expires mid-export, and what the user sees on errors. | Add a criterion for each failure case. |\n| minor | R-3 | It doesn't say whether the file has a BOM (Excel often needs one for UTF-8), how commas, quotes and newlines are escaped, which columns appear in what order, or which timezone the dates use. | Name the columns, the escaping rule (RFC 4180), and the timezone. Say whether to add a BOM. |\n| minor | AC-3 vs R-4; `docs/reports.md:3` | The filters are date range and team. AC-3 tests only team and checks \"only that team's rows\", not that every row is there. | Test team plus date range, and assert the exact row count. |\n| minor | Scope | There are no non-goals: other formats (XLSX), scheduled or emailed exports, choosing columns. | Add a non-goals list. |\n| nit | AC-1 | \"then a CSV file downloads\" doesn't give the file name or say the contents must match the view. | Give the file name pattern, for example `report-<team>-<from>-<to>.csv`. |\n| question | R-1 | \"The report they are viewing\": does that mean the current page of 500 rows or the whole filtered result? R-4 suggests the whole result. | Confirm with the author. |\n\n## Strengths\n\n- Requirements and criteria have IDs, and each criterion names its requirement, so the gaps were easy to trace.\n- The problem statement is short and names a real user need: analysts copying tables by hand.\n- R-3 names concrete formats (UTF-8, ISO 8601) rather than \"standard format\".\n\n## Questions for the author\n\n1. Should viewers who aren't analysts or admins be able to export? If so, the endpoint's role check would have to change too.\n2. What's the largest export you'll support (the docs mention up to 200,000 rows), and what should happen above it?\n3. Should the CSV be built on the server, as a new streaming endpoint, or in the browser from the paged API?\n4. Do the CSV dates use UTC or the viewer's local timezone?\n\nI haven't changed the spec.",
+  "changed": [],
+  "files": {}
+}

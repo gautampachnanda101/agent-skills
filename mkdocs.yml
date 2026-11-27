@@ -14,6 +14,7 @@ nav:
       - skill-correction: skills/skill-correction.md
       - decision-record-author: skills/decision-record-author.md
       - specification-author: skills/specification-author.md
+      - specification-review: skills/specification-review.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md

@@ -29,6 +29,7 @@ the Claude plugin route.
   behaviour into a failing eval case and the smallest fix.
 - [decision-record-author](decision-record-author.md) — writes architecture decision records that follow the repository's own records, and supersedes rather than rewrites.
 - [specification-author](specification-author.md) — turns a rough request into a specification with numbered requirements and Given/When/Then acceptance criteria, after asking the questions that change the outcome.
+- [specification-review](specification-review.md) — reviews a specification before it is built: untestable requirements, incomplete criteria, uncovered requirements, and contradictions with the repository.
 
 ## Levels and owners
 
@@ -46,6 +47,7 @@ asked to review changes to it, from
 | [skill-correction](skill-correction.md) | Team | The skill's owner, before the case and fix are written | @gautampachnanda101 |
 | [decision-record-author](decision-record-author.md) | Personal | The people making the decision, before its status changes from Proposed | @gautampachnanda101 |
 | [specification-author](specification-author.md) | Personal | The person who asked for the feature, and whoever builds or tests it | @gautampachnanda101 |
+| [specification-review](specification-review.md) | Team | The spec's author, and whoever approves building it | @gautampachnanda101 |
 
 To make a skill's important rules hold whatever model runs it, apply the
 settings in [Make a skill's rules hard](../hard-rules.md).

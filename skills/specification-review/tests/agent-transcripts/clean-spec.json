@@ -1,0 +1,54 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "specification-review"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/csv-export.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/reports.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    }
+  ],
+  "reply": "**Verdict:** `ready after changes`\n\nI found no blockers or majors. The spec agrees with the repository on the roles (`src/reports/routes.js:2-4`, `ROLES = ['analyst', 'admin']`, others get 403). It also agrees on the 200,000-row ceiling (`docs/reports.md:4`) and the filter set (`from`, `to`, `team` at `src/reports/routes.js:1`). Every requirement has at least one acceptance criterion with a Given, a When and a Then that can clearly pass or fail. The findings below are gaps a careful developer would ask about.\n\n## Findings\n\n| Severity | Location | Evidence | Suggested direction |\n| --- | --- | --- | --- |\n| minor | R-4, AC-6 | \"A text cell whose value begins with `=`, `+`, `-`, or `@` is prefixed\". Common CSV-injection guidance also treats a leading tab (`\\t`) and carriage return (`\\r`) as triggers. | Decide whether `\\t` and `\\r` are in scope, and add them to R-4 and AC-6 if so. |\n| minor | R-4 | \"text cell\" and \"numeric cell\" aren't defined. Does the type come from the column's declared type or from parsing the value? A text column holding `-12` would be treated differently under each. | Say the column's schema type decides it. |\n| minor | Scope, AC-1 | \"Export every row that matches… across all pages\" is a requirement, but it lives in Scope with no R- number. AC-1 is tagged R-1 (permissions), yet it mostly tests completeness across pages. | Make all-pages completeness its own R-n and tag AC-1 to it. |\n| minor | Scope, `src/reports/routes.js:1` | The export \"takes the same filters as the rows API\", and that API also takes `page=`. | Say whether `page` is ignored or rejected on the export endpoint. |\n| minor | Failure cases | Invalid filters aren't covered: a malformed date, `from` later than `to`, or an unknown team. | Say the export validates filters the same way the rows API does and returns the same error status. |\n| minor | R-5 | 413 means *Content Too Large*, which is about the request body. Here the request is small and the result is too large. Some proxies and clients handle 413 in their own way. | Confirm 413 on purpose, or use 422 or 400 with the same JSON body. |\n| minor | R-3, AC-5 | R-3 requires dates \"in UTC\", but AC-5 only checks the pattern `YYYY-MM-DD`, so a date in local time would pass. | Add a fixture whose UTC date differs from its local date. |\n| minor | AC-2 | \"then the file downloads\" doesn't check what the file contains. | Check the admin's file the same way as AC-1. |\n| minor | R-3 | Nothing is said about the response headers: `Content-Type` (`text/csv; charset=utf-8`), the `Content-Disposition` file name, or caching. | Specify the content type and the file name pattern. |\n| nit | R-3 | \"with the table's columns in order\" doesn't say whether the header holds the display labels or the field keys. | Say which. |\n| nit | R-5 | The JSON example runs past the line width at line 39, unlike the rest of the file. | Re-wrap it. |\n\n## Strengths\n\n- R-2 is a real, measurable target: a named dataset, a named environment, a defined start and end point, and a 95-of-100 threshold. AC-4 tests it directly.\n- The 50,000-row limit is stated as a non-goal with the reason, and R-5 and AC-7 test the boundary at 50,001. AC-4's 50,000-row dataset covers the case at exactly the limit.\n- R-1 and AC-3 cover both 401 and 403, and match the code's existing role model.\n- AC-5 deals with the R-3/R-4 interaction by comparing cells without their prefix. That's easy to miss.\n- R-5 and AC-8 specify the empty result: a file with only the header.\n\n## Questions for the author\n\n1. Are daily usage buckets stored in UTC or in a local time zone? If they're local, writing dates \"in UTC\" could move rows onto the previous or next day.\n2. The row count is checked before streaming. If data changes in between, can the file exceed 50,000 rows or differ from the count the user saw? Is that acceptable?\n3. Is there any limit on concurrent exports per user or per server, given that each export can take up to 10 seconds?\n4. Should exports be audit-logged, since they take data out of the app in bulk? If not, should that be listed as a non-goal?\n\nI haven't edited the spec.",
+  "changed": [],
+  "files": {}
+}

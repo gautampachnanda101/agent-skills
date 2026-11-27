@@ -1,0 +1,50 @@
+{
+  "skill_name": "specification-review",
+  "guides": [],
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this specification before the team builds it. The repository's route file and reports doc are included as evidence.",
+      "files": [
+        "tests/fixtures/planted/csv-export.md",
+        "tests/fixtures/planted/routes.js",
+        "tests/fixtures/planted/reports.md"
+      ],
+      "expected_output": "Verdict not ready; findings for the role contradiction, the vague R-2, AC-2 without Then, uncovered R-3, missing non-goals, and the 10,000-row claim that contradicts 200,000-row reports.",
+      "assertions": [
+        "Finds all six planted defects",
+        "Rates the repository contradictions blocker or major",
+        "Gives the verdict not ready"
+      ],
+      "checks": {
+        "ledger": "tests/ledger.json",
+        "must_match": [
+          "not ready"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "prompt": "Review this specification before the team builds it. The repository's route file and reports doc are included as evidence.",
+      "files": [
+        "tests/fixtures/clean/csv-export.md",
+        "tests/fixtures/planted/routes.js",
+        "tests/fixtures/planted/reports.md"
+      ],
+      "expected_output": "Verdict ready or ready after changes, with no blocker or major findings.",
+      "assertions": [
+        "Raises nothing above minor",
+        "Gives the verdict ready or ready after changes"
+      ],
+      "checks": {
+        "max_severity": "minor",
+        "must_match": [
+          "\\bready\\b"
+        ],
+        "must_not_match": [
+          "not ready"
+        ]
+      }
+    }
+  ]
+}

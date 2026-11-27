@@ -1,0 +1,52 @@
+{
+  "skill_name": "specification-review",
+  "evals": [
+    {
+      "id": "planted-spec",
+      "fixture": "tests/fixtures/agent/planted-spec",
+      "prompt": "Review the spec in docs/specs/csv-export.md before we build it.",
+      "allow": {
+        "write": [
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "specification-review",
+        "read": [
+          "docs/specs/csv-export.md",
+          "src/reports/routes.js"
+        ],
+        "writes_only": [],
+        "must_match": [
+          "not ready",
+          "(analyst|admin|403)",
+          "200,000"
+        ]
+      }
+    },
+    {
+      "id": "clean-spec",
+      "fixture": "tests/fixtures/agent/clean-spec",
+      "prompt": "Review the spec in docs/specs/csv-export.md before we build it.",
+      "allow": {
+        "write": [
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "specification-review",
+        "read": [
+          "docs/specs/csv-export.md"
+        ],
+        "writes_only": [],
+        "must_match": [
+          "\\bready\\b"
+        ],
+        "must_not_match": [
+          "not ready",
+          "\\|\\s*`?(blocker|major)`?\\s*\\|"
+        ]
+      }
+    }
+  ]
+}
