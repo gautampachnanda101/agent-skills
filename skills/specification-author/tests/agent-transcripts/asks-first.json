@@ -1,0 +1,61 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "specification-author"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/ReportTable.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/reports.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    }
+  ],
+  "reply": "I've read the reports code and docs. Here's what's already settled: the table has five fixed columns (`src/reports/ReportTable.js:6`), filters are date range and team, rows come from `/api/reports/rows` in pages of 500 (`src/reports/routes.js:3`), only analysts and admins can call that endpoint (`src/reports/routes.js:4`), and reports can reach 200,000 rows (`docs/reports.md:4`).\n\nFour questions would change what gets built. Each has a suggested answer:\n\n1. **What does the export contain: the current filtered view, or everything?**\n   Suggested: the current filtered view, with all of its rows and not just the page on screen. `ReportTable` already holds the filter state, and \"export what I'm looking at\" is what people expect.\n\n2. **Who can export?**\n   Suggested: the same people who can view the report, analysts and admins, enforced on the server. That matches `ROLES` in `routes.js`, and it keeps the export from becoming a way around the viewing restriction.\n\n3. **How should large exports work, given reports can reach 200,000 rows?**\n   Suggested: a synchronous, streamed download from a new endpoint (say `GET /api/reports/export.csv`) up to 200,000 rows. Above that, refuse with a clear message asking the user to narrow the filters. At five numeric or short columns, 200,000 rows is roughly 10 MB, which streams quickly. Building the file in the browser from 400 paged requests would be slow and fragile. Background jobs with an emailed link would be a follow-up, not part of this release.\n\n4. **What format details matter: Excel compatibility, column headers, dates?**\n   Suggested: UTF-8 with a byte order mark (BOM) so Excel opens it correctly, comma-separated per RFC 4180, a header row using the `COLUMNS` names, ISO 8601 dates (`YYYY-MM-DD`), and a filename like `reports_<from>_<to>_<team|all>.csv`. Also neutralise cells that start with `=`, `+`, `-` or `@` so team names can't inject formulas into a spreadsheet.\n\n5. **What's the latency target?**\n   Suggested: the download starts within 2 seconds and the full 200,000-row file finishes within 15 seconds at the 95th percentile.\n\nReply with \"go with the suggestions\" or tell me which answers to change. Once you do, I'll write the spec to `docs/specs/reports-csv-export.md`. If you'd rather see a draft now, I can write it with these points listed under \"Open questions\".",
+  "changed": [],
+  "files": {}
+}

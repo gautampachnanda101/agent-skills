@@ -25,6 +25,7 @@ has been tested. The skills today:
   correction to a skill's behaviour into a failing eval case and the
   smallest fix, then re-runs the skill's cases.
 - [`decision-record-author`](./skills/decision-record-author/SKILL.md) — writes architecture decision records that follow the repository's own records, and supersedes rather than rewrites.
+- [`specification-author`](./skills/specification-author/SKILL.md) — turns a rough request into a specification with numbered requirements and Given/When/Then acceptance criteria, after asking the questions that change the outcome.
 
 This README is the landing page; the complete documentation lives in
 [the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),

@@ -24,6 +24,7 @@ In this page:
 | [documentation-author](skills/documentation-author.md) | "Write the getting-started guide for this repository using the documentation-author skill." |
 | [skill-correction](skills/skill-correction.md) | "The peer-code-review skill approved a change with failing tests; here is the transcript. Fix the skill with skill-correction." |
 | [decision-record-author](skills/decision-record-author.md) | "Write a decision record for moving payment updates from polling to webhooks; the discussion is in notes/webhooks.md." |
+| [specification-author](skills/specification-author.md) | "Write a spec for adding CSV export to the reports page." |
 
 The two review skills report findings and change nothing unless you ask. The
 rest of this page covers `backstage-catalog-builder`.

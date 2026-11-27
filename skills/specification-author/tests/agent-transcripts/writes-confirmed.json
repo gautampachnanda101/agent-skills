@@ -1,0 +1,85 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "specification-author"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "find . -type f -not -path './node_modules/*' -not -path './.git/*' | head -100"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/ReportTable.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/reports.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/specification-author/scripts/check-specification.mjs"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "docs/specs/csv-export.md"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "node .claude/skills/specification-author/scripts/check-specification.mjs docs/specs/csv-export.md"
+    }
+  ],
+  "reply": "I've written the spec to `docs/specs/csv-export.md`, and the skill's checker passes it with no problems.\n\n**What it says:**\n- **Rows:** the export contains all rows that match the current date range and team, not just the pages already loaded into the table. This matters because the table loads 500 rows at a time and a report can reach 200,000 rows.\n- **Columns:** `date, team, active_users, sessions, avg_session_minutes`, in the same order as the table. The file is UTF-8 with a header row, and quoting follows the standard CSV format (RFC 4180).\n- **Limit:** up to 50,000 data rows. An export of exactly 50,000 succeeds; at 50,001 or more, no file is produced and the page shows the matching row count and asks the user to narrow the filters. The server enforces the limit too, not just the page.\n- **Access:** only analysts and admins see the export control. The server returns 403 to other signed-in users and 401 when no one is signed in.\n- **Other cases:** if no rows match, the file contains just the header row. It also covers what the control shows while an export is running, what happens when an export fails, and the file name.\n- **Out of scope:** scheduled and emailed exports, as you said. I also listed splitting large exports into several files, other formats, and choosing columns just for the export, so nobody builds them by accident.\n\nThere are 16 numbered requirements, and every one is covered by at least one acceptance criterion.\n\n**Still open (listed in the spec's Open questions section):**\n- **Header names:** the code only has column keys like `active_users`, not display labels, so the spec uses the keys. If the table shows friendlier labels, the header could use those instead.\n- **Excel:** Excel on Windows can misread UTF-8 files unless they start with a byte order mark. Someone needs to decide whether to add one.\n- **10-second target:** I added a requirement that a 50,000-row download starts within 10 seconds. You didn't give a number, so this is my suggestion and needs confirming with engineering.\n- **Hidden columns:** if the table later lets users hide columns, should the export leave them out too?\n- **Changing data:** the file reflects the data at the moment of export, which may differ from what the table showed. This needs confirming as acceptable.",
+  "changed": [
+    "docs/specs/csv-export.md"
+  ],
+  "files": {
+    "docs/specs/csv-export.md": "# CSV export for the reports page\n\n## Problem\n\nAnalysts and admins can view and filter usage reports on the reports page, but\nthey cannot take the data out of the app to analyse it in a spreadsheet or\nanother tool. Today the only option is copying rows by hand from a table that\nloads 500 rows a page, and a report can reach 200,000 rows (`docs/reports.md`).\n\n## Users\n\n- **Analysts** – the main users. They filter a report and export it for\n  further analysis.\n- **Admins** – have the same access to reports as analysts and can export in\n  the same way.\n- **Other signed-in users** – cannot view reports today\n  (`src/reports/routes.js` allows only `analyst` and `admin`) and cannot export.\n\n## Scope\n\nThis release adds an on-demand CSV download to the reports page that:\n\n- exports exactly the rows matching the current filters (date range and team)\n- exports the columns shown in the report table, in the same order, with a\n  header row, encoded as UTF-8\n- produces at most 50,000 data rows in one file, and refuses larger exports\n  with a message asking the user to narrow the filters\n- is available only to users with the `analyst` or `admin` role\n\n## Non-goals\n\n- Scheduled or recurring exports.\n- Emailing exports or sending them to any other destination.\n- Splitting an export of more than 50,000 rows into several files, or\n  exporting everything regardless of filters.\n- Other file formats (Excel, JSON, PDF).\n- Choosing, renaming, or reordering columns for the export only.\n- An export history or a record of past downloads.\n\n## Requirements\n\n### Content\n\n- **R-1** The export contains every row that matches the filters active on the\n  reports page when the user starts the export (date range and team), and no\n  other rows. It includes all matching rows, not only the pages the table has\n  loaded so far.\n- **R-2** The export contains the columns shown in the report table, in the\n  same order as the table. With the current table these are `date`, `team`,\n  `active_users`, `sessions`, and `avg_session_minutes`\n  (`src/reports/ReportTable.js`).\n- **R-3** The first line of the file is a header row naming each column. Each\n  following line is one data row.\n- **R-4** The file is encoded as UTF-8. Team names and other text containing\n  non-ASCII characters (for example `Équipe Zürich`) appear unchanged when the\n  file is decoded as UTF-8.\n- **R-5** The file follows RFC 4180: fields are separated by commas, records\n  end with CRLF, and any field containing a comma, a double quote, or a line\n  break is enclosed in double quotes, with embedded double quotes doubled.\n- **R-6** Values in the file match the values the table shows for the same row\n  and column.\n- **R-7** When no rows match the filters, the export produces a file that\n  contains only the header row.\n\n### Size limit\n\n- **R-8** An export may contain at most 50,000 data rows (header row not\n  counted). An export of exactly 50,000 rows succeeds.\n- **R-9** When the filters match more than 50,000 rows, no file is produced.\n  The page shows a message that states the number of matching rows, states\n  the 50,000-row limit, and asks the user to narrow the filters. The filters\n  and the table stay as they were.\n- **R-10** The server enforces the 50,000-row limit as well as the page, so a\n  request made outside the page that matches more than 50,000 rows is refused\n  without returning row data.\n\n### Access\n\n- **R-11** The export control appears on the reports page only for users with\n  the `analyst` or `admin` role.\n- **R-12** The server refuses an export request from a user without the\n  `analyst` or `admin` role with HTTP 403 and returns no row data. A request\n  with no signed-in user is refused with HTTP 401.\n\n### Behaviour\n\n- **R-13** The file is downloaded with a `.csv` extension and a name that\n  identifies the report and the filters, in the form\n  `report_<from>_<to>_<team>.csv` (for example\n  `report_2026-10-01_2026-10-31_all-teams.csv`).\n- **R-14** For an export of 50,000 rows, the download starts within 10\n  seconds of the user starting the export, at the 95th percentile, measured\n  on the production environment.\n- **R-15** While an export is in progress, the export control shows that it\n  is working and cannot start a second export. The control returns to its\n  normal state when the download starts or the export fails.\n- **R-16** If the export fails for any reason other than the row limit or\n  access (for example a server error or a timeout), no partial file is\n  downloaded and the page shows a message saying the export failed and the\n  user can try again.\n\n## Acceptance criteria\n\n- **AC-1** (R-1) Given an analyst has filtered the report to 2026-10-01 to\n  2026-10-31 and team \"Platform\", and 1,200 rows match, when they export to\n  CSV, then the file has 1,200 data rows, each dated within that range with\n  team \"Platform\".\n- **AC-2** (R-1) Given the filters match 1,200 rows and the table has loaded\n  only the first 500, when the user exports, then the file has 1,200 data\n  rows.\n- **AC-3** (R-2, R-3) Given any filters that match at least one row, when the\n  user exports, then the first line of the file is\n  `date,team,active_users,sessions,avg_session_minutes` and every other line\n  has exactly 5 fields.\n- **AC-4** (R-4) Given a matching row whose team is `Équipe Zürich`, when the\n  user exports and the file is decoded as UTF-8, then the team field reads\n  `Équipe Zürich` exactly.\n- **AC-5** (R-5) Given a matching row whose team name is `Sales, \"EMEA\"`, when\n  the user exports, then that field appears in the file as\n  `\"Sales, \"\"EMEA\"\"\"` and a standard CSV parser reads the row as 5 fields.\n- **AC-6** (R-6) Given a filtered report, when the user exports, then for 20\n  rows chosen at random every field in the file equals the value the table\n  shows for that row and column.\n- **AC-7** (R-7) Given filters that match no rows, when the user exports, then\n  a file is downloaded that contains only the header row.\n- **AC-8** (R-8, R-14) Given filters that match exactly 50,000 rows, when the\n  user exports, then a file with 50,000 data rows downloads, and across 20\n  runs on production the download starts within 10 seconds in at least 19.\n- **AC-9** (R-9) Given filters that match 50,001 rows, when the user exports,\n  then no file is downloaded, the page shows a message that states 50,001\n  matching rows and the 50,000-row limit and asks the user to narrow the\n  filters, and the filters and table are unchanged.\n- **AC-10** (R-10) Given an analyst calls the export endpoint directly with\n  filters that match 200,000 rows, when the server handles the request, then\n  it refuses the request and the response contains no row data.\n- **AC-11** (R-11) Given a user with the `analyst` role, and separately a user\n  with the `admin` role, when each opens the reports page, then each sees the\n  export control.\n- **AC-12** (R-11, R-12) Given a signed-in user with neither the `analyst` nor\n  the `admin` role, when they call the export endpoint directly, then the\n  response is HTTP 403 with no row data, and the export control is not shown\n  to them anywhere in the app.\n- **AC-13** (R-12) Given no user is signed in, when the export endpoint is\n  called, then the response is HTTP 401 with no row data.\n- **AC-14** (R-13) Given filters from 2026-10-01 to 2026-10-31 for all teams,\n  when the user exports, then the downloaded file is named\n  `report_2026-10-01_2026-10-31_all-teams.csv`.\n- **AC-15** (R-15) Given an export is in progress, when the user selects the\n  export control again, then no second export starts and the control shows\n  that an export is in progress until the download starts.\n- **AC-16** (R-16) Given the server returns an error during an export, when\n  the export ends, then no file is downloaded, the page shows a message that\n  the export failed and can be tried again, and the export control can be\n  used again.\n\n## Open questions\n\n- **Header labels** – the table code defines column keys\n  (`active_users`, `avg_session_minutes`) but no display labels. This spec\n  uses the keys as header names. If the table shows human-readable labels,\n  should the header use those instead? Decides: product owner.\n- **Excel compatibility** – Excel on Windows can misread UTF-8 files without\n  a byte order mark. Should the file start with a UTF-8 BOM? Decides: product\n  owner, with analysts' tooling in mind.\n- **10-second target** (R-14) – proposed, not agreed. It needs confirming\n  against current API response times for 100 pages of 500 rows, or a\n  dedicated export endpoint. Decides: engineering lead.\n- **Hidden columns** – if the table later lets users hide columns, should the\n  export follow the visible set? This spec assumes the export matches what the\n  table shows. Decides: product owner.\n- **Data changing during export** – if rows are added between viewing the\n  table and exporting, the file reflects the data at export time. Confirm this\n  is acceptable. Decides: product owner.\n"
+  }
+}

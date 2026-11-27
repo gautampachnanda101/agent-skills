@@ -1,0 +1,32 @@
+{
+  "skill_name": "specification-author",
+  "guides": [],
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write the specification for this request: \"Let support agents merge duplicate customer accounts.\"\n\nDecisions already made: agents with the support-lead role can merge; a merge keeps the older account and moves orders, addresses, and notes to it; the newer account is closed, not deleted, and keeps a pointer to the one it merged into; merges can be undone within 30 days; accounts with an open dispute cannot be merged; bulk merging is out of scope for now. A merge of an account with up to 1,000 orders must finish within 5 seconds.\n\nAnswer with only one fenced markdown block containing the specification.",
+      "expected_output": "A specification with the need, scope, non-goals including bulk merges, numbered requirements including the 5-second target and the dispute rule, and Given/When/Then criteria covering every requirement, including the undo window and the role check.",
+      "assertions": [
+        "Has every section",
+        "Requirements are numbered and measurable",
+        "Every requirement is covered by a Given/When/Then criterion",
+        "Covers the failure cases: open dispute, wrong role, undo after 30 days"
+      ],
+      "checks": {
+        "unwrap_fence": true,
+        "grader": "scripts/check-specification.mjs",
+        "must_match": [
+          "\\bR-1\\b",
+          "\\bAC-1\\b",
+          "support-lead",
+          "30 days",
+          "dispute",
+          "5 seconds",
+          "1,000",
+          "(## Non-goals|## Out of scope)",
+          "bulk"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "skill_name": "specification-author",
+  "evals": [
+    {
+      "id": "asks-first",
+      "fixture": "tests/fixtures/agent/asks-first",
+      "prompt": "Before we build CSV export for the reports page, write a spec for it.",
+      "allow": {
+        "write": [
+          "docs/**",
+          "src/**"
+        ]
+      },
+      "checks": {
+        "skill": "specification-author",
+        "read": [
+          "src/reports/ReportTable.js",
+          "src/reports/routes.js"
+        ],
+        "writes_only": [],
+        "must_match": [
+          "\\?",
+          "(suggest|based on|because)",
+          "(50,000|200,000|500 rows|page|filter)"
+        ]
+      }
+    },
+    {
+      "id": "writes-confirmed",
+      "fixture": "tests/fixtures/agent/writes-confirmed",
+      "prompt": "Add CSV export to the reports page. Answers: export only the current filtered view; up to 50,000 rows per file, and above that show a message asking to narrow the filters; the columns shown in the table, as UTF-8 with a header row; analysts and admins only; scheduled or emailed exports are out of scope. Write the spec to docs/specs/csv-export.md.",
+      "allow": {
+        "write": [
+          "docs/specs/**"
+        ],
+        "run": [
+          "node {{skills}}/specification-author/scripts/check-specification.mjs",
+          "node {{root}}/{{skills}}/specification-author/scripts/check-specification.mjs"
+        ]
+      },
+      "checks": {
+        "skill": "specification-author",
+        "read": [
+          "src/reports/ReportTable.js"
+        ],
+        "ran": [
+          "check-specification\\.mjs"
+        ],
+        "writes_only": [
+          "docs/specs/**"
+        ],
+        "files": {
+          "docs/specs/csv-export.md": [
+            "AC-1",
+            "\\bGiven\\b",
+            "\\bThen\\b",
+            "50,000",
+            "(## Non-goals|## Out of scope)",
+            "(schedul|email)",
+            "(analyst|admin)",
+            "\\bR-1\\b"
+          ]
+        }
+      }
+    }
+  ]
+}
