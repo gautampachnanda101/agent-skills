@@ -21,4 +21,7 @@ Given/When/Then acceptance criteria that cover every requirement.
 
 > Write a spec for adding CSV export to the reports page.
 
-It stands alone: no other skill has to come before or after it.
+It stands alone. To check a specification, use
+[specification-review](specification-review.md); to plan its tests, use
+[test-plan-author](test-plan-author.md); to plan the work, use
+[change-plan-author](change-plan-author.md).

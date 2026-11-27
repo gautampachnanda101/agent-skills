@@ -282,8 +282,8 @@ covered by an existing skill, linked to elsewhere, or not built.
 | 1. Behaviour evals | Contracts, `claude-code` and `openai` adapters, and recordings done. Opus passes every case; three-run results for each case and an OpenCode adapter remain |
 | 2. Levels and ownership | Done: owners, levels, and the stale-recording report. All nine recordings predate version tracking and need re-recording |
 | 3. Corrections into evals | Done. Three real corrections: one skill fix (2 of 6 to 3 of 3), one grader fix, and one model-capability result with no skill change |
-| 4. Inception | Not started |
-| 5. Verification | Not started |
-| 6. Delivery | Not started |
-| 7. Role pages | Not started |
+| 4. Inception | Done: `specification-author`, `specification-review`, `decision-record-author` |
+| 5. Verification | Done: `test-plan-author`, `security-review` |
+| 6. Delivery | Done: `change-plan-author`, `release-notes-author` |
+| 7. Role pages | Done: seven role pages, checked against the skills |
 | Multi-agent orchestration | Deferred |

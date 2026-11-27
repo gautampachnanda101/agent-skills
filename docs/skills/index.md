@@ -57,6 +57,8 @@ asked to review changes to it, from
 | [change-plan-author](change-plan-author.md) | Personal | Whoever builds the change, and its reviewers | @gautampachnanda101 |
 | [release-notes-author](release-notes-author.md) | Team | Whoever publishes the release | @gautampachnanda101 |
 
+To find the skills for your job, start from [Roles](../roles/index.md).
+
 To make a skill's important rules hold whatever model runs it, apply the
 settings in [Make a skill's rules hard](../hard-rules.md).
 

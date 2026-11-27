@@ -17,6 +17,11 @@ skill's `metadata.version` field.
 
 ### Added
 
+- Role pages for product, architect, developer, QA, security, operations,
+  and skill owners: each lists its skills, what they read and produce, and
+  what the role approves. A test checks that every skill appears on one.
+- `agent-evals --grade --save` keeps a passing re-graded run as a case's
+  recording, so a check that changes needs no new model run.
 - `release-notes-author` 1.0.0: drafts release notes for the people who install a release from the changelog, the merged changes, and the code: breaking changes with exact upgrade steps, migrations, how to roll back, and what changed in the reader's terms. It looks in the diff for what changelogs miss, such as renamed settings, and never tags or publishes. `scripts/check-release-notes.mjs` fails on a missing version, upgrade section, or rollback section, a bare commit hash, or a placeholder.
 - `change-plan-author` 1.0.0: breaks an approved specification, design, or written request into small, ordered, independently reviewable changes, each with the files it touches, the check that proves it, its size, and its dependencies. It reads the code first and plans only changes it has located. `scripts/check-change-plan.mjs` fails on a task with no files, check, or size, a task over the 400-line review limit, or one that depends on a later task.
 - `security-review` 1.0.1: reviews a diff, commit, or pull request for security defects after running the repository's own configured scanners: injection, missing authentication and authorization, path traversal, eval and unsafe deserialization, secrets and personal data in code or logs, weakened token checks, and risky dependencies. It rates findings by exploitability, never quotes a secret, and never edits the code. Its evals plant eight defects beside a clean change, and read the verdict from the verdict line.

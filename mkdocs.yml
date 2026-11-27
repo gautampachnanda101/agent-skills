@@ -19,6 +19,15 @@ nav:
       - security-review: skills/security-review.md
       - change-plan-author: skills/change-plan-author.md
       - release-notes-author: skills/release-notes-author.md
+  - Roles:
+      - Overview: roles/index.md
+      - Product: roles/product.md
+      - Architect: roles/architect.md
+      - Developer: roles/developer.md
+      - QA: roles/qa.md
+      - Security: roles/security.md
+      - Operations: roles/operations.md
+      - Skill owner: roles/skill-owner.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md

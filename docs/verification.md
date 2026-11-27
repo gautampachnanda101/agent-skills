@@ -210,6 +210,25 @@ Claude Code estimates $0.06 to $0.24 a run at API prices, about $3.80 for
 this phase. On a Claude subscription, runs count against its usage limits
 instead; with an API key, that account is charged.
 
+Results for the skills added on 2026-11-27, with Claude Opus 5.5, one run
+per case. Reply cases ran with the skill and once without it:
+
+| Skill | Reply, with the skill | Without | Behaviour cases |
+| --- | --- | --- | --- |
+| decision-record-author | Pass | Fail | 2 of 2 |
+| specification-author | Pass | Fail: none of the sections | 2 of 2 |
+| specification-review | 2 of 2 | 0 of 2 | 2 of 2 |
+| test-plan-author | Pass | Fail: no levels or boundary tests | 2 of 2 |
+| security-review | 2 of 2 | 0 of 2 | 2 of 2 |
+| change-plan-author | Pass | Fail: no task table | 2 of 2 |
+| release-notes-author | Pass | Fail: no rollback | 2 of 2 |
+
+Several first runs failed for reasons in the evals, not the skills, and were
+fixed before these results: a prompt that asked to build instead of to
+specify, checks that matched too narrowly, a fixture name that hinted at the
+answer, and a "clean" specification that the review correctly found gaps in,
+three times.
+
 With the `openai` adapter and Qwen3 8B on a local llama.cpp server, at no
 cost, 1 of 9 cases passed: the unrelated question.
 
