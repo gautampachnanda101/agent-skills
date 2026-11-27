@@ -1,8 +1,8 @@
 {
   "agent": "claude-code",
   "model": "claude-opus-5-5",
-  "skill_version": null,
-  "recorded": "2026-11-26",
+  "skill_version": "1.3.2",
+  "recorded": "2026-11-27",
   "events": [
     {
       "tool": "Skill",
@@ -16,7 +16,7 @@
       "denied": false,
       "error": false,
       "kind": "run",
-      "command": "git show HEAD"
+      "command": "git show --stat HEAD"
     },
     {
       "tool": "Read",
@@ -26,20 +26,18 @@
       "path": ".claude/skills/peer-code-review/checklists.md"
     },
     {
-      "tool": "Grep",
+      "tool": "Bash",
       "denied": false,
       "error": false,
-      "kind": "search",
-      "path": "",
-      "pattern": "deliver|retry|attempt"
+      "kind": "run",
+      "command": "git show HEAD"
     },
     {
-      "tool": "Glob",
+      "tool": "Bash",
       "denied": false,
       "error": false,
-      "kind": "search",
-      "path": "**/*",
-      "pattern": "**/*"
+      "kind": "run",
+      "command": "git show HEAD --name-only --format= HEAD~1"
     },
     {
       "tool": "Read",
@@ -47,9 +45,17 @@
       "error": false,
       "kind": "read",
       "path": "README.md"
+    },
+    {
+      "tool": "Grep",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "",
+      "pattern": "deliver|retry|retries"
     }
   ],
-  "reply": "# Review of 5ef30e7, \"Retry deliveries until they succeed\"\n\nThe commit changes 6 lines in `src/queue.js`. It replaces \"try up to 3 times, then throw\" with \"retry forever and ignore every error\". The diff is small and easy to follow, but the new behaviour is unsafe.\n\n## Verdict\n\nVerdict: request changes\n\n## Findings\n\n| Severity | Location | Evidence | Direction |\n|---|---|---|---|\n| blocker | `src/queue.js:3` | `while (true) {` | Nothing stops the loop. If a message can never be delivered (bad payload, revoked credentials, deleted endpoint), `deliver` never resolves. Whatever awaits it stalls, so one bad message can stop the outbox queue for good. Keep a cap on attempts, or a deadline, and when it is used up, raise the error or send the message to a dead-letter path. |\n| blocker | `src/queue.js:6-7` | `} catch (error) { // ignore and try again` | Every error is thrown away without being logged or checked. Errors that will never succeed on retry, like a 400 or 401 or a `TypeError` from a bug, get the same endless treatment as a brief network failure. No caller can ever see them, so failures stay hidden. Retry only errors that are known to be temporary and raise the rest right away. At the very least, log each failure with the attempt number. |\n| major | `src/queue.js:3-8` | `return await send(message);` retried with no pause | There is no wait between attempts, so a failing `send` gets called again immediately. That hammers the downstream service while it's down and keeps the CPU busy. Wait between tries with exponential backoff plus jitter. |\n| major | `src/queue.js` (whole change) | no test files in the repository | The retry behaviour changed and nothing tests it. Before merge, add tests for: success on the first try, success after N failures, giving up after the cap, and an error that should not be retried being raised right away. A fake `send` makes these quick and repeatable. |\n| question | commit message | \"Retry deliveries until they succeed\" | What problem led to this change? Was it a flaky network, or a cap of 3 that was too low? If the cap was the issue, raising it and adding backoff would fix that without the risks above. |\n| minor | `README.md:3` | \"Sends notifications from the outbox queue.\" | Nothing documents how many times a delivery is retried or what happens when it finally fails. Once that's settled, add a line to the README. |\n\n## Strengths\n\n- The commit updates the comment on line 1 to match the new behaviour, so the comment stays accurate.\n\n## Deferred\n\n- Retrying \"until it succeeds\" is a real requirement for an outbox. It is usually done by leaving the message in the outbox and retrying it on later runs, not by blocking inside `deliver`. That design change is worth its own ticket.\n\n## Unevaluated\n\n- **Tests, linters and build:** none exist in the repository, and this session only allowed read-only git commands, so nothing was run.\n- **Report format check:** the skill's `check-review-report.mjs` didn't run, because running Node and saving files weren't allowed.\n- **Callers of `deliver`:** none exist in the repository, so I couldn't confirm how much a hang would affect other code.",
+  "reply": "I reviewed commit `729561d`, \"Retry deliveries until they succeed\". It is a 6-line change to `src/queue.js`. The repository has no tests, no `package.json` and no linter config, and this session only allows `git` reads, so nothing could be run.\n\n## Verdict\n\nVerdict: request changes\n\nThe change swaps a three-try limit for an endless retry loop that hides every error. If a message can never be sent, `deliver` never returns and never fails, and nothing records why.\n\n## Findings\n\n| Severity | Location | Evidence | Direction |\n|---|---|---|---|\n| blocker | `src/queue.js:3` | `while (true) {` | There is no exit apart from success. If a message can never be delivered (bad payload, revoked credentials, deleted recipient), the caller's promise never settles. That message is stuck, and if the outbox handles messages one after another, every message behind it is stuck too. Add an upper limit: a maximum number of tries, a total time budget, or an `AbortSignal` the caller controls. When the limit is reached, throw the last error so the caller can send the message to a dead-letter queue. |\n| blocker | `src/queue.js:3-8` | `try { return await send(message); } catch (error) { }` | The retry runs again straight away with no delay. Against a downed or rate-limited endpoint it fires requests as fast as the event loop can turn, which piles more load on the failing service and keeps a CPU core busy. Wait between tries with exponential backoff plus jitter, and respect `Retry-After` if `send` exposes it. |\n| major | `src/queue.js:7` | `// ignore and try again` | Every error is thrown away, so a failing delivery looks exactly like a slow one: no log, no metric, no alert. It also retries errors that can never succeed, such as a 4xx validation error or a programming error like a `TypeError` inside `send`. Split errors into retryable and permanent, rethrow the permanent ones at once, and log or count each retry, including the attempt number. |\n| major | `src/queue.js:2` | `export async function deliver(send, message)` | Retrying until success means `send` can run several times for one message, for example when the send worked but the response timed out. That makes duplicate notifications more likely. Nothing in the change says whether `send` is idempotent. State that requirement, or pass an idempotency key with each send. |\n| major | `src/queue.js` (no tests) | no test files in the repo | This change alters behaviour on purpose but ships no tests. At minimum, cover: success on the first try, success after N failures, giving up once the limit is hit (rethrowing the last error), and a permanent error stopping the retries straight away. Use fake timers so the backoff tests run quickly and give the same result every time. |\n| question | commit message | \"Retry deliveries until they succeed\" | What problem caused this change? Were real messages being dropped after three tries? If the real cause was too few tries or no delay between them, raising the limit and adding backoff fixes it without the risk of hanging forever. |\n\n## Strengths\n\n- The header comment was updated to match the new behaviour, so the comment and the code agree.\n- The change is small and does one thing, which makes the problem easy to see.\n\n## Deferred\n\n- Dead-letter handling for messages that use up all their retries. This probably belongs in the outbox consumer, which isn't in this repository.\n- Making the retry policy (try count, base delay, max delay) configurable and documenting it in `README.md`.\n\n## Unevaluated\n\n- Tests, linter and build: none are set up in the repository, and this session doesn't allow running commands other than `git`.\n- The skill's `check-review-report.mjs` structure check, because this session can't write files or run Node.\n- How the outbox calls `deliver` (one at a time or in parallel). There's no calling code in the repository, so I couldn't confirm the head-of-line blocking described in the first finding.",
   "changed": [],
   "files": {}
 }

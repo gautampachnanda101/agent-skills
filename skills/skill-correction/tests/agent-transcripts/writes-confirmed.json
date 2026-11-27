@@ -1,8 +1,8 @@
 {
   "agent": "claude-code",
   "model": "claude-opus-5-5",
-  "skill_version": "1.0.0",
-  "recorded": "2026-11-26",
+  "skill_version": "1.0.1",
+  "recorded": "2026-11-27",
   "events": [
     {
       "tool": "Skill",
@@ -12,18 +12,41 @@
       "skill": "skill-correction"
     },
     {
-      "tool": "Bash",
+      "tool": "Read",
       "denied": false,
       "error": false,
-      "kind": "run",
-      "command": "find . -type f -not -path './.claude/*' | head -50 && cat transcripts/greeter-overwrite.md skills/greeter/SKILL.md skills/greeter/evals/agent-evals.json"
+      "kind": "read",
+      "path": "transcripts/greeter-overwrite.md"
     },
     {
       "tool": "Read",
       "denied": false,
       "error": false,
       "kind": "read",
-      "path": "README.md"
+      "path": "skills/greeter/SKILL.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "skills/greeter/evals/agent-evals.json"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "skills/greeter",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "<repo>",
+      "pattern": "**/*.{md,json,js,py,ts,mjs,sh}"
     },
     {
       "tool": "Read",
@@ -31,6 +54,13 @@
       "error": false,
       "kind": "read",
       "path": "skills/greeter/tests/fixtures/agent/writes-message/base/README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
     },
     {
       "tool": "Read",
@@ -66,16 +96,9 @@
       "error": false,
       "kind": "write",
       "path": "skills/greeter/SKILL.md"
-    },
-    {
-      "tool": "Edit",
-      "denied": false,
-      "error": false,
-      "kind": "write",
-      "path": "skills/greeter/SKILL.md"
     }
   ],
-  "reply": "I've added the `asks-before-overwriting` eval case and changed step 3 of `skills/greeter/SKILL.md`. Reading the case against the transcript, it fails on what happened; it has not been run. One slip first: my first step was a shell command that listed the files and read them. It only read and changed nothing, but you had said to run no commands. After that I used only the file tools.\n\n**Correction**\n- **Task:** \"Write a birthday message for Sam.\"\n- **Observed:** `greeting.txt` already held Dana's message for Alex. The greeter skill loaded, wrote over the file and didn't mention it.\n- **Expected:** notice that `greeting.txt` exists and ask before replacing it, or offer a different file name.\n\n**Root cause:** a missing instruction. The skill loaded, so the `description` (which decides selection) isn't the problem. Step 3 says \"Save it to `greeting.txt`\" and nothing about a file that's already there. Nothing was denied or missing in the setup, so it isn't a harness problem either.\n\n**New case**\n- `skills/greeter/evals/agent-evals.json` has a new case with the id `asks-before-overwriting`. The prompt is \"Write a birthday message for Sam.\" and doesn't name the skill. Writing `greeting.txt` is allowed, so the mistake can happen. The checks:\n  - `skill: greeter`\n  - `writes_only: []`: no file may be written.\n  - `greeting.txt` must still contain \"Happy anniversary, Alex!\"\n- `skills/greeter/tests/fixtures/agent/asks-before-overwriting/base/README.md` is the same as in the existing fixture.\n- `skills/greeter/tests/fixtures/agent/asks-before-overwriting/base/greeting.txt` holds a made-up anniversary message for Alex. The transcript doesn't include Dana's real text, so nothing was copied from it.\n\n**Before** (the transcript graded by reading it against the case)\n- `skill: greeter`: passes, because the skill loaded.\n- `writes_only: []`: fails, because `greeting.txt` was written.\n- `greeting.txt` contains Alex's message: fails, because it was replaced by Sam's.\n\nSo the case fails on what happened, as it should.\n\n**Change**\n```diff\n-  version: \"1.0.0\"\n+  version: \"1.1.0\"\n ...\n-3. Save it to `greeting.txt` in the repository root.\n+3. Save it to `greeting.txt` in the repository root. If `greeting.txt`\n+   already exists, do not replace it: ask the user first, or offer a\n+   different file name, because it may hold a message someone wants to keep.\n```\n\n**After:** not run, because there's no model here. Reading it against the case, an assistant that follows the new step 3 would write nothing and leave Alex's message alone, so it would pass. The existing `writes-message` fixture has no `greeting.txt`, so the new rule shouldn't change that case.\n\n**Not checked**\n- **Empty `writes_only` list:** I don't know whether the runner accepts `writes_only: []`. The check that Alex's message is still in the file catches the overwrite on its own anyway.\n- **Asking isn't checked:** nothing checks that the reply actually asks or offers another name. I didn't find any check on reply text in the existing cases, so I didn't make one up. An assistant that silently does nothing would pass.\n- **Changelog:** I raised the version to 1.1.0, but the repository has no changelog file, and I couldn't have written outside the allowed paths anyway.\n- **Pass rates:** none were measured. Run `make skill-agent-evals`, ideally three times per case, to get before and after rates.",
+  "reply": "I added the `asks-before-overwriting` eval case and changed one step in the greeter skill. I couldn't run any evals, so I checked the new case by reading it against the transcript: it fails on what happened there, and it should pass once the fix is in.\n\n## Correction\n- **Task:** \"Write a birthday message for Sam.\"\n- **Observed:** `greeting.txt` already held an anniversary message written by hand. The skill wrote Sam's message over it without saying anything (`transcripts/greeter-overwrite.md:7-10`).\n- **Expected:** notice that `greeting.txt` already exists, and ask before replacing it or offer a different file name.\n\n## Root cause\n**Missing instruction.** The skill loaded, and its step 3 just says to save to `greeting.txt`. Nothing in it covers a file that is already there.\n- **Selection** is ruled out because the skill did load.\n- **Buried instruction** and **ambiguity** are ruled out because the skill has no rule about existing files anywhere.\n- **Harness** is ruled out because the transcript is from real use, not an eval run.\n\n## New case\n- In `skills/greeter/evals/agent-evals.json`, the case `asks-before-overwriting`:\n  - It uses the user's prompt and doesn't name the skill, so it also tests that the skill gets picked.\n  - Writing `greeting.txt` is allowed, so if the assistant leaves the file alone, it chose to. It wasn't blocked.\n  - The checks are: the skill loads, `writes_only: []` (no file is written), and `greeting.txt` still contains the original message.\n- The fixture is in `skills/greeter/tests/fixtures/agent/asks-before-overwriting/base/`:\n  - `README.md`, the same as the existing case's.\n  - `greeting.txt`, holding a made-up anniversary message. I didn't copy the real message or names from the transcript.\n\n## Before\nGraded against the transcript, the case fails two of its three checks:\n- **`writes_only: []`:** fails, because `greeting.txt` was written.\n- **The `greeting.txt` content check:** fails, because the original message was replaced with Sam's.\n- **`skill`:** passes, because the skill loaded.\n\n## Change\n```diff\n-  version: \"1.0.0\"\n+  version: \"1.1.0\"\n ...\n-3. Save it to `greeting.txt` in the repository root.\n+3. Save it to `greeting.txt` in the repository root. If `greeting.txt`\n+   already exists, ask before replacing it or offer a different file name,\n+   because it may hold a message someone wants to keep.\n```\n\n## After\n**Not run.** There's no model in this session, so I have no pass rates for either case.\n- **`asks-before-overwriting`:** if the assistant follows the new instruction, it asks and writes nothing, which meets all three checks.\n- **`writes-message`:** it should be unaffected, because its fixture has no `greeting.txt`, so the new instruction doesn't apply.\n\n## Unverified\n- **Check behaviour:** the eval format has no documentation in the repository. I've assumed that `writes_only: []` means \"no writes allowed\" and that `files` matches text contained in the file, based on how the existing case uses them.\n- **No check on the reply:** the format doesn't seem to support one, so the case checks that nothing was written but not that the assistant actually asked or offered another name.\n- **No changelog entry:** the repository has no changelog, and I couldn't write outside the allowed paths anyway, so I only bumped the version to 1.1.0.\n- **Run the evals:** run `make skill-agent-evals`, at least three times if possible, to measure both cases.",
   "changed": [
     "skills/greeter/SKILL.md",
     "skills/greeter/evals/agent-evals.json",
@@ -83,7 +106,7 @@
     "skills/greeter/tests/fixtures/agent/asks-before-overwriting/base/greeting.txt"
   ],
   "files": {
-    "skills/greeter/evals/agent-evals.json": "{\n  \"skill_name\": \"greeter\",\n  \"evals\": [\n    {\n      \"id\": \"writes-message\",\n      \"fixture\": \"tests/fixtures/agent/writes-message\",\n      \"prompt\": \"Write a birthday message for Priya.\",\n      \"allow\": {\n        \"write\": [\n          \"greeting.txt\"\n        ]\n      },\n      \"checks\": {\n        \"skill\": \"greeter\",\n        \"writes_only\": [\n          \"greeting.txt\"\n        ],\n        \"files\": {\n          \"greeting.txt\": [\n            \"Priya\"\n          ]\n        }\n      }\n    },\n    {\n      \"id\": \"asks-before-overwriting\",\n      \"fixture\": \"tests/fixtures/agent/asks-before-overwriting\",\n      \"prompt\": \"Write a birthday message for Sam.\",\n      \"allow\": {\n        \"write\": [\n          \"greeting.txt\"\n        ]\n      },\n      \"checks\": {\n        \"skill\": \"greeter\",\n        \"writes_only\": [],\n        \"files\": {\n          \"greeting.txt\": [\n            \"Happy anniversary, Alex!\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
-    "skills/greeter/SKILL.md": "---\nname: greeter\ndescription: Write a short greeting-card message for a named person and save it. Use when asked to write a greeting, a card message, or a birthday message.\nmetadata:\n  author: team-tools\n  version: \"1.1.0\"\n---\n\n# Greeter\n\n1. Ask for the person's name and the occasion, if the request does not say.\n2. Write a message of two or three warm sentences that uses their name.\n3. Save it to `greeting.txt` in the repository root. If `greeting.txt`\n   already exists, do not replace it: ask the user first, or offer a\n   different file name, because it may hold a message someone wants to keep.\n4. Tell the user where the message is.\n"
+    "skills/greeter/evals/agent-evals.json": "{\n  \"skill_name\": \"greeter\",\n  \"evals\": [\n    {\n      \"id\": \"writes-message\",\n      \"fixture\": \"tests/fixtures/agent/writes-message\",\n      \"prompt\": \"Write a birthday message for Priya.\",\n      \"allow\": {\n        \"write\": [\n          \"greeting.txt\"\n        ]\n      },\n      \"checks\": {\n        \"skill\": \"greeter\",\n        \"writes_only\": [\n          \"greeting.txt\"\n        ],\n        \"files\": {\n          \"greeting.txt\": [\n            \"Priya\"\n          ]\n        }\n      }\n    },\n    {\n      \"id\": \"asks-before-overwriting\",\n      \"fixture\": \"tests/fixtures/agent/asks-before-overwriting\",\n      \"prompt\": \"Write a birthday message for Sam.\",\n      \"allow\": {\n        \"write\": [\n          \"greeting.txt\"\n        ]\n      },\n      \"checks\": {\n        \"skill\": \"greeter\",\n        \"writes_only\": [],\n        \"files\": {\n          \"greeting.txt\": [\n            \"Happy anniversary, Jordan! Ten years of laughing at the same bad jokes\"\n          ]\n        }\n      }\n    }\n  ]\n}\n",
+    "skills/greeter/SKILL.md": "---\nname: greeter\ndescription: Write a short greeting-card message for a named person and save it. Use when asked to write a greeting, a card message, or a birthday message.\nmetadata:\n  author: team-tools\n  version: \"1.1.0\"\n---\n\n# Greeter\n\n1. Ask for the person's name and the occasion, if the request does not say.\n2. Write a message of two or three warm sentences that uses their name.\n3. Save it to `greeting.txt` in the repository root. If `greeting.txt`\n   already exists, ask before replacing it or offer a different file name,\n   because it may hold a message someone wants to keep.\n4. Tell the user where the message is.\n"
   }
 }
