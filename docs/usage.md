@@ -28,6 +28,7 @@ In this page:
 | [specification-review](skills/specification-review.md) | "Review the spec in docs/specs/csv-export.md before we build it." |
 | [test-plan-author](skills/test-plan-author.md) | "Write a test plan for the account-merge spec in docs/specs/merge-accounts.md." |
 | [security-review](skills/security-review.md) | "Do a security review of the latest commit before I merge it." |
+| [change-plan-author](skills/change-plan-author.md) | "Plan the work for the CSV export spec as a sequence of reviewable changes." |
 
 The two review skills report findings and change nothing unless you ask. The
 rest of this page covers `backstage-catalog-builder`.

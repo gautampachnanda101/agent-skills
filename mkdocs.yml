@@ -17,6 +17,7 @@ nav:
       - specification-review: skills/specification-review.md
       - test-plan-author: skills/test-plan-author.md
       - security-review: skills/security-review.md
+      - change-plan-author: skills/change-plan-author.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md

@@ -1,0 +1,65 @@
+{
+  "skill_name": "change-plan-author",
+  "evals": [
+    {
+      "id": "plans-from-spec",
+      "fixture": "tests/fixtures/agent/plans-from-spec",
+      "prompt": "Plan the work for the CSV export spec in docs/specs/csv-export.md as a sequence of reviewable changes.",
+      "allow": {
+        "write": [
+          "docs/**",
+          "src/**"
+        ]
+      },
+      "checks": {
+        "skill": "change-plan-author",
+        "read": [
+          "docs/specs/csv-export.md",
+          "src/reports/routes.js"
+        ],
+        "writes_only": [
+          "docs/**"
+        ],
+        "must_match": [
+          "src/reports/(routes|query)\\.js",
+          "(\\bS\\b|\\bM\\b|lines)",
+          "(AC-\\d|test)",
+          "(413|50,000)"
+        ]
+      }
+    },
+    {
+      "id": "saves-plan",
+      "fixture": "tests/fixtures/agent/saves-plan",
+      "prompt": "Plan the work for the CSV export spec in docs/specs/csv-export.md as a sequence of reviewable changes, and save the plan to docs/plans/csv-export.md.",
+      "allow": {
+        "write": [
+          "docs/plans/**"
+        ],
+        "run": [
+          "node {{skills}}/change-plan-author/scripts/check-change-plan.mjs",
+          "node {{root}}/{{skills}}/change-plan-author/scripts/check-change-plan.mjs"
+        ]
+      },
+      "checks": {
+        "skill": "change-plan-author",
+        "read": [
+          "docs/specs/csv-export.md"
+        ],
+        "ran": [
+          "check-change-plan\\.mjs"
+        ],
+        "writes_only": [
+          "docs/plans/**"
+        ],
+        "files": {
+          "docs/plans/csv-export.md": [
+            "^\\|\\s*Task",
+            "src/reports/",
+            "(countRows|query\\.js)"
+          ]
+        }
+      }
+    }
+  ]
+}

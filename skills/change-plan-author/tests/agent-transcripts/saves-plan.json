@@ -1,0 +1,100 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "change-plan-author"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/csv-export.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/query.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/auth.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/ui/ReportTable.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/change-plan-author/scripts/check-change-plan.mjs"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "docs/plans/csv-export.md"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "node .claude/skills/change-plan-author/scripts/check-change-plan.mjs docs/plans/csv-export.md"
+    }
+  ],
+  "reply": "I've saved the plan to `docs/plans/csv-export.md`. It splits the work into five changes, and the repository's plan checker found no problems with it.\n\n| # | Change | Size | Covers |\n| --- | --- | --- | --- |\n| 1 | Move the report column list into `src/reports/columns.js`, with a type for each column. Nothing changes for users. | S | groundwork |\n| 2 | Add a CSV writer, `toCsv`, in `src/reports/csv.js` | M | AC-5, AC-6, AC-8 |\n| 3 | Add `GET /api/reports/export` in `src/reports/routes.js`, using the existing role check and query builders | M | AC-1, AC-2, AC-3, AC-7, AC-8 (server side) |\n| 4 | Add an Export CSV button to the report toolbar, including the message shown when there are too many rows | M | AC-1, AC-2, AC-7 (page side) |\n| 5 | Add a script that times 100 exports on staging | S | AC-4 |\n\nThe endpoint goes in before the button, so users can't reach the feature until change 4 is merged. That means no feature flag is needed, and the work can stop safely after any change.\n\nThe plan also lists four things to settle before or during change 3:\n- **I couldn't find where queries are run.** `queryRows` and `countRows` only build the SQL and its parameters. The rows route sends that straight back as its response. Someone needs to find the code that runs the queries, or the plan needs an extra change to add it.\n- **Column names don't match.** The table's column list calls the date column `date`, but the SQL uses `day`. The query also selects every column with no fixed order, so the export has to match database columns to table columns by name.\n- **The rows query has no sort order.** I recommend giving the export a stable sort so the same filters always produce the same file.\n- **Dates may shift by a day.** If `day` is stored as a timestamp rather than a plain date, converting it in the server's time zone could change the date. The spec asks for UTC.\n\nThe formula protection depends on each column's type, not on what the value looks like. A team named `-12` gets the leading quote, but a `-12` in a number column doesn't. That's why change 1 adds a type to each column.",
+  "changed": [
+    "docs/plans/csv-export.md"
+  ],
+  "files": {
+    "docs/plans/csv-export.md": "# Plan: CSV export for reports\n\nSpecification: [CSV export for reports](../specs/csv-export.md).\n\nThe work is five changes. Each one leaves the main branch working. The\nendpoint ships before the button, so nobody can reach the feature until\ntask 4 merges. That means no feature flag is needed, and the work can stop\nsafely after any task.\n\n## What already exists\n\n- `src/auth.js`: `requireRole(roles)` already responds 401 when there is no\n  user and 403 when the user lacks the role, which is what R-1 asks for.\n- `src/reports/routes.js`: `registerRoutes(app)` registers\n  `GET /api/reports/rows` with `requireRole(ROLES)`, where `ROLES` is\n  `['analyst', 'admin']` and `PAGE_SIZE` is 500. The export route goes here\n  and reuses the same `ROLES`.\n- `src/reports/query.js`: `queryRows(filters, limit, offset)` and\n  `countRows(filters)` build parameterised queries from the `from`, `to`,\n  and `team` filters. Export reuses both, so it gets the same filters as\n  the rows API.\n- `src/ui/ReportTable.js`: `ReportTable` returns a `toolbar` (currently\n  `['filters']`), and `COLUMNS` lists the table's five columns in order.\n- `package.json`: tests run with `node --test`. There are no test files yet,\n  so each task adds its own `*.test.js` next to the code it tests.\n\n## Tasks\n\n| Task | Files | Check | Size | Depends on |\n| --- | --- | --- | --- | --- |\n| 1. Move report column definitions to a shared module and add a type to each column | `src/reports/columns.js` (new), `src/ui/ReportTable.js`, `src/reports/columns.test.js` (new) | `npm test`: `COLUMNS` is unchanged in names and order, and `ReportTable.js` re-exports it. Groundwork for AC-5 and AC-6, with no change in behaviour | S (about 40 lines) | |\n| 2. Add a CSV serialiser for report rows | `src/reports/csv.js` (new), `src/reports/csv.test.js` (new) | `npm test`: RFC 4180 quoting of a comma, a quote, and a non-ASCII letter; LF endings; no BOM; header in `COLUMNS` order; dates as `YYYY-MM-DD` in UTC (AC-5); `=SUM(A1:A2)` becomes `'=SUM(A1:A2)` and numeric `-12` stays `-12`, while a text cell `-12` is prefixed (AC-6); no rows gives only the header (AC-8) | M (about 180 lines) | 1 |\n| 3. Add `GET /api/reports/export` | `src/reports/routes.js`, `src/reports/routes.test.js` (new) | `npm test`: 401 with no session and 403 for another role, with no body (AC-3); 200 with `text/csv; charset=utf-8` and `Content-Disposition: attachment` for analyst and admin; a team filter covering more than one 500-row page returns every row (server half of AC-1 and AC-2); 50,001 matching rows gives 413 with `{\"error\": \"too_many_rows\", \"rowCount\": 50001}` (server half of AC-7); no matching rows gives only the header (AC-8) | M (about 200 lines) | 2 |\n| 4. Add an Export CSV button to the report toolbar | `src/ui/ReportTable.js`, `src/ui/ReportTable.test.js` (new) | `npm test`: the toolbar includes the export button; selecting it requests `/api/reports/export` with the current `from`, `to`, and `team` filters and starts a download (AC-1, AC-2); on 413 nothing downloads and the page shows the `rowCount` and asks the user to narrow the filters (AC-7) | M (about 150 lines) | 3 |\n| 5. Add the staging performance check for export | `scripts/export-perf.mjs` (new) | Run `node scripts/export-perf.mjs` against staging with the 50,000-row, five-column reference dataset: it sends 100 export requests, times each from request to last byte, and fails unless at least 95 finish within 10 seconds (AC-4) | S (about 80 lines) | 3 |\n\n## Notes on each task\n\n1. `COLUMNS` lives in a UI file today, and the server must not import from\n   the UI. Move it to `src/reports/columns.js` as\n   `{ name, type }` entries, where `type` is `date`, `text`, or `number`,\n   and keep `export const COLUMNS` in `ReportTable.js` as the list of\n   names so nothing else changes. R-4 depends on the column's type, not on\n   what the value looks like: a team called `-12` is text and gets the\n   prefix, while `sessions` of `-12` is a number and does not.\n2. A pure function, `toCsv(columns, rows)`, with no I/O, so all of the\n   R-3 and R-4 rules are tested without a server. Quote a field only when\n   it contains a comma, a quote, CR, or LF, and double any quotes inside\n   it. Apply the formula prefix before quoting.\n3. Add `export const MAX_EXPORT_ROWS = 50000` next to `PAGE_SIZE`, and\n   register the route with `requireRole(ROLES)`. Call\n   `queryRows(req.query, MAX_EXPORT_ROWS + 1, 0)`. If it returns more than\n   50,000 rows, call `countRows(req.query)` and respond 413 with the count.\n   Otherwise respond with `toCsv`. This takes one query in the normal case\n   and avoids a count that goes out of date before the rows query runs.\n4. The 413 message uses the `rowCount` from the response body, not a\n   count worked out in the browser.\n5. This needs staging access and the reference dataset, so it runs by hand\n   or in a scheduled job, not in `npm test`. If it fails, change task 3 to\n   stream rows to the response rather than building the whole file in\n   memory. Do that as its own task after this one.\n\n## Risks and open questions\n\n- **I could not find where queries run.** `queryRows` and `countRows`\n  return `{ sql, params }` and do not execute anything, and the rows route\n  passes that object straight to `res.json`. Before task 3 starts, find the\n  code that runs these queries, or decide that task 3 adds it. If task 3\n  has to add a database client, that is a separate task before it, and the\n  plan needs updating.\n- **The column names do not match.** `COLUMNS` has `date`, but the SQL\n  filters on `day`, and `SELECT *` does not promise any column order. Task 3\n  must map each database column to a `COLUMNS` entry by name, so the header\n  and the values stay in table order (AC-5). Confirm the real column names\n  in the `usage` table.\n- **There is no `ORDER BY`.** The rows API pages with `LIMIT` and `OFFSET`\n  but no stable order. Export reads in a single query, so this does not\n  affect it. Give the export a stable sort anyway, for example by `day`\n  then `team`, so repeated exports produce the same file.\n- **Date time zones.** R-3 asks for UTC dates. Check whether `day` is a\n  `date` or a `timestamptz`, because a `timestamptz` converted in the\n  server's local time zone could move to the next or previous day.\n- **Memory.** Task 3 holds up to 50,001 rows in memory for each request.\n  At five columns that is small, but concurrent exports multiply it. Task 5\n  measures this, and streaming is the fallback.\n- **Permissions** reuse `requireRole(ROLES)` from the rows route, so export\n  access matches report access by design. A test in task 3 checks this.\n- **Rollback** is simple. There is no migration and no stored data, so\n  reverting task 4 removes the feature from the page, and reverting task 3\n  removes the endpoint.\n"
+  }
+}

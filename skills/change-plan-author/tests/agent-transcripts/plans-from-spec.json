@@ -1,0 +1,75 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "change-plan-author"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/csv-export.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/auth.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/query.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/ui/ReportTable.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    }
+  ],
+  "reply": "I've written the plan below. Two gaps came up while reading the code. One affects how Task 4 is built (an open question), and one is an existing bug the plan works around.\n\n## What the code has today\n\n- **Access control:** `requireRole` in `src/auth.js:1` already returns 401 when there is no session and 403 for the wrong role. The rows route uses it with `ROLES = ['analyst', 'admin']` in `src/reports/routes.js:6`. The export can reuse both, which covers R-1.\n- **Queries:** `queryRows` and `countRows` in `src/reports/query.js` take the same filters (`from`, `to`, `team`). There are two problems for export:\n  - `SELECT *` has no column order, which R-3 needs.\n  - There is no `ORDER BY`, so the order of exported rows is not fixed.\n- **Columns:** `COLUMNS` is defined in the UI file `src/ui/ReportTable.js:5`, so the server can't import it cleanly. Nothing records which columns are text and which are numbers, and R-4 needs that.\n- **Tests:** there are none yet. `npm test` runs `node --test`, so test files placed next to the code as `*.test.js` will be picked up.\n\n## Plan\n\n| Task | Files | Check | Size | Depends on |\n| --- | --- | --- | --- | --- |\n| 1. Move report columns into a shared module with a type for each column (`date`, `text`, `number`). No behaviour change. | add `src/reports/columns.js`; change `src/ui/ReportTable.js` (import `COLUMNS` instead of defining it) | `npm test`: new `src/reports/columns.test.js` checks the order is `date, team, active_users, sessions, avg_session_minutes` and each column has a type. Groundwork for AC-5 and AC-6. | S | — |\n| 2. Add `exportRows(filters, limit)` with an explicit column list in `COLUMNS` order and a fixed sort (`ORDER BY day, team`) | change `src/reports/query.js`; add `src/reports/query.test.js` | `npm test`: the SQL selects the columns in `COLUMNS` order, sorts by `day, team`, and uses the same filter parameters as `countRows`. Groundwork for AC-1 and AC-5. | S | 1 |\n| 3. Add a CSV serializer: RFC 4180 quoting, LF line endings, no byte-order mark, UTC `YYYY-MM-DD` dates, a `'` prefix for text cells only | add `src/reports/csv.js`, `src/reports/csv.test.js` | `npm test`: a team name with a comma, a quote and a non-ASCII letter survives a round trip through an RFC 4180 parser (AC-5). `=SUM(A1:A2)` becomes `'=SUM(A1:A2)` and the number `-12` stays `-12` (AC-6). No rows gives only the header line (AC-8). Also checks there is no byte-order mark, no CR, and dates at UTC midnight boundaries. | M (~150) | 1 |\n| 4. Add `GET /api/reports/export`: role check, count, 413 above 50,000 rows, otherwise send the CSV as a download | change `src/reports/routes.js`; add `src/reports/routes.test.js` | `npm test` with a stubbed database: no session → 401 and a user with neither role → 403, both with no body (AC-3). Admin → 200 with `text/csv; charset=utf-8` and `Content-Disposition: attachment` (AC-2). A count of 50,001 → 413 with `{\"error\":\"too_many_rows\",\"rowCount\":50001}` (the endpoint part of AC-7). A count of 0 → header only (AC-8). | M (~150) | 2, 3 |\n| 5. Add an Export CSV button to the report toolbar that sends the current filters, plus a message for a 413 response | change `src/ui/ReportTable.js`; add `src/ui/ReportTable.test.js` | `npm test`: the toolbar includes the export action, the export URL carries the current `from`, `to` and `team`, and a 413 shows the row count and asks the user to narrow the filters without downloading anything (the page part of AC-7). Manual check on staging: an analyst filtered to one team gets every row for that team across all pages (AC-1), and an admin gets a download (AC-2). | S (~80) | 4 |\n| 6. Add a performance check for the export on staging | add `scripts/bench-export.mjs` | Run it against staging with the 50,000-row, five-column reference dataset: 100 requests, and at least 95 must finish within 10 s, timed to the last byte (AC-4). | S (~60) | 4 |\n\nNo clean-up task is needed. There is no feature flag: the endpoint is harmless before the button ships, because it only reads data and only the existing roles can call it.\n\n## Risks and open questions\n\n1. **Open question: I couldn't find where queries are run.** `queryRows` returns `{ sql, params }` and never runs it, and the rows route sends that object back as JSON (`src/reports/routes.js:8`). Task 4 needs real rows, so the builder has to find the database client, or decide where one goes, before starting it. Where do queries actually run?\n2. **Existing bug: the rows route ignores `page`.** It never works out an offset, so every page returns the first 500 rows. That's outside this spec, and the export doesn't depend on it, but it means the table and the export file won't match past page one.\n3. **The count and the export query can disagree.** Rows can change between the count and the fetch. Task 4 should put `LIMIT 50000` on the export query, so a file can never go over the limit.\n4. **Dates near midnight can shift by a day.** The type of the `day` column isn't known. If it's a `DATE` and the database driver turns it into a local-time JavaScript `Date`, dates can move by a day on servers that aren't set to UTC. Task 3's UTC tests should use values right at midnight.\n5. **Performance (R-2).** 50,000 rows is small enough to load in one go. If Task 6 fails, the likely fixes are an index on `(day, team)`, which is a schema migration and the only hard-to-undo change here, or streaming the rows through a database cursor. Both would be extra tasks.\n6. **Nothing here is hard to undo.** There is no data migration and no permission change: the export reuses the existing roles and `requireRole`.\n\nI haven't run the skill's plan checker (`check-change-plan.mjs`) because this session can't run commands. I can save the plan to `docs/plans/csv-export.md` if you'd like it in the repository.",
+  "changed": [],
+  "files": {}
+}
