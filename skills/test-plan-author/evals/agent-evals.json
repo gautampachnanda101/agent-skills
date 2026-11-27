@@ -1,0 +1,69 @@
+{
+  "skill_name": "test-plan-author",
+  "evals": [
+    {
+      "id": "plans-from-spec",
+      "fixture": "tests/fixtures/agent/plans-from-spec",
+      "prompt": "Write a test plan for the account-merge spec in docs/specs/merge-accounts.md.",
+      "allow": {
+        "write": [
+          "docs/**",
+          "test/**"
+        ]
+      },
+      "checks": {
+        "skill": "test-plan-author",
+        "read": [
+          "docs/specs/merge-accounts.md"
+        ],
+        "writes_only": [
+          "docs/**"
+        ],
+        "must_match": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "(\\b31\\b|boundary)",
+          "dispute",
+          "(does not|doesn't|no) (check|handle)|disagree|missing"
+        ]
+      }
+    },
+    {
+      "id": "failing-tests-first",
+      "fixture": "tests/fixtures/agent/failing-tests-first",
+      "prompt": "Write the tests for AC-3 in docs/specs/merge-accounts.md (open disputes) first, in test/merge.test.js, and run them. They should fail until the code handles disputes; don't change the code.",
+      "allow": {
+        "write": [
+          "test/**"
+        ],
+        "run": [
+          "npm test",
+          "node --test"
+        ]
+      },
+      "checks": {
+        "skill": "test-plan-author",
+        "read": [
+          "docs/specs/merge-accounts.md"
+        ],
+        "ran": [
+          "(npm test|node --test)"
+        ],
+        "writes_only": [
+          "test/**"
+        ],
+        "files": {
+          "test/merge.test.js": [
+            "dispute",
+            "AC-3"
+          ]
+        },
+        "must_match": [
+          "fail"
+        ]
+      }
+    }
+  ]
+}

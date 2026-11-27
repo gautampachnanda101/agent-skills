@@ -1,0 +1,33 @@
+{
+  "skill_name": "test-plan-author",
+  "guides": [],
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write the test plan for this specification. The current implementation is included so you know where tests attach.\n\nAnswer with only one fenced markdown block containing the plan.",
+      "files": [
+        "tests/fixtures/reply/merge-accounts.md",
+        "tests/fixtures/reply/merge.js"
+      ],
+      "expected_output": "A table with a test for every acceptance criterion, negative tests for the role and dispute rules, boundary tests at 30 and 31 days, and a note that the code does not check disputes.",
+      "assertions": [
+        "Every criterion AC-1 to AC-4 has a test",
+        "Has negative and boundary tests",
+        "Plans from the spec: includes the dispute test the code cannot pass, and reports the disagreement"
+      ],
+      "checks": {
+        "unwrap_fence": true,
+        "grader": "scripts/check-test-plan.mjs",
+        "must_match": [
+          "AC-1",
+          "AC-2",
+          "AC-3",
+          "AC-4",
+          "(30 days|day 30)",
+          "(31 days|day 31)",
+          "dispute"
+        ]
+      }
+    }
+  ]
+}

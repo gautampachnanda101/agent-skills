@@ -1,0 +1,71 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "test-plan-author"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "ls -R | grep -v node_modules | head -50"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/merge-accounts.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "test/merge.test.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/accounts/merge.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Edit",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "test/merge.test.js"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": true,
+      "kind": "run",
+      "command": "npm test"
+    }
+  ],
+  "reply": "I added two AC-3 tests to `test/merge.test.js` and ran `npm test`. Both fail as intended: the merge goes through when it should be refused. The existing test still passes (1 pass, 2 fail). I didn't change `src/`.\n\n| Test | Criterion | Why it fails now |\n| --- | --- | --- |\n| `AC-3: a merge is refused and nothing moves when the newer account has an open dispute` | AC-3 (R-3) | `Missing expected exception`: `merge()` never checks for disputes, so it doesn't refuse. |\n| `AC-3: a merge is refused and nothing moves when the older account has an open dispute` | AC-3 (R-3) | Same reason. |\n\nEach test gives both accounts orders, addresses and notes, and puts an open dispute on one of them. It saves a copy of the accounts, then expects `merge()` to throw and leave both accounts exactly as they were. Comparing the whole account this way is how the tests check that \"nothing moves\". The spec doesn't say which account has the dispute, so there's one test for each.\n\nAssumptions and gaps in the spec:\n- **What an \"open dispute\" looks like:** the spec doesn't define it. The existing test has a `disputes: []` array, so I used `{ id: 'd1', status: 'open' }` entries. If the real data looks different, the fixture needs to match it.\n- **How a refusal is signalled:** AC-1 says 403, but AC-3 only says \"refused\". The tests just check that `merge()` throws and don't check the error or status code. If you pick a code (409 would fit), add an assertion for it.\n- **Undecided cases:** I didn't add a test that a closed or resolved dispute still allows a merge. It would pass today, and the spec doesn't say what should happen. It's worth deciding, because otherwise a fix could refuse any account with any dispute and still pass.\n- **A separate AC-2 gap:** the code moves only orders, not the addresses and notes R-2 requires.\n\nI skipped the test-plan skill's plan file and its checker script, because this session only lets me write under `test/`.",
+  "changed": [
+    "test/merge.test.js"
+  ],
+  "files": {
+    "test/merge.test.js": "import assert from 'node:assert/strict';\nimport test from 'node:test';\nimport { merge } from '../src/accounts/merge.js';\n\nconst store = accounts => ({ get: id => accounts[id] });\n\ntest('a support lead can merge', () => {\n  const accounts = { a: { orders: [1], disputes: [] }, b: { orders: [2], disputes: [] } };\n  merge(store(accounts), 'a', 'b', { roles: ['support-lead'] });\n  assert.deepEqual(accounts.a.orders, [1, 2]);\n});\n\n// AC-3 (R-3): Given an account with an open dispute, when a support lead\n// merges it, then the merge is refused and nothing moves.\nconst accountsWithOpenDisputeOn = side => {\n  const openDispute = [{ id: 'd1', status: 'open' }];\n  return {\n    a: {\n      orders: [1],\n      addresses: ['1 Old Street'],\n      notes: ['older note'],\n      disputes: side === 'older' ? openDispute : [],\n    },\n    b: {\n      orders: [2],\n      addresses: ['2 New Street'],\n      notes: ['newer note'],\n      disputes: side === 'newer' ? openDispute : [],\n    },\n  };\n};\n\nfor (const side of ['newer', 'older']) {\n  test(`AC-3: a merge is refused and nothing moves when the ${side} account has an open dispute`, () => {\n    const accounts = accountsWithOpenDisputeOn(side);\n    const before = structuredClone(accounts);\n\n    assert.throws(() => merge(store(accounts), 'a', 'b', { roles: ['support-lead'] }));\n    assert.deepEqual(accounts, before);\n  });\n}\n"
+  }
+}

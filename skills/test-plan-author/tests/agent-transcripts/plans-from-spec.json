@@ -1,0 +1,70 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "test-plan-author"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/merge-accounts.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "test/merge.test.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/accounts/merge.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "docs/test-plans/merge-accounts.md"
+    }
+  ],
+  "reply": "I've written the test plan to `docs/test-plans/merge-accounts.md`. It plans 19 tests covering all four acceptance criteria, built from the spec rather than the code. I haven't run the skill's plan checker (`check-test-plan.mjs`) because this session doesn't allow running commands, and I haven't written any test files yet.\n\n**What the plan covers**\n\n| Criterion | Tests | What they check |\n| --- | --- | --- |\n| AC-1 (support-lead role) | 5 | A merge without the role is refused with 403 and changes nothing; an empty role list and look-alike role names are refused; a support lead who also holds other roles can merge. |\n| AC-2 (moves data, closes newer account) | 5 | Orders, addresses and notes all end up on the older account; the newer account is closed and points to the older one; a newer account with no orders still merges; passing the accounts in the wrong order is handled. |\n| AC-3 (open disputes) | 3 | An open dispute on either account blocks the merge and nothing moves; a resolved dispute doesn't block it. |\n| AC-4 (30-day undo) | 6 | Undo works at 0, 29 and exactly 30 days and is refused at 31; a second undo is refused; undo after new activity on the merged account. |\n\nAll tests are unit tests using Node's built-in test runner and the in-memory store helper already in `test/merge.test.js`. Merge tests go in that file and undo tests in a new `test/merge-undo.test.js`.\n\n**Where the code doesn't match the spec**\n\nThese come from `src/accounts/merge.js`, and each means some planned tests will fail against the current code:\n1. Only orders are moved; addresses and notes stay behind (R-2).\n2. There's no check for open disputes (R-3).\n3. There's no undo at all, and nothing records when a merge happened (R-4).\n4. The code takes the caller's word for which account is older and never compares creation dates.\n\n**Questions for the spec author**\n\nThe plan assumes an answer to each of these; they're listed in full in the plan:\n- How is \"older\" decided: by creation date, or by the caller?\n- Does a dispute on either account block the merge, and what status does that refusal return?\n- Are the 30 days counted as 24-hour periods or calendar days? This changes the result at exactly 30 days.\n- What should undo do with orders, addresses or notes added after the merge?\n- Who is allowed to undo, and what status does a refused undo return?\n- Should merging an account into itself, or into a closed account, be refused?\n\nOnce you confirm the plan and answer those questions, I can write the tests in `test/`. I won't be able to run them under the current permissions, so I can't show you they fail for the right reasons.",
+  "changed": [
+    "docs/test-plans/merge-accounts.md"
+  ],
+  "files": {}
+}

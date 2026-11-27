@@ -44,7 +44,7 @@
  *   node scripts/agent-evals.mjs --agent <adapter> [--model <model>]
  *     [--base-url <url>] [--skill <name>] [--eval <id>] [--runs <n>]
  *     [--out <dir>] [--keep] [--record]
- *   node scripts/agent-evals.mjs --grade <skill> <eval-id> <record.json>
+ *   node scripts/agent-evals.mjs --grade <skill> <eval-id> <record.json> [--save]
  *   node scripts/agent-evals.mjs --stale   recordings older than their skill
  *
  * --record saves each passing run as skills/<skill>/tests/agent-transcripts/
@@ -371,8 +371,19 @@ async function main() {
     const evalCase = loadCases(skill)?.evals.find(e => String(e.id) === id);
     if (!evalCase) usageError(`no agent eval ${skill}#${id}`);
     const stored = JSON.parse(fs.readFileSync(file, 'utf8'));
-    const result = grade(evalCase, stored.record ?? stored);
+    const run = stored.record ?? stored;
+    const result = grade(evalCase, run);
     console.log(JSON.stringify(result, null, 2));
+    // --save keeps a run that passes as the case's recording, so a check
+    // that changes needs no new model run.
+    if (result.passed && process.argv.includes('--save')) {
+      if (!stored.agent || !stored.model) usageError('--save needs a run output from this runner, which names its agent and model');
+      const target = path.join(root, 'skills', skill, 'tests', 'agent-transcripts', `${id}.json`);
+      fs.mkdirSync(path.dirname(target), { recursive: true });
+      const { events, reply, changed, files } = run;
+      fs.writeFileSync(target, JSON.stringify({ agent: stored.agent, model: stored.model, skill_version: skillVersion(skill), recorded: new Date().toISOString().slice(0, 10), events, reply, changed, files }, null, 2) + '\n');
+      console.error(`agent-evals: saved ${path.relative(root, target)}`);
+    }
     process.exit(result.passed ? 0 : 1);
   }
   const agent = option('--agent');

@@ -219,3 +219,25 @@ test('a host ask rule blocks the write in both adapters, and must have a matchin
   const unmatched = { id: 'x', prompt: 'p', fixture: 'tests/fixtures/agent/owner-evidence', ask: ['catalog-info.yaml'], checks: { writes_only: [] } };
   assert.match(validateCase('backstage-catalog-builder', unmatched).join('\n'), /ask catalog-info\.yaml needs a matching allow\.write/);
 });
+
+test('--grade --save keeps a passing run as the recording, and refuses a failing one', async t => {
+  const { skillVersion } = await load();
+  const runner = path.join(root, 'scripts', 'agent-evals.mjs');
+  const target = path.join(root, 'skills', 'peer-code-review', 'tests', 'agent-transcripts', 'unrelated.json');
+  const original = fs.readFileSync(target, 'utf8');
+  t.after(() => fs.writeFileSync(target, original));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'save-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const recorded = JSON.parse(original);
+  const out = path.join(dir, 'run.json');
+  fs.writeFileSync(out, JSON.stringify({ agent: 'claude-code', model: 'm', record: recorded }));
+  const ok = require('node:child_process').spawnSync(process.execPath, [runner, '--grade', 'peer-code-review', 'unrelated', out, '--save'], { encoding: 'utf8' });
+  assert.equal(ok.status, 0, ok.stderr);
+  const saved = JSON.parse(fs.readFileSync(target, 'utf8'));
+  assert.equal(saved.model, 'm');
+  assert.equal(saved.skill_version, skillVersion('peer-code-review'));
+  fs.writeFileSync(out, JSON.stringify({ agent: 'claude-code', model: 'm', record: { ...recorded, reply: 'no answer' } }));
+  const bad = require('node:child_process').spawnSync(process.execPath, [runner, '--grade', 'peer-code-review', 'unrelated', out, '--save'], { encoding: 'utf8' });
+  assert.equal(bad.status, 1);
+  assert.equal(JSON.parse(fs.readFileSync(target, 'utf8')).model, 'm', 'a failing run is not saved');
+});

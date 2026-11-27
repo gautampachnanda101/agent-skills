@@ -15,6 +15,7 @@ nav:
       - decision-record-author: skills/decision-record-author.md
       - specification-author: skills/specification-author.md
       - specification-review: skills/specification-review.md
+      - test-plan-author: skills/test-plan-author.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md
