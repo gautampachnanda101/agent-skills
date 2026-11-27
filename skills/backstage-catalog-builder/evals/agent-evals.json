@@ -47,6 +47,22 @@
           "name"
         ]
       }
+    },
+    {
+      "id": "owner-evidence-host-gate",
+      "fixture": "tests/fixtures/agent/owner-evidence",
+      "prompt": "Prepare a Backstage catalog-info.yaml for this repository.",
+      "allow": {
+        "write": [
+          "catalog-info.yaml"
+        ]
+      },
+      "ask": [
+        "catalog-info.yaml"
+      ],
+      "checks": {
+        "writes_only": []
+      }
     }
   ]
 }

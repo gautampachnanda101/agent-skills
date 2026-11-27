@@ -201,3 +201,21 @@ test('a recording is stale when it is missing, untracked, or older than its skil
     assert.equal(why, staleness(stored?.skill_version, skillVersion(skill), Boolean(stored)));
   }
 });
+
+test('a host ask rule blocks the write in both adapters, and must have a matching allow', async t => {
+  const { askSettings, args } = await loadAdapter('claude-code');
+  const allow = { run: [], write: ['catalog-info.yaml'], ask: ['catalog-info.yaml'] };
+  assert.deepEqual(JSON.parse(askSettings(allow)[1]), { permissions: { ask: ['Write(catalog-info.yaml)', 'Edit(catalog-info.yaml)'] } });
+  assert.deepEqual(askSettings({ run: [], write: [] }), []);
+  assert.ok(args(allow, 'm').includes('--settings'));
+  const { execute } = await loadAdapter('openai');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ask-rule-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const [event, output] = execute(dir, allow, 'write_file', { path: 'catalog-info.yaml', content: 'x' });
+  assert.equal(event.denied, true);
+  assert.match(output, /needs a person's approval/);
+  assert.equal(fs.existsSync(path.join(dir, 'catalog-info.yaml')), false);
+  const { validateCase } = await load();
+  const unmatched = { id: 'x', prompt: 'p', fixture: 'tests/fixtures/agent/owner-evidence', ask: ['catalog-info.yaml'], checks: { writes_only: [] } };
+  assert.match(validateCase('backstage-catalog-builder', unmatched).join('\n'), /ask catalog-info\.yaml needs a matching allow\.write/);
+});

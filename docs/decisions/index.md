@@ -15,3 +15,4 @@ message, and copy [the template](template.md).
 | [0006](0006-skill-names.md) | Name skills in full words, with a shared prefix per family | Accepted |
 | [0007](0007-protect-main-without-requiring-pull-requests.md) | Protect `main` from rewrites without requiring pull requests | Accepted |
 | [0008](0008-contract-based-behaviour-evals.md) | Contract-based behaviour evals, with no model in CI | Accepted |
+| [0009](0009-enforce-rules-outside-the-model.md) | Enforce a rule that matters outside the model | Accepted |

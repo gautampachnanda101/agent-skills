@@ -43,6 +43,9 @@ asked to review changes to it, from
 | [peer-code-review](peer-code-review.md) | Team | The change's author, and whoever decides to merge | @gautampachnanda101 |
 | [skill-correction](skill-correction.md) | Team | The skill's owner, before the case and fix are written | @gautampachnanda101 |
 
+To make a skill's important rules hold whatever model runs it, apply the
+settings in [Make a skill's rules hard](../hard-rules.md).
+
 CI checks every skill against the specification and runs the tests a skill
 ships. `backstage-catalog-builder` also gets structural checks and a
 local-model check. See [Verification](../verification.md).

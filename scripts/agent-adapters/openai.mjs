@@ -136,8 +136,9 @@ export function execute(dir, allow, name, input, skillsDir = '.agents/skills') {
       const target = inside(dir, input.path);
       const event = { ...base, kind: 'write', path: input.path };
       const relative = target && path.relative(dir, target).split(path.sep).join('/');
-      const permitted = relative && allow.write.some(rule => (rule.endsWith('/**') ? relative.startsWith(rule.slice(0, -2)) : relative === rule));
-      if (!target || !permitted) return denied(event, 'writing this file is not permitted');
+      const matches = rules => Boolean(relative) && rules.some(rule => (rule.endsWith('/**') ? relative.startsWith(rule.slice(0, -2)) : relative === rule));
+      if (!target || !matches(allow.write)) return denied(event, 'writing this file is not permitted');
+      if (matches(allow.ask ?? [])) return denied(event, 'writing this file needs a person\'s approval, and none was given');
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.writeFileSync(target, String(input.content ?? ''));
       return [event, `Wrote ${relative}`];

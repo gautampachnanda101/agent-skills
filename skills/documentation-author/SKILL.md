@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools; Bash or Node are optional for running commands, link checks, and Markdown linters. Network access requires permission.
 metadata:
   author: gautampachnanda101
-  version: "2.1.0"
+  version: "2.2.0"
 ---
 
 # Documentation author
@@ -128,7 +128,9 @@ cases come last.
 1. Run the mechanical pass: any available Markdown linter (`markdownlint`,
    `vale`), link checker, or the repository's bundled site checker (for
    MkDocs/TechDocs sites, the zero-dependency
-   `check-techdocs.mjs`) — fix findings before human review.
+   `check-techdocs.mjs`) — fix findings before human review. When Node.js is
+   available, also run this skill's `node scripts/check-page.mjs <pages>`,
+   which fails on placeholder notes, vague link text, and bare URLs.
 2. Self-check against [style-rules.md](./style-rules.md) as the validator:
    type fit, structure, voice, accuracy, links, accessibility.
 3. Report what changed, the evidence for every runnable claim, and anything

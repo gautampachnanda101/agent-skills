@@ -45,6 +45,14 @@ repos:
         language: system
         pass_filenames: false
         files: '^(Makefile|scripts/|tests/|skills/|\.claude-plugin/|\.githooks/|\.pre-commit-config\.yaml)'
+      # Finished pages carry no placeholder notes, vague link text, or bare
+      # URLs, whatever wrote them. Eval fixtures are excluded: their planted
+      # defects are deliberate.
+      - id: check-page
+        name: Placeholders and link text in finished pages
+        entry: node skills/documentation-author/scripts/check-page.mjs
+        language: system
+        files: '^(README|CHANGELOG|AGENTS)\.md$|^docs/.*\.md$|^skills/[^/]+/[^/]+\.md$'
       - id: check-versions
         name: Skill and plugin versions, and the changelog
         entry: node scripts/check-versions.mjs

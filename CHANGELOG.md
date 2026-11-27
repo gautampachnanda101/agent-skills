@@ -54,6 +54,15 @@ skill's `metadata.version` field.
   Recorded transcripts are graded in the test suite with no model, and
   each contract clause is broken in turn to show it is enforced. Every
   skill gets a patch release for its new cases.
+- Hard rules, enforced outside the model: a [Make a skill's rules
+  hard](https://gautampachnanda101.github.io/agent-skills/hard-rules/)
+  page gives each skill's important rules with the assistant settings and
+  checks that enforce them. `documentation-author` 2.2.0 ships
+  `scripts/check-page.mjs`, which fails on placeholder notes, vague link
+  text, and bare URLs, and runs in this repository's pre-commit hooks.
+  Behaviour cases can declare host rules with `ask`; with an ask rule for
+  `catalog-info.yaml`, Claude Haiku 5.5 tried to write it in three of three
+  runs and was stopped every time. Decision record 0009.
 - Three real corrections, worked through with `skill-correction`:
   - `documentation-author` 2.1.0 delivers no `TODO`, `FIXME`, or editor's
     notes: unknowns go in the report, and an unconfirmed link or fact is

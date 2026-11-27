@@ -19,10 +19,16 @@ export function permissionRules(allow) {
   ];
 }
 
+/** Host rules that make Claude Code ask a person; ask outranks allow. */
+export function askSettings(allow) {
+  const ask = (allow.ask ?? []).flatMap(file => [`Write(${file})`, `Edit(${file})`]);
+  return ask.length ? ['--settings', JSON.stringify({ permissions: { ask } })] : [];
+}
+
 export function args(allow, model) {
   return ['-p', '--output-format', 'stream-json', '--verbose', '--model', model,
     '--setting-sources', 'project', '--strict-mcp-config', '--no-session-persistence',
-    '--permission-mode', 'dontAsk', '--tools', OFFERED.join(','), '--allowedTools', ...permissionRules(allow)];
+    '--permission-mode', 'dontAsk', ...askSettings(allow), '--tools', OFFERED.join(','), '--allowedTools', ...permissionRules(allow)];
 }
 
 function toEvent(call) {

@@ -24,6 +24,11 @@
  * {{skills}} in a prefix or prompt is the skills folder, and {{root}} the
  * repository's absolute path.
  *
+ * A case's "ask" lists files the assistant itself must ask a person about
+ * before writing, as a host permission rule would, overriding allow.write.
+ * No person answers during an eval, so those writes are blocked by the
+ * host, not by the model's choice. The model is not told in advance.
+ *
  * Checks:
  *   skill            this skill must be loaded
  *   no_skill         none of these skills may be loaded
@@ -308,7 +313,7 @@ export function resolveCase(evalCase, skillsDir, dir = '') {
   const roots = [...new Set([dir, dir && fs.existsSync(dir) ? fs.realpathSync(dir) : dir])];
   const fill = text => text.replaceAll('{{skills}}', skillsDir);
   const expand = text => (text.includes('{{root}}') ? roots.map(root => fill(text).replaceAll('{{root}}', root)) : [fill(text)]);
-  const allow = { run: [...new Set((evalCase.allow?.run ?? []).flatMap(expand))], write: evalCase.allow?.write ?? [] };
+  const allow = { run: [...new Set((evalCase.allow?.run ?? []).flatMap(expand))], write: evalCase.allow?.write ?? [], ask: evalCase.ask ?? [] };
   const shown = { run: (evalCase.allow?.run ?? []).filter(rule => !rule.includes('{{root}}')).map(fill), write: allow.write };
   return { prompt: `${fill(evalCase.prompt)}\n\n${permissionNote(shown)}`, allow };
 }
@@ -326,6 +331,9 @@ export function validateCase(skill, evalCase) {
   const checks = evalCase.checks ?? {};
   if (!Object.keys(checks).length) problems.push(`${where}: no checks`);
   for (const key of Object.keys(checks)) if (!CHECK_KEYS.has(key)) problems.push(`${where}: unknown check "${key}"`);
+  for (const file of evalCase.ask ?? []) {
+    if (!writeAllowed(evalCase.allow?.write ?? [], file)) problems.push(`${where}: ask ${file} needs a matching allow.write, or the model is simply told it cannot write`);
+  }
   const patterns = [...(checks.ran ?? []), ...(checks.must_match ?? []), ...(checks.must_not_match ?? []), ...Object.values(checks.files ?? {}).flat()];
   for (const pattern of patterns) {
     try {

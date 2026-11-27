@@ -1,6 +1,6 @@
 # documentation-author
 
-**Version 2.1.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/SKILL.md) · plugin name `agent-skills:documentation-author`**
+**Version 2.2.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/SKILL.md) · plugin name `agent-skills:documentation-author`**
 
 Writes new documentation and rewrites existing pages to the standard a
 [documentation-review](documentation-review.md) pass will check. It states
@@ -27,6 +27,7 @@ from your repository before it asks.
 | --- | --- |
 | [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/SKILL.md) | Need → form → structure → voice → validation flow |
 | [`style-rules.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/style-rules.md) | The self-validator checklist applied before delivery |
+| [`scripts/check-page.mjs`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/scripts/check-page.mjs) | Fails on placeholder notes, vague link text, and bare URLs; zero dependencies |
 | [`evals/evals.json`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/evals/evals.json) | Eval prompts and assertions |
 
 ## Mechanical pass built in
