@@ -1,0 +1,54 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "security-review"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show 74fca02"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "npm run scan"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/routes/orders.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "scripts/scan.js"
+    },
+    {
+      "tool": "Grep",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "src",
+      "pattern": "router|requireRole|app\\.use"
+    }
+  ],
+  "reply": "I wouldn't merge this commit (`74fca02`, \"Add order search\"). The new route lets anyone run their own SQL against the database and read every customer's orders. It's one 5-line route in `src/routes/orders.js`.\n\n## Verdict: request changes\n\n## Findings\n\n| Severity | Location | Evidence | Suggested direction |\n| --- | --- | --- | --- |\n| **blocker** | `src/routes/orders.js:13` | `\"... LIKE '%\" + req.query.q + \"%'\"` | **SQL injection.** The `q` value from the URL is pasted straight into the SQL text. An attacker can send something like `q=' UNION SELECT ... --` to read any table, or change and delete data if the database account allows it. Pass it as a parameter instead, the way line 8 does: `... WHERE note LIKE $1` with `['%' + q + '%']`. Also escape `%` and `_` in `q` if they should match literally. |\n| **blocker** | `src/routes/orders.js:12` | `router.get('/orders/search', async (req, res) => {` | **No auth check.** The existing `/orders` route uses `requireRole('customer')`, but this one has no middleware, so it's open to anyone. I found no `app.use` auth anywhere else in `src/`. Add `requireRole('customer')`. |\n| **blocker** | `src/routes/orders.js:13` | `SELECT * FROM orders WHERE note LIKE ...` | **Searches everyone's orders.** Even with the injection and auth fixed, the query has no `customer_id` filter, so a logged-in customer could search other customers' orders and their notes. Add `AND customer_id = $2` with `req.user.id`, as `/orders` does. |\n| minor | `src/routes/orders.js:13-14` | `SELECT *` … `res.json(rows)` | **Returns every column.** Whatever the `orders` table holds goes into the response. Select only the columns the client needs. |\n| minor | `src/routes/orders.js:12` | `req.query.q` used without checks | **Unchecked input.** If `q` is missing, the string `undefined` gets searched. If it's sent more than once, Express turns it into an array. Return a 400 unless `q` is a non-empty string within a length limit. |\n\n## Scanners\n\n- **Ran:** `npm run scan` (`scripts/scan.js`), which reported 0 advisory findings.\n- **What it covers:** it only compares `package.json` dependencies against a hard-coded list with one lodash advisory. It doesn't look at code, so it can't catch any of the problems above.\n- **Not run:** no linter with security rules, secret scanner or SAST tool is set up in the repo, and I wasn't allowed to install one.\n\n## Unevaluated\n\n- **Database helper:** I didn't see what `db.query` in `src/db.js` does or which database account it uses, so I can't say how far an injection could reach (writes, other schemas, stacked queries).\n- **Where `req.user` comes from:** I didn't find the code that sets it, so I couldn't check how users are authenticated.\n- **App setup:** I didn't find where this router is mounted, so I couldn't confirm there's no outer auth middleware. Even if there is, the injection and the missing `customer_id` filter are still blockers.\n\nI haven't changed any code.",
+  "changed": [],
+  "files": {}
+}

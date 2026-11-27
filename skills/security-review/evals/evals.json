@@ -1,0 +1,46 @@
+{
+  "skill_name": "security-review",
+  "guides": [],
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Do a security review of this pull request before it is merged.",
+      "files": [
+        "tests/fixtures/pr-318.diff"
+      ],
+      "expected_output": "Request changes, with blockers for the SQL injection, unverified token, removed role check, eval, missing admin authorization, and logged password, a major or blocker for path traversal, and a finding for the HTTP dependency, without quoting any credential.",
+      "assertions": [
+        "Finds all eight planted defects",
+        "Rates each by exploitability",
+        "Gives the verdict request changes"
+      ],
+      "checks": {
+        "ledger": "tests/ledger.json",
+        "must_match": [
+          "verdict[^\\n]*request changes"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "prompt": "Do a security review of this pull request before it is merged.",
+      "files": [
+        "tests/fixtures/pr-319.diff"
+      ],
+      "expected_output": "Approve or approve with comments; the new route is scoped to the customer and parameterised, and the log line drops the password.",
+      "assertions": [
+        "Raises nothing above minor",
+        "Approves"
+      ],
+      "checks": {
+        "max_severity": "minor",
+        "must_match": [
+          "verdict[^\\n]*\\bapprove\\b"
+        ],
+        "must_not_match": [
+          "verdict[^\\n]*request changes"
+        ]
+      }
+    }
+  ]
+}

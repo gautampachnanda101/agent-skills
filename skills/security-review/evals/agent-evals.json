@@ -1,0 +1,69 @@
+{
+  "skill_name": "security-review",
+  "evals": [
+    {
+      "id": "review-commit",
+      "fixture": "tests/fixtures/agent/review-commit",
+      "git": {
+        "message": "Add order search"
+      },
+      "prompt": "Do a security review of the latest commit before I merge it.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git status",
+          "npm run scan"
+        ],
+        "write": [
+          "src/**"
+        ]
+      },
+      "checks": {
+        "skill": "security-review",
+        "ran": [
+          "git (show|diff|log)"
+        ],
+        "writes_only": [],
+        "must_match": [
+          "request changes",
+          "inject",
+          "(requireRole|authoriz|role)"
+        ]
+      }
+    },
+    {
+      "id": "runs-scanner",
+      "fixture": "tests/fixtures/agent/runs-scanner",
+      "git": {
+        "message": "Group orders by customer"
+      },
+      "prompt": "Do a security review of the latest commit before I merge it.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git status",
+          "npm run scan"
+        ],
+        "write": [
+          "package.json",
+          "src/**"
+        ]
+      },
+      "checks": {
+        "skill": "security-review",
+        "ran": [
+          "npm run scan"
+        ],
+        "writes_only": [],
+        "must_match": [
+          "CVE-2020-8203|prototype pollution",
+          "4\\.17\\.(20|21)|upgrade"
+        ]
+      }
+    }
+  ]
+}

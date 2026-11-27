@@ -1,0 +1,26 @@
+diff --git a/src/routes/orders.js b/src/routes/orders.js
+index 3b1c2a4..9c8b7a6 100644
+--- a/src/routes/orders.js
++++ b/src/routes/orders.js
+@@ -9,10 +9,22 @@ export const router = express.Router();
+ router.get('/orders', requireRole('customer'), async (req, res) => {
+   const rows = await db.query('SELECT * FROM orders WHERE customer_id = $1', [req.user.id]);
+   res.json(rows);
+ });
+ 
++router.get('/orders/:id', requireRole('customer'), async (req, res) => {
++  const [order] = await db.query(
++    'SELECT * FROM orders WHERE id = $1 AND customer_id = $2',
++    [req.params.id, req.user.id],
++  );
++  if (!order) return res.status(404).end();
++  res.json(order);
++});
++
+ router.post('/login', async (req, res) => {
+   const { email, password } = req.body;
++  logger.info('login attempt', { emailDomain: email.split('@')[1] });
+   const user = await db.verifyLogin(email, password);
+   if (!user) return res.status(401).end();
+   res.json({ token: user.token });
+ });

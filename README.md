@@ -28,6 +28,7 @@ has been tested. The skills today:
 - [`specification-author`](./skills/specification-author/SKILL.md) — turns a rough request into a specification with numbered requirements and Given/When/Then acceptance criteria, after asking the questions that change the outcome.
 - [`specification-review`](./skills/specification-review/SKILL.md) — reviews a specification before it is built: untestable requirements, incomplete criteria, uncovered requirements, and contradictions with the repository.
 - [`test-plan-author`](./skills/test-plan-author/SKILL.md) — plans tests from a specification's acceptance criteria, not from the code, with negative and boundary cases, and writes failing tests first when asked.
+- [`security-review`](./skills/security-review/SKILL.md) — reviews a change for injection, broken authorization, data exposure, weakened checks, and risky dependencies, after running the repository's own scanners.
 
 This README is the landing page; the complete documentation lives in
 [the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),

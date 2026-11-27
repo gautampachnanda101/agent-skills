@@ -1,0 +1,59 @@
+diff --git a/src/routes/orders.js b/src/routes/orders.js
+index 3b1c2a4..7d9e0f1 100644
+--- a/src/routes/orders.js
++++ b/src/routes/orders.js
+@@ -1,18 +1,44 @@
+ import express from 'express';
++import path from 'node:path';
++import jwt from 'jsonwebtoken';
+ import { db } from '../db.js';
+ import { requireRole } from '../auth.js';
+ import { logger } from '../logger.js';
+ 
+ export const router = express.Router();
++const UPLOAD_DIR = '/srv/uploads';
+ 
+-router.get('/orders', requireRole('customer'), async (req, res) => {
+-  const rows = await db.query('SELECT * FROM orders WHERE customer_id = $1', [req.user.id]);
++router.get('/orders', async (req, res) => {
++  const user = jwt.decode(req.headers.authorization?.split(' ')[1]);
++  const rows = await db.query(
++    "SELECT * FROM orders WHERE customer_id = '" + req.query.customer + "'",
++  );
+   res.json(rows);
+ });
+ 
++router.post('/orders/search', requireRole('customer'), async (req, res) => {
++  const matches = (await db.query('SELECT * FROM orders WHERE customer_id = $1', [req.user.id]))
++    .filter(order => eval(req.body.filter));
++  res.json(matches);
++});
++
++router.get('/orders/:id/invoice/:name', requireRole('customer'), (req, res) => {
++  res.sendFile(path.join(UPLOAD_DIR, req.params.name));
++});
++
++router.post('/admin/refunds', async (req, res) => {
++  await db.query('UPDATE orders SET refunded = true WHERE id = $1', [req.body.orderId]);
++  res.status(204).end();
++});
++
+ router.post('/login', async (req, res) => {
+   const { email, password } = req.body;
++  logger.info(`login attempt email=${email} password=${password}`);
+   const user = await db.verifyLogin(email, password);
+   if (!user) return res.status(401).end();
+   res.json({ token: user.token });
+ });
+diff --git a/package.json b/package.json
+index 1a2b3c4..5d6e7f8 100644
+--- a/package.json
++++ b/package.json
+@@ -6,6 +6,8 @@
+   "dependencies": {
+     "express": "4.21.2",
++    "jsonwebtoken": "9.0.2",
++    "csv-tools": "http://packages.example.net/csv-tools-1.2.0.tgz",
+     "pg": "8.13.1"
+   }
+ }

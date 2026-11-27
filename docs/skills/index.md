@@ -31,6 +31,7 @@ the Claude plugin route.
 - [specification-author](specification-author.md) — turns a rough request into a specification with numbered requirements and Given/When/Then acceptance criteria, after asking the questions that change the outcome.
 - [specification-review](specification-review.md) — reviews a specification before it is built: untestable requirements, incomplete criteria, uncovered requirements, and contradictions with the repository.
 - [test-plan-author](test-plan-author.md) — plans tests from a specification's acceptance criteria, not from the code, with negative and boundary cases, and writes failing tests first when asked.
+- [security-review](security-review.md) — reviews a change for injection, broken authorization, data exposure, weakened checks, and risky dependencies, after running the repository's own scanners.
 
 ## Levels and owners
 
@@ -50,6 +51,7 @@ asked to review changes to it, from
 | [specification-author](specification-author.md) | Personal | The person who asked for the feature, and whoever builds or tests it | @gautampachnanda101 |
 | [specification-review](specification-review.md) | Team | The spec's author, and whoever approves building it | @gautampachnanda101 |
 | [test-plan-author](test-plan-author.md) | Team | The developer and reviewer of the change | @gautampachnanda101 |
+| [security-review](security-review.md) | Team | The change's author, and whoever decides to merge | @gautampachnanda101 |
 
 To make a skill's important rules hold whatever model runs it, apply the
 settings in [Make a skill's rules hard](../hard-rules.md).

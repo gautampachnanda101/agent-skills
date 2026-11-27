@@ -1,0 +1,55 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "security-review"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show HEAD"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": true,
+      "kind": "run",
+      "command": "npm run scan"
+    },
+    {
+      "tool": "Grep",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "",
+      "pattern": "lodash|zipObjectDeep|byCustomer"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "scripts/scan.js"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "{package-lock.json,npm-shrinkwrap.json,yarn.lock,pnpm-lock.yaml,.github/**}",
+      "pattern": "{package-lock.json,npm-shrinkwrap.json,yarn.lock,pnpm-lock.yaml,.github/**}"
+    }
+  ],
+  "reply": "## Security review: `dbcf28e` \"Group orders by customer\"\n\n**Verdict: request changes.** The commit adds a lodash version with known vulnerabilities, and the repository's own scanner fails on it. The new code is fine. The fix is to change the version number.\n\n### Findings\n\n| Severity | Location | Evidence | Suggested direction |\n| --- | --- | --- | --- |\n| major | `package.json:12` | `\"lodash\": \"4.17.15\"` | Pin `4.17.21`, the current lodash 4 release. It fixes CVE-2020-8203, which the scanner reports: prototype pollution in `zipObjectDeep`, fixed in 4.17.20. From my own knowledge rather than the scanner, it also fixes CVE-2021-23337, command injection through `_.template`, and CVE-2020-28500, a ReDoS in `trim`/`toNumber`. Both were fixed in 4.17.21. |\n| minor | `package.json` (repo) | No lockfile is committed | Commit a `package-lock.json` so installs can't pull a different dependency tree. Without one, `npm audit` can't check the full tree either. |\n\n**How an attacker would use it:** The only new call is `_.groupBy(orders, 'customerId')` in `src/util/group.js:2`, and `groupBy` isn't one of the affected functions. So this commit by itself doesn't open an attack path. The risk is that once 4.17.15 is installed, any later use of `zipObjectDeep`, `set`-style deep paths, or `template` on request data would give a prototype-pollution or code-execution path. Prototype pollution can bypass checks or crash an Express app. Version bumps are easy to forget later, and the scanner blocks CI as things stand. That's why I rated this major rather than minor.\n\nThe rest of the change has no injection, auth, file path, data exposure, or crypto issues. `byCustomer` isn't called anywhere yet.\n\n### Scanners\n\n- **Ran `npm run scan` (`scripts/scan.js`):** exited with code 1 and found one advisory: `lodash@4.17.15: CVE-2020-8203`.\n- **Limits of the scanner:** it checks a hard-coded list of advisories against the direct dependencies in `package.json`. It has one entry, so it doesn't catch the two later lodash CVEs above, and it ignores transitive dependencies.\n- **Not run:** `npm audit` and any other scanners. My permissions here only cover `npm run scan`, and with no lockfile `npm audit` would be incomplete anyway. The repo has no CI security jobs.\n\n### Unevaluated\n\n- **Future callers of `byCustomer`:** I can't see where it will be wired in. If it's meant to group orders by customer in a response, the calling route should check that the requester may see every customer's orders in the result.\n- **`express`/`pg` and their transitive dependencies:** unchanged by this commit and not scanned beyond the scanner's one-entry list.\n\nI haven't made any edits. The fix is a one-line change in `package.json` from `4.17.15` to `4.17.21`, which I can make if you want.",
+  "changed": [],
+  "files": {}
+}

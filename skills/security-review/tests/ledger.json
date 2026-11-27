@@ -1,0 +1,87 @@
+[
+  {
+    "defect": "SQL built from req.query.customer",
+    "severity": [
+      "blocker"
+    ],
+    "match": [
+      "orders\\.js|\\/orders",
+      "SQL|inject|concat|req\\.query"
+    ]
+  },
+  {
+    "defect": "Token decoded with jwt.decode, never verified",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "jwt|decode|token",
+      "verif|signature|forg"
+    ]
+  },
+  {
+    "defect": "requireRole removed from GET /orders",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "requireRole|role|auth",
+      "GET \\/orders|\\/orders'|removed|dropped|no longer|lost"
+    ]
+  },
+  {
+    "defect": "eval on req.body.filter",
+    "severity": [
+      "blocker"
+    ],
+    "match": [
+      "eval",
+      "filter|req\\.body|code execution|RCE|arbitrary"
+    ]
+  },
+  {
+    "defect": "Path traversal in the invoice route",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "sendFile|invoice|req\\.params\\.name|path\\.join",
+      "travers|\\.\\.\\/|outside|arbitrary file"
+    ]
+  },
+  {
+    "defect": "POST /admin/refunds has no authorization",
+    "severity": [
+      "blocker"
+    ],
+    "match": [
+      "admin|refund",
+      "author|role|requireRole|anyone|unauthenticated"
+    ]
+  },
+  {
+    "defect": "Password written to the log",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "password|log",
+      "log|password"
+    ]
+  },
+  {
+    "defect": "Dependency fetched over plain HTTP",
+    "severity": [
+      "major",
+      "minor"
+    ],
+    "match": [
+      "csv-tools|http:|package\\.json",
+      "http|insecure|TLS|unpinned|integrity|tamper"
+    ]
+  }
+]
