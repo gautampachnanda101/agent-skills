@@ -33,6 +33,7 @@ the Claude plugin route.
 - [test-plan-author](test-plan-author.md) — plans tests from a specification's acceptance criteria, not from the code, with negative and boundary cases, and writes failing tests first when asked.
 - [security-review](security-review.md) — reviews a change for injection, broken authorization, data exposure, weakened checks, and risky dependencies, after running the repository's own scanners.
 - [change-plan-author](change-plan-author.md) — breaks a spec or request into small, ordered, independently reviewable changes, each with its files, check, and size.
+- [release-notes-author](release-notes-author.md) — drafts release notes that lead with what readers must do: breaking changes with upgrade steps, migrations, and how to roll back.
 
 ## Levels and owners
 
@@ -54,6 +55,7 @@ asked to review changes to it, from
 | [test-plan-author](test-plan-author.md) | Team | The developer and reviewer of the change | @gautampachnanda101 |
 | [security-review](security-review.md) | Team | The change's author, and whoever decides to merge | @gautampachnanda101 |
 | [change-plan-author](change-plan-author.md) | Personal | Whoever builds the change, and its reviewers | @gautampachnanda101 |
+| [release-notes-author](release-notes-author.md) | Team | Whoever publishes the release | @gautampachnanda101 |
 
 To make a skill's important rules hold whatever model runs it, apply the
 settings in [Make a skill's rules hard](../hard-rules.md).

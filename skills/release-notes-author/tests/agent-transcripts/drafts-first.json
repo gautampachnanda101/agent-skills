@@ -1,0 +1,70 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "release-notes-author"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git log --stat"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git tag"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show eb8b87a"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show 9bb271a"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/release-notes-author/scripts/check-release-notes.mjs"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "docs/release-notes/1.5.0.md"
+    }
+  ],
+  "reply": "I've drafted the release notes and saved them to `docs/release-notes/1.5.0.md`. I didn't run the skill's checker because running `node` isn't allowed in this session, so I compared the notes against its rules by hand. They pass: the version is in the title, and there are Upgrade and Roll back sections. I didn't change `CHANGELOG.md`, create a tag or publish anything.\n\nThe notes are based on the `[Unreleased]` changelog entries and the release-prep commit (`eb8b87a`). The repo has no tags, so I compared that commit against the initial commit, which holds the 1.4.0 entry.\n\n**What readers have to act on:**\n- **Breaking change:** the app now reads only `DATABASE_URL`. It no longer reads `ORDERS_DB_URL` and doesn't fall back to it (`src/config.js:3`). The changelog line \"reads the database URL from one variable\" doesn't say this, so the notes spell it out and give the upgrade steps.\n- **Migration:** `0007_refund_totals` locks the `refunds` table while it runs. It took about 4 minutes on 2 million orders in staging. The notes say to schedule a maintenance window and take a backup first.\n- **Rollback:** the release has no down migration. The notes say to redeploy 1.4.0 with `ORDERS_DB_URL` set, and then either keep the new column or restore the backup.\n\n**Questions for you before publishing:**\n1. **Release date:** neither the changelog nor any tag gives one, so I left it out of the title. Tell me the date and I'll add it.\n2. **Rolling back with the column kept:** I couldn't confirm that 1.4.0 works with the extra `total_cents` column, because the refund code isn't in the repo. It's an empty-allowed column, so it's probably harmless, but someone should check.\n3. **Refunds created after the migration:** I couldn't find any code that fills `total_cents` for new refunds. If that isn't written yet, the \"computed by the database\" change may not be finished.\n4. **Discount tax fix:** I couldn't find the code for it in the diff, so the note just repeats the changelog wording.\n\n**Problem outside the notes:** `README.md` still tells users to set `ORDERS_DB_URL`. It needs updating to `DATABASE_URL` for this release, but I'm not allowed to edit that file in this session.",
+  "changed": [
+    "docs/release-notes/1.5.0.md"
+  ],
+  "files": {}
+}

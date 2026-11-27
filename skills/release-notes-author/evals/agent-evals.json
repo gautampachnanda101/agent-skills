@@ -1,0 +1,81 @@
+{
+  "skill_name": "release-notes-author",
+  "evals": [
+    {
+      "id": "drafts-first",
+      "fixture": "tests/fixtures/agent/drafts-first",
+      "git": {
+        "message": "Release preparation for 1.5.0"
+      },
+      "prompt": "Draft the release notes for orders-api 1.5.0.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git tag",
+          "git status"
+        ],
+        "write": [
+          "CHANGELOG.md",
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "release-notes-author",
+        "writes_only": [
+          "docs/**"
+        ],
+        "must_match": [
+          "DATABASE_URL",
+          "ORDERS_DB_URL",
+          "(lock|4 minutes)",
+          "(roll ?back|revert)"
+        ],
+        "ran": [
+          "git (log|show|diff)"
+        ]
+      }
+    },
+    {
+      "id": "saves-notes",
+      "fixture": "tests/fixtures/agent/saves-notes",
+      "git": {
+        "message": "Release preparation for 1.5.0"
+      },
+      "prompt": "Draft the release notes for orders-api 1.5.0 and save them to docs/releases/1.5.0.md.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git tag",
+          "git status",
+          "node {{skills}}/release-notes-author/scripts/check-release-notes.mjs",
+          "node {{root}}/{{skills}}/release-notes-author/scripts/check-release-notes.mjs"
+        ],
+        "write": [
+          "docs/releases/**"
+        ]
+      },
+      "checks": {
+        "skill": "release-notes-author",
+        "ran": [
+          "check-release-notes\\.mjs"
+        ],
+        "writes_only": [
+          "docs/releases/**"
+        ],
+        "files": {
+          "docs/releases/1.5.0.md": [
+            "^# .*1\\.5\\.0",
+            "DATABASE_URL",
+            "ORDERS_DB_URL",
+            "## .*(roll ?back|revert)",
+            "(lock|4 minutes)"
+          ]
+        }
+      }
+    }
+  ]
+}

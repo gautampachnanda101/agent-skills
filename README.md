@@ -30,6 +30,7 @@ has been tested. The skills today:
 - [`test-plan-author`](./skills/test-plan-author/SKILL.md) — plans tests from a specification's acceptance criteria, not from the code, with negative and boundary cases, and writes failing tests first when asked.
 - [`security-review`](./skills/security-review/SKILL.md) — reviews a change for injection, broken authorization, data exposure, weakened checks, and risky dependencies, after running the repository's own scanners.
 - [`change-plan-author`](./skills/change-plan-author/SKILL.md) — breaks a spec or request into small, ordered, independently reviewable changes, each with its files, check, and size.
+- [`release-notes-author`](./skills/release-notes-author/SKILL.md) — drafts release notes that lead with what readers must do: breaking changes with upgrade steps, migrations, and how to roll back.
 
 This README is the landing page; the complete documentation lives in
 [the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),

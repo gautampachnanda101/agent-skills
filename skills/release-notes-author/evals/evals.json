@@ -1,0 +1,34 @@
+{
+  "skill_name": "release-notes-author",
+  "guides": [],
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Draft the release notes for orders-api 1.5.0 from its changelog and the changes since 1.4.0, both included.\n\nAnswer with only one fenced markdown block containing the notes.",
+      "files": [
+        "tests/fixtures/reply/CHANGELOG.md",
+        "tests/fixtures/reply/changes-since-1.4.0.diff"
+      ],
+      "expected_output": "Notes titled with 1.5.0 that lead with the breaking rename of ORDERS_DB_URL to DATABASE_URL and the steps to upgrade, describe migration 0007 with its four-minute lock on refunds, explain how to roll back, and list the tax fix.",
+      "assertions": [
+        "Leads with the breaking rename, found in the diff although the changelog only says one variable",
+        "Gives upgrade steps and a rollback, including after the migration",
+        "Mentions the lock and its duration",
+        "Lists the fix in the reader's terms"
+      ],
+      "checks": {
+        "unwrap_fence": true,
+        "grader": "scripts/check-release-notes.mjs",
+        "must_match": [
+          "^# .*1\\.5\\.0",
+          "ORDERS_DB_URL",
+          "DATABASE_URL",
+          "0007",
+          "(lock)",
+          "(4 minutes|four minutes)",
+          "tax"
+        ]
+      }
+    }
+  ]
+}
