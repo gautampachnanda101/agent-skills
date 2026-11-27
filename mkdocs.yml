@@ -12,6 +12,7 @@ nav:
       - documentation-review: skills/documentation-review.md
       - documentation-author: skills/documentation-author.md
       - skill-correction: skills/skill-correction.md
+      - decision-record-author: skills/decision-record-author.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md

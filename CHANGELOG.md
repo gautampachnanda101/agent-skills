@@ -17,6 +17,7 @@ skill's `metadata.version` field.
 
 ### Added
 
+- `decision-record-author` 1.0.0: writes an architecture decision record with checkable context, the options considered, the decision, and its consequences. It reads the repository's existing records first and suggests the number, title, and status before writing, and supersedes rather than edits an accepted record. `scripts/check-decision-record.mjs` checks the title, status, sections, placeholders, numbering, and supersede links, and runs on this repository's own records in pre-commit.
 - A fifth skill, `skill-correction` 1.0.0: it turns a correction to a
   skill's behaviour into a failing eval case and the smallest fix. It reads
   the skill, its evals, and the evidence; classifies the root cause

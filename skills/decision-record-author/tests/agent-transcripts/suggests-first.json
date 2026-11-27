@@ -1,0 +1,47 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "decision-record-author"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "notes/webhooks-discussion.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "docs/**/*",
+      "pattern": "docs/**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/decisions/0002-poll-payment-status.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/decisions/0001-use-postgres.md"
+    }
+  ],
+  "reply": "I've read the discussion notes and the two existing records. Before I write anything, here's what I plan to use. Please confirm or correct it.\n\n**Path and number:** `docs/decisions/0003-use-webhooks-for-payment-status.md`. The folder already has 0001 and 0002, so 0003 is the next number, and the name follows their `NNNN-kebab-title.md` pattern.\n\n**Title:** `0003. Use webhooks with hourly reconciliation for payment status`\n\n**Status:** `Accepted`, dated 2026-11-18. The notes say \"Agreed: webhooks plus an hourly reconciliation poll\" in the meeting with Ana, Ben and Chloe. If someone else still has to sign off, I'll use `Proposed` instead.\n\n**Supersedes:** 0002 (\"Poll the payment provider for status\"). Its consequences say \"Revisit when the provider offers webhooks,\" and the provider launched them on 2026-11-01. I'd change only 0002's status line to `Superseded by 0003` and leave the rest of it alone.\n\n**What the record will say**, all taken from the notes:\n- **Context:**\n  - The provider has offered signed webhooks since 2026-11-01. Each event has an HMAC-SHA256 signature over the body, and the same event can arrive more than once.\n  - Polling makes 1.9 million provider calls a month. From 2027-01-01, the provider will charge for status calls over 1 million a month.\n  - Support reports that customers see paid orders as pending for up to 30 seconds.\n- **Options:** keep polling, switch to webhooks only, or use webhooks plus an hourly poll.\n- **Decision:** use webhooks plus an hourly reconciliation poll. This needs a public HTTPS endpoint, signature checks, and handling that ignores repeat events.\n- **Consequences:** status updates arrive faster and we make far fewer provider calls. The downside, from Ben, is a new endpoint to monitor and secure.\n\n**Gaps I'll leave out unless you give me the facts:**\n- The notes don't say what would make the team revisit this decision.\n- They don't estimate how many calls the hourly poll will make, so I can't show it stays under the 1 million limit.\n\nI also can't run commands this session, so I won't be able to run the skill's checker script on the record.\n\nShall I go ahead with these, or change any of them?",
+  "changed": [],
+  "files": {}
+}

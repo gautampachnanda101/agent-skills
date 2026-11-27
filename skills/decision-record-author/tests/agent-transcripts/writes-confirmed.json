@@ -1,0 +1,80 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "decision-record-author"
+    },
+    {
+      "tool": "Bash",
+      "denied": true,
+      "error": true,
+      "kind": "run",
+      "command": "ls -R docs notes; cat notes/webhooks-discussion.md; for f in docs/decisions/*; do echo \"=== $f\"; cat \"$f\"; done"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "{docs,notes}/**/*",
+      "pattern": "{docs,notes}/**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "notes/webhooks-discussion.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/decisions/0002-poll-payment-status.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/decisions/0001-use-postgres.md"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "docs/decisions/0003-use-payment-webhooks.md"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "node .claude/skills/decision-record-author/scripts/check-decision-record.mjs docs/decisions/0003-use-payment-webhooks.md"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "node .claude/skills/decision-record-author/scripts/check-decision-record.mjs --dir docs/decisions"
+    }
+  ],
+  "reply": "I've written the decision record at `docs/decisions/0003-use-payment-webhooks.md`, number 0003, status Proposed, superseding 0002. The bundled checker found no problems in the record or in the `docs/decisions` folder.\n\nIt uses the same headings and layout as 0001 and 0002. Every fact in it comes from the discussion notes or from 0002:\n- **Context:** the provider launched signed webhooks on 2026-11-01. Polling uses 1.9 million calls a month, and the provider starts charging over 1 million a month from 2027-01-01. Customers see paid orders as pending for up to 30 seconds.\n- **Options:** keep polling, webhooks only, or webhooks plus an hourly poll, with what each costs.\n- **Decision:** receive events on a public HTTPS endpoint, reject events whose signature doesn't verify, handle repeated events so they change an order only once, and replace the 30-second poll with an hourly one.\n- **Consequences:** includes Ben's point that the endpoint is a new thing to monitor and secure.\n\nI left 0002 unchanged, because its decision still stands while 0003 is only proposed. Once 0003 is accepted, change only 0002's status line to `Superseded by 0003`; the record also says this.\n\nTwo things the notes didn't cover, so I left them out:\n- **When to revisit:** the notes give no trigger for reconsidering this decision. If the team has one (for example, the hourly poll often finding missed events), it belongs in Consequences.\n- **Call volume after the change:** the notes don't estimate how many calls the hourly poll will make. So the record says calls drop from 1.9 million a month, but doesn't claim the new total will be under 1 million.",
+  "changed": [
+    "docs/decisions/0003-use-payment-webhooks.md"
+  ],
+  "files": {
+    "docs/decisions/0003-use-payment-webhooks.md": "# 0003. Use payment webhooks with an hourly reconciliation poll\n\n- **Status:** Proposed\n- **Date:** 2026-11-27\n- **Supersedes:** [0002. Poll the payment provider for status](0002-poll-payment-status.md)\n\n## Context\n\n[0002](0002-poll-payment-status.md) chose polling because the provider offered no webhooks in April 2026, and said to revisit when it did. Facts from the [discussion on 2026-11-18](../../notes/webhooks-discussion.md) (Ana, payments; Ben, platform; Chloe, support):\n\n- The provider launched signed webhooks on 2026-11-01. Each event carries an HMAC-SHA256 signature over the body, and events can arrive more than once.\n- Polling costs 1.9 million provider calls a month. From 2027-01-01 the provider will charge for status calls over 1 million a month.\n- Support reports that customers see paid orders as pending for up to 30 seconds.\n\n## Options considered\n\n- **Keep polling every 30 seconds.** No new endpoint to run. Keeps the delay of up to 30 seconds, and at 1.9 million calls a month it goes over the 1 million free calls once charging starts on 2027-01-01.\n- **Switch to webhooks only.** Removes the status-call volume. Needs a public HTTPS endpoint, signature checks, and idempotent handling. Any event that never arrives leaves an order in the wrong status, with nothing to catch it.\n- **Webhooks plus an hourly reconciliation poll.** Needs the same endpoint, signature checks, and idempotent handling as webhooks only, plus a poll that runs once an hour to catch missed events.\n\n## Decision\n\nTake payment status updates from the provider's webhooks, and run a reconciliation poll once an hour to catch missed events:\n\n- Receive events on a public HTTPS endpoint.\n- Reject any event whose HMAC-SHA256 signature over the body does not verify.\n- Handle events idempotently, so an event that arrives more than once changes the order only once.\n- Stop the 30-second poll from 0002 and replace it with the hourly reconciliation poll.\n\n## Consequences\n\n- Easier: status updates no longer wait for the next 30-second poll, and provider status calls drop from the 1.9 million a month of polling.\n- Harder: the webhook endpoint is a new public service to monitor and secure, and the handlers must stay idempotent because events repeat.\n- Ruled out: running without a public endpoint, which 0002 relied on.\n- 0002 stays Accepted while this record is Proposed. When this record is accepted, change 0002's status to `Superseded by 0003`.\n",
+    "docs/decisions/0002-poll-payment-status.md": "# 0002. Poll the payment provider for status\n\n- **Status:** Accepted\n- **Date:** 2026-04-11\n\n## Context\n\nThe payment provider offered no webhooks in April 2026.\n\n## Options considered\n\n- Poll every 30 seconds.\n- Ask customers to refresh.\n\n## Decision\n\nPoll the provider's status endpoint every 30 seconds for open orders.\n\n## Consequences\n\nEasier: no public endpoint. Harder: up to 30 seconds of delay, and 2,880 calls a day per open order. Revisit when the provider offers webhooks.\n"
+  }
+}

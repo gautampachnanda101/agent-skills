@@ -1,0 +1,31 @@
+{
+  "skill_name": "decision-record-author",
+  "guides": [],
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write the decision record for this, as the repository's fourth record (number 0004), status Proposed.\n\nNotes from the platform team, 2026-11-20: CI takes 38 minutes on average, and 70% of that is the end-to-end suite, which runs on every push. Options discussed: keep running it on every push; run it only on the main branch and nightly; split it into four parallel shards (about 11 minutes, four times the runner cost). The team agreed to shard it, because failures caught after merge cost more than runners. Dana warned that shards make flaky tests harder to trace.\n\nAnswer with only one fenced markdown block containing the record.",
+      "expected_output": "A record titled as the decision, status Proposed, context with the 38 minutes and 70% figures, at least two options with costs, the sharding decision, and consequences including the runner cost, flaky-test tracing, and when to revisit.",
+      "assertions": [
+        "Has a title, status, Context, Options, Decision, and Consequences",
+        "Uses the numbers from the notes",
+        "Names the trade-offs of each option",
+        "Says when to revisit"
+      ],
+      "checks": {
+        "unwrap_fence": true,
+        "grader": "scripts/check-decision-record.mjs",
+        "must_match": [
+          "^# 0004\\.",
+          "Proposed",
+          "38 minutes",
+          "70\\s?%",
+          "(?:## Options|## Considered)",
+          "(four times|4x|4 times)",
+          "flak",
+          "revisit"
+        ]
+      }
+    }
+  ]
+}

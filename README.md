@@ -24,6 +24,7 @@ has been tested. The skills today:
 - [`skill-correction`](./skills/skill-correction/SKILL.md) — turns a
   correction to a skill's behaviour into a failing eval case and the
   smallest fix, then re-runs the skill's cases.
+- [`decision-record-author`](./skills/decision-record-author/SKILL.md) — writes architecture decision records that follow the repository's own records, and supersedes rather than rewrites.
 
 This README is the landing page; the complete documentation lives in
 [the TechDocs site](https://gautampachnanda101.github.io/agent-skills/),

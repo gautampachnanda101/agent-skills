@@ -27,6 +27,7 @@ the Claude plugin route.
   ones with the same rules the review skill enforces.
 - [skill-correction](skill-correction.md) — turns a correction to a skill's
   behaviour into a failing eval case and the smallest fix.
+- [decision-record-author](decision-record-author.md) — writes architecture decision records that follow the repository's own records, and supersedes rather than rewrites.
 
 ## Levels and owners
 
@@ -42,6 +43,7 @@ asked to review changes to it, from
 | [documentation-review](documentation-review.md) | Personal | The page's author | @gautampachnanda101 |
 | [peer-code-review](peer-code-review.md) | Team | The change's author, and whoever decides to merge | @gautampachnanda101 |
 | [skill-correction](skill-correction.md) | Team | The skill's owner, before the case and fix are written | @gautampachnanda101 |
+| [decision-record-author](decision-record-author.md) | Personal | The people making the decision, before its status changes from Proposed | @gautampachnanda101 |
 
 To make a skill's important rules hold whatever model runs it, apply the
 settings in [Make a skill's rules hard](../hard-rules.md).

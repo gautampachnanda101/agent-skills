@@ -53,6 +53,12 @@ repos:
         entry: node skills/documentation-author/scripts/check-page.mjs
         language: system
         files: '^(README|CHANGELOG|AGENTS)\.md$|^docs/.*\.md$|^skills/[^/]+/[^/]+\.md$'
+      - id: check-decision-records
+        name: Decision records
+        entry: node skills/decision-record-author/scripts/check-decision-record.mjs --dir docs/decisions
+        language: system
+        pass_filenames: false
+        files: '^docs/decisions/'
       - id: check-versions
         name: Skill and plugin versions, and the changelog
         entry: node scripts/check-versions.mjs

@@ -1,0 +1,71 @@
+{
+  "skill_name": "decision-record-author",
+  "evals": [
+    {
+      "id": "suggests-first",
+      "fixture": "tests/fixtures/agent/suggests-first",
+      "prompt": "Write a decision record for moving payment status updates from polling to webhooks. The discussion is in notes/webhooks-discussion.md.",
+      "allow": {
+        "write": [
+          "docs/decisions/**"
+        ]
+      },
+      "checks": {
+        "skill": "decision-record-author",
+        "read": [
+          "notes/webhooks-discussion.md",
+          "docs/decisions/0002-poll-payment-status.md"
+        ],
+        "writes_only": [],
+        "must_match": [
+          "0003",
+          "(supersede|0002)",
+          "(confirm|approve|go ahead|shall I|should I)"
+        ]
+      }
+    },
+    {
+      "id": "writes-confirmed",
+      "fixture": "tests/fixtures/agent/writes-confirmed",
+      "prompt": "Write a decision record for moving payment status updates from polling to webhooks. The discussion is in notes/webhooks-discussion.md. I confirm: write it as docs/decisions/0003-use-payment-webhooks.md, titled \"Use payment webhooks with an hourly reconciliation poll\", status Proposed, superseding 0002. Go ahead.",
+      "allow": {
+        "write": [
+          "docs/decisions/**"
+        ],
+        "run": [
+          "node {{skills}}/decision-record-author/scripts/check-decision-record.mjs",
+          "node {{root}}/{{skills}}/decision-record-author/scripts/check-decision-record.mjs"
+        ]
+      },
+      "checks": {
+        "skill": "decision-record-author",
+        "read": [
+          "notes/webhooks-discussion.md"
+        ],
+        "ran": [
+          "check-decision-record\\.mjs"
+        ],
+        "writes_only": [
+          "docs/decisions/0003-use-payment-webhooks.md"
+        ],
+        "files": {
+          "docs/decisions/0003-use-payment-webhooks.md": [
+            "^# 0003\\.",
+            "Proposed",
+            "(?:## Options|## Considered)",
+            "(1\\.9 million|1,000,000|1 million)",
+            "(idempot|more than once|duplicate)",
+            "0002"
+          ],
+          "docs/decisions/0002-poll-payment-status.md": [
+            "\\*\\*Status:\\*\\* Accepted",
+            "## Context\\n\\nThe payment provider offered no webhooks in April 2026\\."
+          ]
+        },
+        "must_match": [
+          "(once|when) 0003 is accepted|(once|when) (it|the new record) is accepted"
+        ]
+      }
+    }
+  ]
+}
