@@ -1,0 +1,67 @@
+[
+  {
+    "defect": "pull_request_target checks out the pull request's head",
+    "severity": [
+      "blocker"
+    ],
+    "match": [
+      "pull_request_target|head\\.sha|checkout",
+      "untrusted|fork|attacker|outsider|secret|write|trigger|base repo|context"
+    ]
+  },
+  {
+    "defect": "Pull request title expanded inside run",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "title|injection|github\\.event",
+      "inject|shell|script|command|env"
+    ]
+  },
+  {
+    "defect": "Secret printed to the log",
+    "severity": [
+      "blocker",
+      "major"
+    ],
+    "match": [
+      "NPM_TOKEN|secret|echo",
+      "log|print|leak|expos"
+    ]
+  },
+  {
+    "defect": "Every job gets every write scope",
+    "severity": [
+      "major",
+      "blocker"
+    ],
+    "match": [
+      "write-all|permissions",
+      "write|scope|least|token"
+    ]
+  },
+  {
+    "defect": "Actions not pinned to a commit",
+    "severity": [
+      "minor",
+      "major"
+    ],
+    "match": [
+      "@v4|pin|unpinned|setup-node|checkout@",
+      "SHA|commit|pin|tag"
+    ]
+  },
+  {
+    "defect": "Checkout persists the token",
+    "severity": [
+      "minor",
+      "major"
+    ],
+    "match": [
+      "persist-credentials|credential|checkout",
+      "persist|\\.git/config|token|credential"
+    ]
+  }
+]

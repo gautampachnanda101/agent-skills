@@ -37,6 +37,8 @@ repos:
     rev: c7d31dc612dffdd4d3b2f2b88b9660d3ab057ee8  # frozen: v1.33.1
     hooks:
       - id: zizmor
+        # Eval fixtures plant workflow defects on purpose.
+        exclude: '^skills/[^/]+/tests/fixtures/'
   - repo: local
     hooks:
       - id: repository-tests

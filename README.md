@@ -16,6 +16,7 @@ has been tested. The skills today:
 | Testing | [`test-plan-author`](./skills/test-plan-author/SKILL.md) |
 | Documentation | [`documentation-author`](./skills/documentation-author/SKILL.md), [`documentation-review`](./skills/documentation-review/SKILL.md) |
 | Releasing and cataloguing | [`release-notes-author`](./skills/release-notes-author/SKILL.md), [`backstage-catalog-builder`](./skills/backstage-catalog-builder/SKILL.md) |
+| Infrastructure and operations | [`ci-workflow-review`](./skills/ci-workflow-review/SKILL.md) |
 | Improving the skills | [`skill-correction`](./skills/skill-correction/SKILL.md) |
 
 Each skill works on its own. The [Roles](https://gautampachnanda101.github.io/agent-skills/roles/)

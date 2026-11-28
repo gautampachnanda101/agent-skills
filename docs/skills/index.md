@@ -34,6 +34,7 @@ the Claude plugin route.
 - [security-review](security-review.md) — reviews a change for injection, broken authorization, data exposure, weakened checks, and risky dependencies, after running the repository's own scanners.
 - [change-plan-author](change-plan-author.md) — breaks a spec or request into small, ordered, independently reviewable changes, each with its files, check, and size.
 - [release-notes-author](release-notes-author.md) — drafts release notes that lead with what readers must do: breaking changes with upgrade steps, migrations, and how to roll back.
+- [ci-workflow-review](ci-workflow-review.md) — reviews CI pipelines, GitHub Actions first, for untrusted code with secrets, script injection, broad tokens, unpinned actions, and leaked secrets.
 
 ## Levels and owners
 
@@ -58,6 +59,7 @@ asked to review changes to it, from
 | [release-notes-author](release-notes-author.md) | Team | Whoever publishes the release | @gautampachnanda101 |
 
 To find the skills for your job, start from [Roles](../roles/index.md).
+| [ci-workflow-review](ci-workflow-review.md) | Team | The workflow's author, and whoever approves the change | @gautampachnanda101 |
 
 To make a skill's important rules hold whatever model runs it, apply the
 settings in [Make a skill's rules hard](../hard-rules.md).

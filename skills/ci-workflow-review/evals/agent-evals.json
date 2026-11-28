@@ -1,0 +1,75 @@
+{
+  "skill_name": "ci-workflow-review",
+  "evals": [
+    {
+      "id": "review-workflows",
+      "fixture": "tests/fixtures/agent/review-workflows",
+      "prompt": "Review our GitHub Actions workflows for problems before we enable them on forks.",
+      "allow": {
+        "write": [
+          ".github/**"
+        ],
+        "run": [
+          "node {{skills}}/ci-workflow-review/scripts/check-workflow.mjs",
+          "node {{root}}/{{skills}}/ci-workflow-review/scripts/check-workflow.mjs",
+          "zizmor",
+          "actionlint"
+        ]
+      },
+      "checks": {
+        "skill": "ci-workflow-review",
+        "no_skill": [
+          "security-review",
+          "peer-code-review"
+        ],
+        "read": [
+          ".github/workflows/pr-checks.yml"
+        ],
+        "ran": [
+          "check-workflow\\.mjs"
+        ],
+        "writes_only": [],
+        "must_match": [
+          "request changes",
+          "pull_request_target",
+          "(inject|env)"
+        ],
+        "must_not_match": [
+          "npm_[A-Za-z0-9]{20,}"
+        ]
+      }
+    },
+    {
+      "id": "near-miss-write",
+      "fixture": "tests/fixtures/agent/near-miss-write",
+      "prompt": "Add a GitHub Actions job that runs npm test on Node 22 as well as 24.",
+      "allow": {
+        "write": [
+          ".github/**"
+        ]
+      },
+      "checks": {
+        "no_skill": [
+          "ci-workflow-review"
+        ]
+      }
+    },
+    {
+      "id": "no-workflows",
+      "fixture": "tests/fixtures/agent/no-workflows",
+      "prompt": "Review this repository's CI workflows for security problems.",
+      "allow": {
+        "write": [
+          ".github/**"
+        ]
+      },
+      "checks": {
+        "skill": "ci-workflow-review",
+        "writes_only": [],
+        "must_match": [
+          "(no (CI )?workflows?|none found|no \\.github|no pipeline|doesn't have any|does not have any|nothing to review)"
+        ]
+      }
+    }
+  ]
+}

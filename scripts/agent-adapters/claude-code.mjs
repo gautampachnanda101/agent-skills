@@ -19,10 +19,12 @@ export function permissionRules(allow) {
   ];
 }
 
-/** Host rules that make Claude Code ask a person; ask outranks allow. */
+/** Host rules: ask makes Claude Code ask a person, deny refuses; both outrank allow. */
 export function askSettings(allow) {
-  const ask = (allow.ask ?? []).flatMap(file => [`Write(${file})`, `Edit(${file})`]);
-  return ask.length ? ['--settings', JSON.stringify({ permissions: { ask } })] : [];
+  const ask = [...(allow.ask ?? []).flatMap(file => [`Write(${file})`, `Edit(${file})`]), ...(allow.askRun ?? []).map(prefix => `Bash(${prefix}:*)`)];
+  const deny = (allow.deny ?? []).map(prefix => `Bash(${prefix}:*)`);
+  const permissions = { ...(ask.length ? { ask } : {}), ...(deny.length ? { deny } : {}) };
+  return Object.keys(permissions).length ? ['--settings', JSON.stringify({ permissions })] : [];
 }
 
 export function args(allow, model) {
@@ -68,7 +70,10 @@ export function parse(text) {
         const parsed = byId.get(block.tool_use_id);
         const output = Array.isArray(block.content) ? block.content.map(part => part.text ?? '').join('\n') : String(block.content ?? '');
         parsed.error = Boolean(block.is_error);
-        parsed.denied = parsed.error && /permission|not allowed|denied|haven't granted|requires approval/i.test(output);
+        // Only Claude Code's own refusal wording counts as a denial: a tool's
+        // output can mention permissions (a workflow checker does) and still
+        // be an ordinary failure.
+        parsed.denied = parsed.error && /haven't granted|requested permissions? to|permission to use [^\n]* (?:was|has been) denied|denied by (?:a )?(?:permission|deny) rule|requires approval|not allowed by/i.test(output);
       }
     }
     if (event.type === 'result') {

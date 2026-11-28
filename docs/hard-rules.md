@@ -14,6 +14,7 @@ Contents:
 - [Settings for each skill](#settings-for-each-skill)
 - [Ask before writing, in each assistant](#ask-before-writing-in-each-assistant)
 - [Check what was produced](#check-what-was-produced)
+- [Production: reviewed code, with a person in the loop](#production-reviewed-code-with-a-person-in-the-loop)
 
 ## Why written rules are not enough
 
@@ -121,3 +122,41 @@ CI:
 
 Point `entry` at wherever the skill is installed in your project, and adjust
 `files` to your documentation folders.
+
+## Production: reviewed code, with a person in the loop
+
+Infra and ops skills help with production without changing it on their own
+([decision 0010](decisions/0010-production-changes-go-through-reviewed-code.md)):
+
+| Action | Allowed? | Gate |
+| --- | --- | --- |
+| Read state, logs, metrics: `kubectl get`, `describe`, `logs`; cloud `describe`, `list`, `get` | Yes | None |
+| Write infrastructure as code on a branch, and run `fmt`, `validate`, `plan`, `kubectl diff`, `helm template` | Yes | The pull request review |
+| Merge the change | A person | `CODEOWNERS` on infra paths and a branch rule requiring approval |
+| Apply: `terraform apply`, `kubectl apply`, `helm upgrade`, cloud writes | The pipeline after merge, or a person | An `ask` rule, so a person approves each command |
+
+In Claude Code, add the apply commands as `ask` rules:
+
+```json
+{
+  "permissions": {
+    "ask": [
+      "Bash(terraform apply:*)",
+      "Bash(terraform destroy:*)",
+      "Bash(kubectl apply:*)",
+      "Bash(kubectl delete:*)",
+      "Bash(kubectl patch:*)",
+      "Bash(kubectl scale:*)",
+      "Bash(kubectl rollout:*)",
+      "Bash(helm install:*)",
+      "Bash(helm upgrade:*)",
+      "Bash(helm rollback:*)",
+      "Bash(helm uninstall:*)"
+    ]
+  }
+}
+```
+
+Cloud CLIs mix reads and writes under one command, so list their write
+verbs too, for example `Bash(aws s3 rm:*)` or `Bash(gcloud compute instances
+delete:*)`, or route cloud changes through infrastructure as code only.

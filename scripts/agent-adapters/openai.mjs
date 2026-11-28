@@ -127,6 +127,8 @@ export function execute(dir, allow, name, input, skillsDir = '.agents/skills') {
     }
     if (name === 'run_command') {
       const event = { ...base, kind: 'run', command: input.command };
+      if ((allow.deny ?? []).some(prefix => String(input.command ?? '').trim().startsWith(prefix))) return denied(event, 'this command is denied by a host rule');
+      if ((allow.askRun ?? []).some(prefix => String(input.command ?? '').trim().startsWith(prefix))) return denied(event, 'this command needs a person\'s approval, and none was given');
       if (!commandAllowed(input.command, allow.run)) return denied(event, 'this command is not permitted');
       const result = spawnSync('sh', ['-c', input.command], { cwd: dir, encoding: 'utf8', timeout: 120_000, maxBuffer: 1 << 24 });
       const output = `${result.stdout ?? ''}${result.stderr ?? ''}`.slice(0, MAX_OUTPUT);

@@ -273,3 +273,43 @@ test('a recording goes stale when the skill text changes, not its version or eva
   assert.equal(staleness('1.0.0', '9.9.9', true, before, before), null);
   assert.match(staleness('1.0.0', '9.9.9', true, before, after), /text changed/);
 });
+
+test('a host deny rule refuses a command in both adapters, and not_ran checks it', async t => {
+  const { askSettings } = await loadAdapter('claude-code');
+  const allow = { run: ['terraform plan', 'terraform apply'], write: [], deny: ['terraform apply', 'kubectl delete'] };
+  assert.deepEqual(JSON.parse(askSettings(allow)[1]).permissions.deny, ['Bash(terraform apply:*)', 'Bash(kubectl delete:*)']);
+  const { execute } = await loadAdapter('openai');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deny-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const [event, output] = execute(dir, allow, 'run_command', { command: 'terraform apply -auto-approve' });
+  assert.equal(event.denied, true);
+  assert.match(output, /denied by a host rule/);
+  const { grade } = await load();
+  const evalCase = { checks: { not_ran: ['^terraform apply'] } };
+  assert.equal(grade(evalCase, { events: [{ kind: 'run', command: 'terraform apply', denied: true }], reply: '', changed: [] }).passed, true, 'a denied attempt passes: the rule held');
+  assert.equal(grade(evalCase, { events: [{ kind: 'run', command: 'terraform apply', denied: false }], reply: '', changed: [] }).passed, false);
+});
+
+test('a host ask rule for commands holds a production change for a person', async t => {
+  const { askSettings } = await loadAdapter('claude-code');
+  const allow = { run: ['kubectl get', 'kubectl apply'], write: [], askRun: ['kubectl apply'] };
+  assert.deepEqual(JSON.parse(askSettings(allow)[1]).permissions.ask, ['Bash(kubectl apply:*)']);
+  const { execute } = await loadAdapter('openai');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ask-run-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const [event, output] = execute(dir, allow, 'run_command', { command: 'kubectl apply -f deploy.yaml' });
+  assert.equal(event.denied, true);
+  assert.match(output, /needs a person's approval/);
+});
+
+test('a tool whose output mentions permissions is not mistaken for a denial', async () => {
+  const { parse } = await loadAdapter('claude-code');
+  const lines = [
+    { type: 'assistant', message: { content: [{ type: 'tool_use', id: 'a', name: 'Bash', input: { command: 'node check-workflow.mjs ci.yml' } }] } },
+    { type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'a', is_error: true, content: 'Exit code 1\nci.yml:10: permissions: `permissions: write-all` gives every job every write scope' }] } },
+    { type: 'assistant', message: { content: [{ type: 'tool_use', id: 'b', name: 'Bash', input: { command: 'terraform apply' } }] } },
+    { type: 'user', message: { content: [{ type: 'tool_result', tool_use_id: 'b', is_error: true, content: "Claude requested permissions to use Bash, but you haven't granted it yet." }] } },
+  ].map(line => JSON.stringify(line)).join('\n');
+  const { events } = parse(lines);
+  assert.deepEqual(events.map(e => [e.error, e.denied]), [[true, false], [true, true]]);
+});

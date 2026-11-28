@@ -28,6 +28,7 @@ nav:
       - Security: roles/security.md
       - Operations: roles/operations.md
       - Skill owner: roles/skill-owner.md
+      - ci-workflow-review: skills/ci-workflow-review.md
   - Getting started:
       - Installing the skills: installation.md
       - Using the skills: usage.md
@@ -47,6 +48,7 @@ nav:
       - 0007 Protecting main: decisions/0007-protect-main-without-requiring-pull-requests.md
       - 0008 Behaviour evals: decisions/0008-contract-based-behaviour-evals.md
       - 0009 Hard rules: decisions/0009-enforce-rules-outside-the-model.md
+      - 0010 Production changes: decisions/0010-production-changes-go-through-reviewed-code.md
       - Template: decisions/template.md
 theme:
   name: material

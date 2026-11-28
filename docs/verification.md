@@ -253,6 +253,17 @@ did not recognise "there's no open-dispute check" as reporting a
 disagreement. Both were fixed in the evals; no skill changed. These runs
 cost about $12 at API prices.
 
+### ci-workflow-review
+
+With Claude Opus 5.5 on 2026-11-28: the planted workflow's six defects were
+all found and the clean workflow approved, while both baselines without the
+skill had no verdict or findings table. Behaviour cases passed three runs in
+three each: it ran the bundled checker, `zizmor`, and `actionlint` and wrote
+nothing; it did not load for writing a new job; and it said so when a
+repository had no workflows. A harness bug first counted the checker's own
+output, which mentions `permissions:`, as a permission denial; denials are
+now read from Claude Code's own refusal wording.
+
 ### Steering: near misses and untested branches
 
 Every skill has a near-miss case: a prompt that sounds like it, but belongs

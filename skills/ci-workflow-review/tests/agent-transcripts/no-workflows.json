@@ -1,0 +1,56 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "skill_digest": "b3a1e7c27c6038ac",
+  "recorded": "2026-11-28",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "ci-workflow-review"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/ci-workflow-review/references/github-actions.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/{.github/**,.gitlab-ci.yml,.pre-commit-config.yaml,*.yml,*.yaml}",
+      "pattern": "**/{.github/**,.gitlab-ci.yml,.pre-commit-config.yaml,*.yml,*.yaml}"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    }
+  ],
+  "reply": "I couldn't review anything: this repository has no CI pipeline definitions.\n\nI listed every file in the working directory. There is no `.github/` directory, so there are no `.github/workflows/*.yml` files and no composite actions under `.github/actions/`. There is also no `.gitlab-ci.yml` or other pipeline configuration. Outside the `.claude/skills/` tooling, the repository holds only `README.md` (\"Open source web app.\") and a two-field `package.json` with no scripts.\n\n- **Verdict:** none. There is nothing to approve or reject.\n- **Findings:** none.\n- **Checks:** none ran. There are no workflow files to scan, the repository has no linter setup such as `zizmor`, `actionlint` or pre-commit, and this session doesn't allow running commands anyway.\n\nTwo things to check on your side:\n1. **Wrong folder or branch.** If your workflows are on another branch or in another checkout, point me at it and I'll review it. The working directory isn't a git repository, so this may be a partial copy.\n2. **CI configured elsewhere.** The pipeline may live in a separate repository, a reusable workflow in another repository, or an external CI service. I'd need those files to review it.\n\nSince the README calls this an open-source project, outside contributors will be able to trigger any workflows you add later. If you'd like, I can write a hardened starting workflow in `.github/workflows/`. It would have a read-only token at the top level, use `pull_request` rather than `pull_request_target`, pin actions to full commit SHAs, and stop the checkout step from saving the token to disk.",
+  "changed": [],
+  "files": {}
+}

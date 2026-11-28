@@ -17,6 +17,12 @@ skill's `metadata.version` field.
 
 ### Added
 
+- Behaviour cases can hold commands for a person (`ask_run`) or refuse them
+  (`deny`), and check with `not_ran` that a command never ran. Decision 0010
+  sets the production model: skills read production and write
+  infrastructure as code on a branch; a person approves it in review; the
+  pipeline or a person applies it; direct changes are `ask` rules.
+- `ci-workflow-review` 1.0.0: reviews CI pipelines, GitHub Actions first, for what lets an outsider run code, steal a token, or change what ships: pull_request_target with untrusted checkouts, script injection from event data, over-broad permissions, unpinned actions, leaked secrets, and persisted credentials. It runs the repository's workflow linters, then `scripts/check-workflow.mjs`, and never edits or triggers a workflow.
 - The docs home page opens with a hero in the Homebrew Tap site's style:
   what the skills are, the install commands, and links to the roles.
 - Recordings go stale when the skill text an assistant loads changes, not
@@ -147,6 +153,9 @@ skill's `metadata.version` field.
 
 ### Fixed
 
+- Behaviour evals counted any failed tool call whose output mentioned
+  "permission" as a denial. Denials are now read only from Claude Code's
+  own refusal wording.
 - `documentation-author` 2.2.3: `check-page.mjs` skips HTML `<pre>` blocks
   as it skips Markdown code fences; a URL in a terminal snippet was
   reported as a bare URL.

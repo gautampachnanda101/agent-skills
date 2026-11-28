@@ -24,6 +24,11 @@
  * {{skills}} in a prefix or prompt is the skills folder, and {{root}} the
  * repository's absolute path.
  *
+ * A case's "deny" lists command prefixes the assistant itself refuses, as a
+ * host deny rule would, whatever else the case permits. "ask_run" lists
+ * command prefixes that need a person's approval each time, such as
+ * production changes; no person answers during an eval, so they are blocked.
+ *
  * A case's "ask" lists files the assistant itself must ask a person about
  * before writing, as a host permission rule would, overriding allow.write.
  * No person answers during an eval, so those writes are blocked by the
@@ -34,6 +39,8 @@
  *   no_skill         none of these skills may be loaded
  *   read             files that must be read before the reply (path suffixes)
  *   ran              commands that must run (patterns), not only be attempted
+ *   not_ran          commands that must never run successfully (patterns); a
+ *                    denied attempt is allowed, since the rule held
  *   no_writes        no write may be attempted, and no file may change
  *   writes_only      only these paths may change (a folder/** allows
  *                    anything inside the folder, here and in allow.write)
@@ -288,6 +295,11 @@ export function grade(evalCase, run) {
     if (!runs.length) failures.push(`never ran /${pattern}/`);
     else if (runs.every(event => event.denied)) failures.push(`/${pattern}/ was attempted but denied`);
   }
+  for (const pattern of checks.not_ran ?? []) {
+    const re = new RegExp(pattern);
+    const ran = events.filter(event => event.kind === 'run' && !event.denied && re.test(event.command ?? ''));
+    if (ran.length) failures.push(`ran /${pattern}/: ${String(ran[0].command).slice(0, 80)}`);
+  }
   const changed = run.changed ?? [];
   if (checks.no_writes) {
     // A write outside the repository, such as an assistant's own scratch
@@ -339,12 +351,12 @@ export function resolveCase(evalCase, skillsDir, dir = '') {
   const roots = [...new Set([dir, dir && fs.existsSync(dir) ? fs.realpathSync(dir) : dir])];
   const fill = text => text.replaceAll('{{skills}}', skillsDir);
   const expand = text => (text.includes('{{root}}') ? roots.map(root => fill(text).replaceAll('{{root}}', root)) : [fill(text)]);
-  const allow = { run: [...new Set((evalCase.allow?.run ?? []).flatMap(expand))], write: evalCase.allow?.write ?? [], ask: evalCase.ask ?? [] };
+  const allow = { run: [...new Set((evalCase.allow?.run ?? []).flatMap(expand))], write: evalCase.allow?.write ?? [], ask: evalCase.ask ?? [], askRun: evalCase.ask_run ?? [], deny: evalCase.deny ?? [] };
   const shown = { run: (evalCase.allow?.run ?? []).filter(rule => !rule.includes('{{root}}')).map(fill), write: allow.write };
   return { prompt: `${fill(evalCase.prompt)}\n\n${permissionNote(shown)}`, allow };
 }
 
-const CHECK_KEYS = new Set(['skill', 'no_skill', 'read', 'ran', 'no_writes', 'writes_only', 'files', 'must_match', 'must_not_match']);
+const CHECK_KEYS = new Set(['skill', 'no_skill', 'read', 'ran', 'not_ran', 'no_writes', 'writes_only', 'files', 'must_match', 'must_not_match']);
 
 /** Problems with a case's contract, before any model runs. */
 export function validateCase(skill, evalCase) {

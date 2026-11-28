@@ -1,0 +1,50 @@
+{
+  "skill_name": "ci-workflow-review",
+  "guides": [
+    "references/github-actions.md"
+  ],
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review this GitHub Actions workflow before we merge it.",
+      "files": [
+        "tests/fixtures/reply/pr-checks.yml"
+      ],
+      "expected_output": "Request changes, with blockers for the pull_request_target head checkout and the title injection, a blocker or major for the echoed secret, and findings for write-all, unpinned actions, and persisted credentials.",
+      "assertions": [
+        "Finds all six planted defects",
+        "Rates the untrusted-code paths as blockers",
+        "Never quotes a secret value"
+      ],
+      "checks": {
+        "ledger": "tests/ledger.json",
+        "grader": "scripts/check-review-report.mjs",
+        "must_match": [
+          "^[#*\\s]*verdict\\b[^\\n]*(?:\\n[ \\t]*)*[^\\n]*?request changes"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "prompt": "Review this GitHub Actions workflow before we merge it.",
+      "files": [
+        "tests/fixtures/reply/ci.yml"
+      ],
+      "expected_output": "Approve or approve with comments; the workflow is pinned, least-privilege, and passes untrusted input through env.",
+      "assertions": [
+        "Raises nothing above minor",
+        "Approves"
+      ],
+      "checks": {
+        "max_severity": "minor",
+        "grader": "scripts/check-review-report.mjs",
+        "must_match": [
+          "^[#*\\s]*verdict\\b[^\\n]*(?:\\n[ \\t]*)*[^\\n]*?\\bapprove\\b"
+        ],
+        "must_not_match": [
+          "^[#*\\s]*verdict\\b[^\\n]*(?:\\n[ \\t]*)*[^\\n]*?request changes"
+        ]
+      }
+    }
+  ]
+}
