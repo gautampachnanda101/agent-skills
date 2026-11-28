@@ -50,20 +50,19 @@ nav:
       - Template: decisions/template.md
 theme:
   name: material
+  # mkdocs-techdocs-core resets the palette and features; the GitHub Pages
+  # build (mkdocs.pages.yml) restores them with docs/plugins. Backstage
+  # TechDocs renders with its own theme and reads only this file.
   palette:
     - media: '(prefers-color-scheme: light)'
       scheme: default
-      primary: indigo
-      accent: indigo
       toggle:
-        icon: material/brightness-7
+        icon: fontawesome/solid/sun
         name: Switch to dark mode
     - media: '(prefers-color-scheme: dark)'
       scheme: slate
-      primary: indigo
-      accent: indigo
       toggle:
-        icon: material/brightness-4
+        icon: fontawesome/solid/moon
         name: Switch to light mode
   font:
     text: Space Grotesk

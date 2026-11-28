@@ -1,0 +1,421 @@
+/* The site theme, kept identical to https://gautampachnanda101.github.io/homebrew-tap/
+   (gautampachnanda101/homebrew-tap, docs/stylesheets/extra.css). Change both together. */
+
+:root {
+  --md-primary-fg-color: #101c24;
+  --md-primary-fg-color--light: #273f4e;
+  --md-primary-fg-color--dark: #091117;
+  --md-accent-fg-color: #c8a64b;
+  --tap-ink: #101c24;
+  --tap-gold: #c8a64b;
+  --tap-muted: #697178;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #10171c;
+  --md-default-bg-color--light: #19232a;
+  --md-default-fg-color: #edf2f5;
+  --md-primary-fg-color: #d7ba68;
+  --md-primary-bg-color: #10171c;
+  --md-accent-fg-color: #e1c979;
+}
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #f4f1ea;
+  --md-default-fg-color: #263238;
+  --md-default-fg-color--light: #697178;
+  --md-primary-fg-color: #101c24;
+  --md-primary-fg-color--light: #273f4e;
+  --md-primary-fg-color--dark: #091117;
+  --md-accent-fg-color: #8b6915;
+}
+
+.md-header {
+  background: var(--tap-ink);
+  box-shadow: 0 1px 0 rgba(16, 28, 36, 0.18);
+}
+
+.md-tabs {
+  background: #1b2b35;
+}
+
+.md-header,
+.md-header a,
+.md-tabs,
+.md-tabs a {
+  color: #f4f1ea;
+}
+
+.md-main__inner {
+  margin-top: 1.2rem;
+}
+
+/* Inline code only — leave fenced blocks to Material's per-scheme theming */
+.md-typeset :not(pre) > code {
+  background: #eceef2;
+  color: #1a3a52;
+}
+
+[data-md-color-scheme="slate"] .md-typeset :not(pre) > code {
+  background: rgba(237, 242, 245, 0.12);
+  color: #e6edf2;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  color: #18313f;
+}
+
+.md-typeset a {
+  color: #1769aa;
+}
+
+.md-typeset a:hover {
+  color: #8b6915;
+}
+
+.catalog-hero {
+  border-bottom: 1px solid rgba(16, 28, 36, 0.18);
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+}
+
+.catalog-hero h1 {
+  color: var(--tap-ink);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+}
+
+.catalog-hero p:last-child {
+  color: var(--tap-muted);
+  font-size: 1.1rem;
+  max-width: 42rem;
+}
+
+.catalog-list {
+  border-top: 1px solid rgba(16, 28, 36, 0.2);
+  margin: 1.5rem 0 3rem;
+}
+
+.catalog-item {
+  align-items: start;
+  border-bottom: 1px solid rgba(16, 28, 36, 0.2);
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 5rem minmax(0, 1fr) minmax(13rem, 0.8fr);
+  padding: 1.5rem 0;
+}
+
+.catalog-number {
+  color: var(--tap-muted);
+  font-family: var(--md-code-font-family);
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.catalog-item h2 {
+  font-size: 1.35rem;
+  margin: 0 0 0.45rem;
+}
+
+.catalog-item p {
+  margin: 0;
+}
+
+.catalog-install {
+  background: #18252c;
+  border: 1px solid rgba(200, 166, 75, 0.25);
+  color: #dce5e4;
+  font-family: var(--md-code-font-family);
+  font-size: 0.78rem;
+  margin: 0;
+  overflow-x: auto;
+  padding: 0.8rem 1rem;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.catalog-install code {
+  background: transparent;
+  color: #dce5e4;
+  white-space: inherit;
+}
+
+.catalog-install a {
+  color: var(--tap-gold);
+  display: block;
+  font-family: var(--md-text-font-family);
+  font-weight: 700;
+  margin-top: 0.65rem;
+}
+
+.catalog-tools {
+  border-top: 2px solid var(--tap-gold);
+  margin-top: 3rem;
+  padding-top: 1rem;
+}
+
+[data-md-color-scheme="slate"] .md-typeset h1,
+[data-md-color-scheme="slate"] .md-typeset h2,
+[data-md-color-scheme="slate"] .md-typeset h3,
+[data-md-color-scheme="slate"] .md-typeset h4 {
+  color: #edf2f5;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a {
+  color: #9ed0ed;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a:hover {
+  color: #e1c979;
+}
+
+[data-md-color-scheme="slate"] .catalog-list,
+[data-md-color-scheme="slate"] .catalog-item,
+[data-md-color-scheme="slate"] .catalog-hero {
+  border-color: rgba(237, 242, 245, 0.2);
+}
+
+.tap-hero {
+  background: var(--tap-ink);
+  color: #f4f1ea;
+  margin: -1.2rem calc(50% - 50vw) 2.5rem;
+  overflow: hidden;
+  padding: clamp(3rem, 8vw, 6rem) max(1.2rem, calc((100vw - 61rem) / 2));
+  position: relative;
+}
+
+.tap-hero,
+.tap-hero h1,
+.tap-hero p,
+.tap-hero a {
+  color: #f4f1ea;
+}
+
+.tap-hero::after {
+  border: 1px solid rgba(200, 166, 75, 0.7);
+  border-radius: 50%;
+  content: "";
+  height: 32rem;
+  position: absolute;
+  right: -11rem;
+  top: -14rem;
+  width: 32rem;
+}
+
+.tap-eyebrow {
+  color: var(--tap-gold);
+  font-family: var(--md-code-font-family);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  margin: 0 0 1.5rem;
+}
+
+.tap-hero h1 {
+  color: #f4f1ea;
+  font-size: clamp(2.2rem, 5.5vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 1.03;
+  margin: 0;
+  max-width: 18ch;
+  position: relative;
+  z-index: 1;
+}
+
+.tap-lede {
+  color: #cbd0d1;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  line-height: 1.55;
+  margin: 2rem 0;
+  max-width: 39rem;
+  position: relative;
+  z-index: 1;
+}
+
+.tap-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.tap-button {
+  border: 1px solid var(--tap-gold);
+  display: inline-block;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+  text-decoration: none;
+}
+
+.tap-button-primary {
+  background: var(--tap-gold);
+  color: var(--tap-ink) !important;
+}
+
+.tap-button-secondary {
+  color: #f4f1ea !important;
+}
+
+.tap-button-secondary:hover,
+.tap-button-primary:hover {
+  color: var(--tap-ink) !important;
+}
+
+.tap-terminal {
+  background: #18252c;
+  box-shadow: 0 1rem 2.5rem rgba(16, 28, 36, 0.15);
+  color: #dce5e4;
+  margin: 0 auto 4rem;
+  max-width: 53rem;
+}
+
+.terminal-bar {
+  align-items: center;
+  background: #22343d;
+  color: #8e9da1;
+  display: flex;
+  gap: 0.35rem;
+  padding: 0.65rem 0.8rem;
+}
+
+.terminal-bar span {
+  background: #718086;
+  border-radius: 50%;
+  height: 0.55rem;
+  width: 0.55rem;
+}
+
+.terminal-bar strong {
+  font-family: var(--md-code-font-family);
+  font-size: 0.7rem;
+  font-weight: 400;
+  margin: 0 auto;
+}
+
+.tap-terminal pre {
+  background: transparent;
+  margin: 0;
+  padding: 1.4rem 1.5rem 1.7rem;
+}
+
+.tap-terminal code {
+  background: transparent;
+  color: #dce5e4;
+}
+
+.tap-terminal .terminal-prompt,
+.tap-terminal .terminal-success {
+  color: var(--tap-gold);
+}
+
+.terminal-prompt,
+.terminal-success {
+  color: var(--tap-gold);
+}
+
+.terminal-success {
+  display: inline-block;
+  margin-top: 0.8rem;
+}
+
+.formula-grid {
+  border-top: 1px solid rgba(16, 28, 36, 0.2);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 1.5rem 0 3rem;
+}
+
+.formula-item {
+  padding: 1.5rem 1.5rem 0 0;
+}
+
+.formula-item + .formula-item {
+  border-left: 1px solid rgba(16, 28, 36, 0.2);
+  padding-left: 1.5rem;
+}
+
+.formula-number {
+  color: var(--tap-muted);
+  font-family: var(--md-code-font-family);
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+.formula-item h3 {
+  color: var(--tap-ink);
+  font-size: 1.3rem;
+  margin: 0.6rem 0;
+}
+
+.formula-item code {
+  display: block;
+  margin: 1rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  width: fit-content;
+}
+
+.formula-item a {
+  color: #1769aa;
+  font-weight: 700;
+}
+
+.formula-item a:hover {
+  color: #8b6915;
+}
+
+.md-typeset table a {
+  color: #1769aa;
+  font-weight: 700;
+}
+
+[data-md-color-scheme="slate"] .md-typeset table a {
+  color: #9ed0ed;
+}
+
+[data-md-color-scheme="slate"] .tap-hero {
+  background: #0b1115;
+}
+
+[data-md-color-scheme="slate"] .formula-grid,
+[data-md-color-scheme="slate"] .formula-item + .formula-item {
+  border-color: rgba(237, 242, 245, 0.2);
+}
+
+@media screen and (max-width: 700px) {
+  .tap-hero {
+    margin-top: -0.5rem;
+  }
+
+  .formula-grid {
+    display: block;
+  }
+
+  .formula-item,
+  .formula-item + .formula-item {
+    border-left: 0;
+    border-top: 1px solid rgba(16, 28, 36, 0.2);
+    padding: 1.5rem 0 0;
+  }
+
+  .formula-item:first-child {
+    border-top: 0;
+  }
+
+  .catalog-item {
+    display: block;
+  }
+
+  .catalog-number {
+    margin-bottom: 0.5rem;
+  }
+
+  .catalog-install {
+    margin-top: 1rem;
+  }
+}

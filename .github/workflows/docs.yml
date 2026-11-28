@@ -37,7 +37,9 @@ jobs:
         run: pip install -r docs/requirements.txt
 
       - name: Build the documentation site
-        run: mkdocs build --strict --site-dir site
+        # mkdocs.pages.yml adds the site theme to mkdocs.yml, which Backstage
+        # TechDocs reads as it is.
+        run: mkdocs build --strict --config-file mkdocs.pages.yml --site-dir site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

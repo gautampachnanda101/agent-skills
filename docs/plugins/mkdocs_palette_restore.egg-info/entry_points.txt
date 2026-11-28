@@ -1,0 +1,2 @@
+[mkdocs.plugins]
+palette-restore = mkdocs_palette_restore:PaletteRestorePlugin

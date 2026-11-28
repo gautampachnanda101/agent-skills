@@ -10,25 +10,17 @@ sources stay in one place and cannot drift.
 from mkdocs.plugins import BasePlugin
 
 PALETTE = [
+    # The same palette as https://gautampachnanda101.github.io/homebrew-tap/;
+    # docs/stylesheets/extra.css sets the colours for both schemes.
     {
         "media": "(prefers-color-scheme: light)",
         "scheme": "default",
-        "primary": "indigo",
-        "accent": "indigo",
-        "toggle": {
-            "icon": "material/brightness-7",
-            "name": "Switch to dark mode",
-        },
+        "toggle": {"icon": "fontawesome/solid/sun", "name": "Switch to dark mode"},
     },
     {
         "media": "(prefers-color-scheme: dark)",
         "scheme": "slate",
-        "primary": "indigo",
-        "accent": "indigo",
-        "toggle": {
-            "icon": "material/brightness-4",
-            "name": "Switch to light mode",
-        },
+        "toggle": {"icon": "fontawesome/solid/moon", "name": "Switch to light mode"},
     },
 ]
 
