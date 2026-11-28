@@ -17,6 +17,8 @@ skill's `metadata.version` field.
 
 ### Added
 
+- The docs home page opens with a hero in the Homebrew Tap site's style:
+  what the skills are, the install commands, and links to the roles.
 - Recordings go stale when the skill text an assistant loads changes, not
   when only the version or the evals change. Each recording stores a digest
   of the skill outside `tests/` and `evals/`, without the version line; all
@@ -145,6 +147,9 @@ skill's `metadata.version` field.
 
 ### Fixed
 
+- `documentation-author` 2.2.3: `check-page.mjs` skips HTML `<pre>` blocks
+  as it skips Markdown code fences; a URL in a terminal snippet was
+  reported as a bare URL.
 - The docs site matches the theme of the Homebrew Tap site again, with its
   search, light and dark toggle, fonts, and colours, both in `mkdocs serve`
   and on GitHub Pages. Version 1.2.0 had dropped the `palette-restore`

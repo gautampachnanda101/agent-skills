@@ -37,6 +37,8 @@ test('code, inline code, badges, autolinks, and descriptive links pass', async (
     'TODO still inside the outer fence; https://example.com',
     '````',
     'TODOS and XXXL are words, not placeholders.',
+    '<pre><code>$ git clone https://example.com/repo',
+    'TODO in an HTML pre block is code</code></pre>',
     'A link whose text wraps: [Make the',
     '  rules hard](https://example.com/hard-rules/) is fine.',
   ].join('\n');

@@ -6,8 +6,8 @@
  *   - link text that says nothing about its destination: "click here",
  *     "here", "this link", "read more", "more", "link"
  *   - bare URLs in prose (write [descriptive text](url) instead)
- * Fenced code blocks and inline code are skipped, so a page can mention
- * these words in code.
+ * Fenced code blocks, HTML <pre> blocks, and inline code are skipped, so a
+ * page can mention these words in code.
  *
  * Usage: node check-page.mjs [--json] <file.md...>
  * Exits 1 if any page has a problem, 2 on bad usage. Zero dependencies.
@@ -19,8 +19,13 @@ const VAGUE_LINK = /^(?:click here|here|this link|this page|read more|more|link)
 export function checkPage(text) {
   const problems = [];
   let fence = null;
+  let pre = false;
   text.split('\n').forEach((raw, index) => {
     const line = index + 1;
+    if (pre || /<pre[\s>]/i.test(raw)) {
+      pre = !/<\/pre>/i.test(raw);
+      return;
+    }
     const opener = /^\s*(`{3,}|~{3,})/.exec(raw);
     if (fence) {
       if (opener && opener[1][0] === fence[0] && opener[1].length >= fence.length) fence = null;
