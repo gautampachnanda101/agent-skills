@@ -70,6 +70,60 @@
           "peer-code-review"
         ]
       }
+    },
+    {
+      "id": "near-miss-general",
+      "fixture": "tests/fixtures/agent/review-commit",
+      "git": {
+        "message": "Add order search"
+      },
+      "prompt": "Review the latest commit for readability, naming, and test coverage.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git status"
+        ]
+      },
+      "checks": {
+        "skill": "peer-code-review",
+        "no_skill": [
+          "security-review"
+        ],
+        "writes_only": []
+      }
+    },
+    {
+      "id": "no-scanner",
+      "fixture": "tests/fixtures/agent/no-scanner",
+      "git": {
+        "message": "Add order search"
+      },
+      "prompt": "Do a security review of the latest commit before I merge it.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git status",
+          "npm test"
+        ]
+      },
+      "checks": {
+        "skill": "security-review",
+        "ran": [
+          "git (show|diff|log)"
+        ],
+        "writes_only": [],
+        "no_skill": [
+          "peer-code-review"
+        ],
+        "must_match": [
+          "inject",
+          "(no (security )?scanners?|not configured|none (is |are )?configured|could not run|couldn't run|no .*scan)"
+        ]
+      }
     }
   ]
 }

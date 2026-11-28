@@ -1,6 +1,6 @@
 # release-notes-author
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/release-notes-author/SKILL.md) · plugin name `agent-skills:release-notes-author`**
+**Version 1.0.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/release-notes-author/SKILL.md) · plugin name `agent-skills:release-notes-author`**
 
 Drafts release notes for the people about to install a version, and leads
 with their first question: what do I have to do? It builds the notes from

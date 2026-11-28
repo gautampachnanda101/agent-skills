@@ -1,0 +1,70 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.2",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "test-plan-author"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/csv-export.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/reports.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/test-plan-author/scripts/check-test-plan.mjs"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "docs/specs/csv-export-test-plan.md"
+    }
+  ],
+  "reply": "I've written the test plan to `docs/specs/csv-export-test-plan.md`. It has 37 tests, and each of the eight acceptance criteria (AC-1 to AC-8) has at least one. I haven't run the plan checker, because this session wasn't allowed to run commands.\n\n**What the plan covers:**\n- **Each criterion's main case**, tested at the cheapest level that proves it: unit tests for writing the CSV and for the formula-prefix rule, integration tests against the export endpoint, and end-to-end tests for the download and the \"too many rows\" message on the page.\n- **Rejected requests:** a user without the analyst or admin role gets 403, and no session or an expired one gets 401. A user without access whose filters match too many rows should get 403, not 413, so the row count isn't revealed to them. Other cases cover a byte-order mark, CRLF line endings, the other characters that trigger the formula prefix (`+`, `@`, tab, carriage return), and negative numbers in numeric columns, which must not be prefixed.\n- **Limits:** the 50,000-row limit is tested at 49,999, 50,000, 50,001 and 200,000 rows. The 500-row page size is tested at 500 and 501 rows, dates are tested either side of midnight UTC, and exports of zero rows and one row are included. For the 95-out-of-100 timing check, 95 fast runs passes, 94 fails, and a run of exactly 10 seconds counts as too slow.\n\n**Code versus spec:** the export endpoint doesn't exist yet, and `src/reports/routes.js` only defines the page size and the two roles. Both match the spec, so there's no disagreement so far.\n\n**Gaps in the spec**, listed in full in the plan. The ones worth deciding before building:\n1. AC-5 doesn't check everything R-3 requires: no byte-order mark, LF line endings, and UTC dates. The plan tests them under AC-5 anyway.\n2. RFC 4180 uses CRLF line endings, but R-3 requires LF. The plan assumes \"quoted as in RFC 4180\" means the quoting rules only.\n3. The spec doesn't say which comes first when both apply: a 403 or a 413.\n4. The spec doesn't say whether a `page` parameter changes the export, or whether the file ends with a line break.\n5. AC-4 needs the staging server and the reference dataset, so it can't run in the normal automated test runs.\n\n**Test setup:** the repository has no test runner or test folder yet, so the file paths in the plan (`tests/unit/`, `tests/integration/`, `tests/e2e/`, `tests/perf/`) are suggestions to change once a runner is chosen.\n\nTo run the plan checker:\n\n```sh\nnode .claude/skills/test-plan-author/scripts/check-test-plan.mjs --spec docs/specs/csv-export.md docs/specs/csv-export-test-plan.md\n```\n\nOnce you've confirmed the plan, I can write these tests so that they fail until the feature is built.",
+  "changed": [
+    "docs/specs/csv-export-test-plan.md"
+  ],
+  "files": {}
+}

@@ -1,0 +1,53 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.1",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "test-plan-author"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "find . -path ./node_modules -prune -o -type f -print | grep -v '^./.git/' | head -100"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "test/merge.test.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/accounts/merge.js"
+    }
+  ],
+  "reply": "I can't find a specification or acceptance criteria for account merge. The repo has only `src/accounts/merge.js`, a one-line README and one test, and there are no linked issues or docs. I could write a plan from the code alone, but those tests would only confirm what the code already does, including anything it gets wrong. So before I write the plan, I need to know what merge is supposed to do.\n\n**What's there now (only to show where tests can hook in):**\n- `merge(store, olderId, newerId, actor)` is one unit-testable function. The store is a plain `{ get }` object, so tests can fake it.\n- Tests use `node:test` with `node:assert/strict` in `test/*.test.js` and run with `npm test`. One happy-path test exists.\n\n**Questions the code doesn't answer:**\n1. **Permissions:** Is `support-lead` the only role allowed to merge? Should admins be able to? What should a caller with no `actor` or no `roles` get? A 403, or some other error?\n2. **Disputes:** The existing test gives accounts a `disputes` array, but merge never touches it. Should disputes move to the older account like orders do? Or should an open dispute block the merge?\n3. **Invalid input:** What should happen when an ID doesn't exist, both IDs are the same, or one account is already closed or merged? Should merge check that `olderId` really is the older account?\n4. **Atomicity:** If merge fails partway through, should the store be left unchanged? There's also no `save` or transaction step yet. Is the merge meant to be persisted?\n5. **Return value and side effects:** Should merge return the older account? Should it write an audit record of who merged what?\n\n**Draft criteria for you to confirm or correct:**\n- **AC-1:** An actor with the `support-lead` role can merge a newer account into an older one. All of the newer account's orders move to the older account, in order.\n- **AC-2:** After a merge, the newer account is closed, has no orders and records which account it was merged into.\n- **AC-3:** An actor without the `support-lead` role gets a 403, and neither account changes.\n- **AC-4:** Merging an account that doesn't exist, an account into itself, or an account that's already closed is rejected, and neither account changes.\n- **AC-5:** Disputes on the newer account *(move to the older account / block the merge — please choose)*.\n\nOnce you've confirmed or edited these, I'll write the plan. For each criterion it will list the test, its level and kind (happy path, negative, boundary) and the file, plus any places where the current code doesn't match. I'll check the plan with the skill's checker. I'll only add tests under `test/` if you ask me to.",
+  "changed": [],
+  "files": {}
+}

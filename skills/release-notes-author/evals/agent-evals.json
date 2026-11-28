@@ -76,6 +76,30 @@
           ]
         }
       }
+    },
+    {
+      "id": "near-miss-changelog",
+      "fixture": "tests/fixtures/agent/drafts-first",
+      "git": {
+        "message": "Release preparation for 1.5.0"
+      },
+      "prompt": "Add a changelog entry under Unreleased for the fix that stops refunds counting tax twice.",
+      "allow": {
+        "write": [
+          "CHANGELOG.md"
+        ],
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git status"
+        ]
+      },
+      "checks": {
+        "no_skill": [
+          "release-notes-author"
+        ]
+      }
     }
   ]
 }

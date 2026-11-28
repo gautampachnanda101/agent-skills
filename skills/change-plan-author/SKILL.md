@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools; file-write only to save the plan. Node.js 20+ is optional, for the bundled plan checker.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Change plan author

@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools. Writes nothing; the review is the reply.
 metadata:
   author: gautampachnanda101
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Specification review
@@ -61,5 +61,10 @@ Report with these headings:
 3. **Strengths:** what the spec does well, only if genuine.
 4. **Questions for the author:** anything you could not settle.
 
-Order findings by severity. Never rewrite the spec in the reply; suggest the
-direction of a fix in a few words.
+Order findings by severity; a `question` can go anywhere. Never rewrite the
+spec in the reply; suggest the direction of a fix in a few words.
+
+When Node.js is available, save the report and run
+`node scripts/check-review-report.mjs <report.md>`. It checks the verdict,
+the findings table's columns and severities, their order, and that a
+blocker or major means `not ready`; it does not judge the findings.

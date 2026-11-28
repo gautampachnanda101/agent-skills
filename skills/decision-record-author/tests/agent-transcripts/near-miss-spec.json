@@ -1,0 +1,54 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.1",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "specification-author"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "notes/webhooks-discussion.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/payments/poller.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/decisions/0002-poll-payment-status.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    }
+  ],
+  "reply": "Before I write the spec, I need answers to a few decisions. I've read `notes/webhooks-discussion.md`, `src/payments/poller.js` and decision `docs/decisions/0002-poll-payment-status.md`. The notes settle the overall approach: webhooks plus an hourly reconciliation poll, HMAC-SHA256 signature checks, and handling that ignores repeats. They leave these five questions open. Each has a suggested answer you can accept or change.\n\n1. **How quickly must a paid order show as paid?**\n   Suggested: within 5 seconds of the provider sending the event, for 95% of events. Support reports delays of up to 30 seconds today, which matches `INTERVAL_MS = 30_000` in the poller. The fix has to beat that by a clear margin.\n\n2. **Which events are in scope for the first release?**\n   Suggested: only the payment status changes the poller already handles. `pollOnce` only calls `orders.update(order.id, status)`. Refunds, disputes and other event types would be non-goals, listed as follow-ups.\n\n3. **Which orders does the hourly reconciliation poll check, and what is its call budget?**\n   Suggested: every order still open more than 1 hour after creation, at most once an hour, kept under 100,000 provider calls a month. That stays far below the 1 million a month free limit that starts on 2027-01-01. Today's 1.9 million calls come from polling every 30 seconds, so hourly polling cuts the calls per order by 120 times.\n\n4. **What happens when a request fails a check?**\n   Suggested:\n   - Bad or missing signature: reply 401, change nothing, and log it without the body.\n   - Valid event we've already handled: reply 200 and change nothing.\n   - Valid event for an unknown order: reply 200 and log it.\n   - Our own error: reply 5xx so the provider retries.\n\n   Should we also reject old events to stop replays, say older than 5 minutes? That only works if the provider's events carry a signed timestamp, and the notes don't say whether they do.\n\n5. **How do we roll out and switch off the 30-second poller, and what do we monitor?**\n   Suggested: run webhooks alongside the 30-second poller for 2 weeks, then turn the poller off before 2027-01-01. Raise an alert when the endpoint returns any 5xx, when signature failures exceed 1% of requests in an hour, or when the hourly poll finds an order that a webhook should already have updated. That last alert is how we'd learn events are going missing. Ben raised monitoring in the discussion.\n\nSeparately, decision 0002 says to \"Revisit when the provider offers webhooks\". That decision needs a new record that replaces it. I can write that afterwards with the decision-record-author skill.\n\nOnce you answer these, or tell me to go with the suggestions, I'll write the spec to `docs/specs/payment-webhooks.md`. This session can't run commands, so I can't run the skill's bundled spec checker. I'll check the spec against the same rules by hand instead.",
+  "changed": [],
+  "files": {}
+}

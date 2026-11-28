@@ -1,0 +1,108 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/csv-export.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/reports/query.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/auth.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/ui/ReportTable.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "src/reports/csv.js"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "src/reports/routes.js"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "src/ui/ReportTable.js"
+    },
+    {
+      "tool": "Write",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "src/reports/export.test.js"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "npm test"
+    }
+  ],
+  "reply": "I've built `GET /api/reports/export`. All 11 new tests pass under `npm test`, but they use a fake database and a stub app, so nothing has run against a real database or server yet.\n\n**What I added (all under `src/`):**\n- **`src/reports/routes.js`**: the new endpoint uses the same `requireRole` check as the rows endpoint, so analysts and admins can export, other roles get 403 and requests without a session get 401. It counts the matching rows first. Over 50,000, it returns 413 with `{\"error\":\"too_many_rows\",\"rowCount\":N}`. Otherwise it fetches every matching row in one query, ignoring the 500-row page size, and sends it as `text/csv; charset=utf-8` as a file download. The header row uses the table's column list from `src/ui/ReportTable.js`.\n- **`src/reports/csv.js`**: turns rows into CSV the way the spec asks. Values with commas, quotes or line breaks are quoted, lines end with LF, there's no byte-order mark, and dates are written as `YYYY-MM-DD` in UTC. Text starting with `=`, `+`, `-` or `@` gets a leading `'`, but numbers never do, including negative ones. With no matching rows you get just the header line.\n- **`src/ui/ReportTable.js`**: adds an Export CSV button to the toolbar and an `exportCsv(filters)` function. When the server returns 413 it gives back a message for the page, e.g. \"These filters match 50,001 rows, but an export can hold at most 50,000. Narrow the filters and try again.\"\n- **`src/reports/export.test.js`**: tests for AC-1 to AC-3 and AC-5 to AC-8, plus a check at exactly 50,000 rows.\n\n**Decisions for you:**\n1. **No database connection exists in the repo.** `queryRows` and `countRows` only build the SQL, and the existing rows endpoint returns that SQL rather than running it. So I changed the setup function to `registerRoutes(app, { db })`, where `db.query(sql, params)` returns the rows. Whatever starts the server needs to pass in a real `db`, and the export endpoint won't work until it does.\n2. **Text that is only a number, like `\"-12\"` or `\"4.5\"`, is treated as a number and not prefixed.** Database drivers often return decimal columns as text, and without this the spec's own `-12` example would get a `'`. A plain number can't run as a formula, so this is safe.\n3. **Dates must arrive as date objects** to come out in UTC. Some Postgres drivers convert `date` columns using the server's local time zone, so check this once you connect the real database.\n\n**Not checked:**\n- **AC-4, the 10-second target on staging, needs a staging run.** Locally, building the CSV for 50,000 rows took about 65 ms.\n- **The file download in the browser.** `exportCsv` returns the file contents, but nothing wires it to the button yet.\n- **Rows added between the count and the fetch.** The file still caps at 50,000 rows, but it would then be cut short silently instead of getting a 413.",
+  "changed": [
+    "src/reports/csv.js",
+    "src/reports/export.test.js",
+    "src/reports/routes.js",
+    "src/ui/ReportTable.js"
+  ],
+  "files": {}
+}

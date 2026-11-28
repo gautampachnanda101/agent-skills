@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools; running tests needs the project's test command. Node.js 20+ is optional, for the bundled plan checker.
 metadata:
   author: gautampachnanda101
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Test plan author

@@ -1,11 +1,11 @@
 ---
 name: decision-record-author
-description: Write an architecture decision record (ADR) that a newcomer can act on - the context in checkable facts, the options considered with their trade-offs, the decision stated so someone can follow it, and its consequences, including what would make the team revisit it. Reads the repository's existing records first to follow their folder, numbering, template, and status words, and suggests the number, title, and status before writing. Supersedes rather than edits an accepted record. Use when asked to record, document, or write up a technical or architectural decision, an ADR, or a design choice and its alternatives.
+description: Write an architecture decision record (ADR) that a newcomer can act on - the context in checkable facts, the options considered with their trade-offs, the decision stated so someone can follow it, and its consequences, including what would make the team revisit it. Reads the repository's existing records first to follow their folder, numbering, template, and status words, and suggests the number, title, and status before writing. Supersedes rather than edits an accepted record. Not for writing a feature specification; use specification-author for that. Use when asked to record, document, or write up a technical or architectural decision, an ADR, or a design choice and its alternatives.
 license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools. Node.js 20+ is optional, for the bundled record checker.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Decision record author

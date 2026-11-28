@@ -1,0 +1,41 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.1",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "decision-record-author"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "notes/webhooks-discussion.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "{docs,doc,architecture}/**/*",
+      "pattern": "{docs,doc,architecture}/**/*"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*{adr,ADR,decision}*",
+      "pattern": "**/*{adr,ADR,decision}*"
+    }
+  ],
+  "reply": "I read the discussion notes. There are no decision records in the repo yet: no `docs/decisions/`, `docs/adr/` or similar folder, and no template. Before I write anything, please confirm these:\n\n**1. File path and number.** I suggest `docs/decisions/0001-use-webhooks-for-payment-status-updates.md`. Since this would be the first record, I could also add `0001-record-decisions.md` to set up the practice and make this one `0002`. My recommendation is to skip that and make this `0001`, unless you want a formal start to the record set.\n\n**2. Title.** \"Use webhooks with hourly reconciliation for payment status updates.\" The notes say the team agreed on webhooks *plus* an hourly poll, not webhooks alone, so the title should say so.\n\n**3. Status and date.** I suggest `Accepted`, dated 2026-11-18. The notes say \"Agreed\", and Ana (payments), Ben (platform) and Chloe (support) were there. If someone else still needs to sign off, I'll use `Proposed`.\n\n**4. Supersedes.** Nothing, since there are no earlier records.\n\n**Facts the notes don't give.** I'll leave these out unless you can supply them:\n- How often we poll now. The 30-second delay suggests a 30-second interval, but the notes don't say so.\n- Who owns and monitors the new endpoint. Ben raised it as a concern, but no owner was named.\n- What the provider charges per status call above 1 million a month. Without it, the cost case is \"1.9M calls/month, with a charge on calls over 1M from 2027-01-01.\"\n\nThe record would use these sections:\n- **Context:** signed webhooks launched on 2026-11-01, 1.9M calls a month, charging starts 2027-01-01, and up to 30 seconds of \"pending\" for paid orders.\n- **Options considered:** keep polling, webhooks only, or webhooks plus an hourly poll.\n- **Decision:** a public HTTPS endpoint, HMAC-SHA256 signature checks, idempotent handling of repeated events, and an hourly reconciliation poll.\n- **Consequences:** the endpoint is something new to monitor and secure. We'd revisit if the provider's webhook delivery proves unreliable or its pricing changes.\n\nI can't run commands in this session, so I won't be able to run the bundled checker on the finished record. I'll check it by hand against the same rules.",
+  "changed": [],
+  "files": {}
+}

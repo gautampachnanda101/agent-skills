@@ -63,6 +63,23 @@
       "checks": {
         "writes_only": []
       }
+    },
+    {
+      "id": "near-miss-readme",
+      "fixture": "tests/fixtures/agent/owner-evidence",
+      "prompt": "Write a README for this repository that explains what it does and how to run it.",
+      "allow": {
+        "write": [
+          "README.md",
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "documentation-author",
+        "no_skill": [
+          "backstage-catalog-builder"
+        ]
+      }
     }
   ]
 }

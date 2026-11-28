@@ -64,6 +64,46 @@
           "fail"
         ]
       }
+    },
+    {
+      "id": "near-miss-review",
+      "fixture": "tests/fixtures/agent/plans-from-spec",
+      "prompt": "Review the spec in docs/specs/merge-accounts.md before we build it.",
+      "allow": {
+        "write": [
+          "docs/**",
+          "test/**"
+        ]
+      },
+      "checks": {
+        "skill": "specification-review",
+        "no_skill": [
+          "test-plan-author"
+        ],
+        "writes_only": []
+      }
+    },
+    {
+      "id": "no-spec",
+      "fixture": "tests/fixtures/agent/no-spec",
+      "prompt": "Write a test plan for the account-merge feature in src/accounts/merge.js.",
+      "allow": {
+        "write": [
+          "test/**"
+        ],
+        "run": [
+          "npm test",
+          "node --test"
+        ]
+      },
+      "checks": {
+        "skill": "test-plan-author",
+        "writes_only": [],
+        "must_match": [
+          "(acceptance criteria|criteria|specification)",
+          "\\?"
+        ]
+      }
     }
   ]
 }

@@ -49,6 +49,7 @@ export function parse(text) {
   const byId = new Map();
   let reply = '';
   let cost = null;
+  let limit = null;
   for (const line of text.split('\n')) {
     if (!line.trim()) continue;
     let event;
@@ -73,9 +74,12 @@ export function parse(text) {
     if (event.type === 'result') {
       reply = event.result ?? '';
       cost = event.total_cost_usd ?? null;
+      // A usage or rate limit ends the run before the model acts; it says
+      // nothing about the skill.
+      if (event.is_error && (event.api_error_status === 429 || /\b(limit|rate|quota|credits)\b/i.test(reply))) limit = reply || 'rate limited';
     }
   }
-  return { events, reply, cost };
+  return { events, reply, cost, limit };
 }
 
 export default {
@@ -88,6 +92,7 @@ export default {
       cwd: dir, input: prompt, encoding: 'utf8', maxBuffer: 1 << 28, timeout: 15 * 60_000,
     });
     const transcript = parse(result.stdout ?? '');
+    if (transcript.limit) return { ...transcript, raw: result.stdout ?? '', failure: `usage limit: ${transcript.limit}`, fatal: true };
     const failure = result.status === 0 ? null : `claude exited ${result.status ?? result.signal}: ${String(result.stderr ?? '').trim().split('\n')[0]}`;
     return { ...transcript, raw: result.stdout ?? '', failure };
   },

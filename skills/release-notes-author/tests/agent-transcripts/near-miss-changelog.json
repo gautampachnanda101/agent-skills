@@ -1,0 +1,32 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.0",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "CHANGELOG.md"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git log --stat -5"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show 9bcc776"
+    }
+  ],
+  "reply": "I didn't change anything, because `CHANGELOG.md` already has this entry under Unreleased. Line 12, in the Fixed section, reads:\n\n> - Refunds no longer count tax twice on orders with discounts.\n\nIt was added in commit `9bcc776` (\"Release preparation for 1.5.0\"). A second entry would just repeat it. If you want different wording, tell me and I'll change that line.\n\nTwo things in that commit aren't clear from the current Unreleased entries:\n\n- **The config change breaks existing setups.** `src/config.js` now reads `DATABASE_URL` instead of `ORDERS_DB_URL`. Any deployment that only sets the old variable will start with no database URL. The entry says \"Configuration now reads the database URL from one variable,\" which doesn't name either variable or say that people need to act.\n- **The migration locks a table.** `db/migrations/0007_refund_totals.sql` says the backfill took 4 minutes on 2 million orders in staging and locks the `refunds` table while it runs. The changelog doesn't mention this.\n\nI can reword those entries, for example by adding a \"Breaking\" note with the variable rename, if you'd like.",
+  "changed": [],
+  "files": {}
+}

@@ -1,0 +1,27 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.2",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/math.js"
+    },
+    {
+      "tool": "Edit",
+      "denied": false,
+      "error": false,
+      "kind": "write",
+      "path": "src/math.js"
+    }
+  ],
+  "reply": "I fixed it: `add` was subtracting its arguments (`a - b`). I changed it to `a + b` at `src/math.js:2`, so `add(2, 3)` will now return 5.\n\nI haven't run it or any tests, because this session doesn't allow running commands.",
+  "changed": [
+    "src/math.js"
+  ],
+  "files": {}
+}

@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools and, for history, git. Node.js 20+ is optional, for the bundled notes checker.
 metadata:
   author: gautampachnanda101
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Release notes author

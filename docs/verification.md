@@ -253,6 +253,32 @@ did not recognise "there's no open-dispute check" as reporting a
 disagreement. Both were fixed in the evals; no skill changed. These runs
 cost about $12 at API prices.
 
+### Steering: near misses and untested branches
+
+Every skill has a near-miss case: a prompt that sounds like it, but belongs
+to a sibling or to no skill. Four more cases test branches no case had run.
+With Claude Opus 5.5, three runs per case, on 2026-11-27:
+
+| Cases | Runs passed |
+| --- | --- |
+| 12 near misses, one per skill | 36 of 36 |
+| `decision-record-author` with no existing records | 3 of 3 |
+| `security-review` with no scanner configured | 3 of 3 |
+| `test-plan-author` with no specification | 3 of 3 |
+| `skill-correction` given a vague complaint and no evidence | 3 of 3 |
+
+Two of the branch cases failed at first because of the cases, not the
+skills. "Write unit tests for merge.js" was a coding request, which the
+assistant rightly did without the skill; the case now asks for a test plan.
+The vague-complaint fixture still held a transcript, which the skill rightly
+read and acted on; the fixture now has no evidence. `specification-review`
+and `security-review` now bundle report graders: every report the skills
+produced passes them, and their baselines fail.
+
+A usage limit stopped one batch of runs part-way. The runner now stops on a
+usage or rate limit, with exit code 3, instead of grading the remaining runs
+as failures.
+
 With the `openai` adapter and Qwen3 8B on a local llama.cpp server, at no
 cost, 1 of 9 cases passed: the unrelated question.
 

@@ -73,6 +73,29 @@
           "\\b5\\b"
         ]
       }
+    },
+    {
+      "id": "near-miss-security",
+      "fixture": "tests/fixtures/agent/review-commit",
+      "git": {
+        "message": "Retry deliveries until they succeed"
+      },
+      "prompt": "Do a security review of the latest commit.",
+      "allow": {
+        "run": [
+          "git log",
+          "git show",
+          "git diff",
+          "git status"
+        ]
+      },
+      "checks": {
+        "skill": "security-review",
+        "no_skill": [
+          "peer-code-review"
+        ],
+        "writes_only": []
+      }
     }
   ]
 }

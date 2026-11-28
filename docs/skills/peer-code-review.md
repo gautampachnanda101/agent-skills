@@ -1,6 +1,6 @@
 # peer-code-review
 
-**Version 1.3.3 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/SKILL.md) · plugin name `agent-skills:peer-code-review`**
+**Version 1.3.4 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/peer-code-review/SKILL.md) · plugin name `agent-skills:peer-code-review`**
 
 Runs an evidence-based peer code review of a diff, commit series, or pull
 request. It reviews in focused passes, grades each finding by severity with

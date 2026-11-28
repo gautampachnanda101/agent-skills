@@ -66,6 +66,44 @@
           "(once|when) 0003 is accepted|(once|when) (it|the new record) is accepted"
         ]
       }
+    },
+    {
+      "id": "near-miss-spec",
+      "fixture": "tests/fixtures/agent/suggests-first",
+      "prompt": "Write a feature specification for payment webhooks, using the discussion in notes/webhooks-discussion.md.",
+      "allow": {
+        "write": [
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "specification-author",
+        "no_skill": [
+          "decision-record-author"
+        ],
+        "writes_only": []
+      }
+    },
+    {
+      "id": "no-records",
+      "fixture": "tests/fixtures/agent/no-records",
+      "prompt": "Write a decision record for moving payment status updates from polling to webhooks. The discussion is in notes/webhooks-discussion.md.",
+      "allow": {
+        "write": [
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "decision-record-author",
+        "read": [
+          "notes/webhooks-discussion.md"
+        ],
+        "writes_only": [],
+        "must_match": [
+          "0001",
+          "(confirm|approve|go ahead|shall I|should I)"
+        ]
+      }
     }
   ]
 }

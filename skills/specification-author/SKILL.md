@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools. Node.js 20+ is optional, for the bundled specification checker.
 metadata:
   author: gautampachnanda101
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Specification author

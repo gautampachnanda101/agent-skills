@@ -1,11 +1,11 @@
 ---
 name: skill-correction
-description: Turn a correction to an Agent Skill's behaviour into a failing eval case and the smallest fix to the skill. Reads the skill, its existing evals, and any transcript of the mistake; classifies the root cause (selection, a missing or buried instruction, ambiguity, the harness, or model capability); writes a minimal fixture and contract that fail on the observed behaviour; proposes the smallest change to the skill; then re-runs the new case and the skill's other cases. Use when a skill did the wrong thing, skipped a step, was not loaded when it should have been, or when review feedback on a skill's output should change how it behaves next time.
+description: Turn a correction to an Agent Skill's behaviour into a failing eval case and the smallest fix to the skill. Reads the skill, its existing evals, and any transcript of the mistake; classifies the root cause (selection, a missing or buried instruction, ambiguity, the harness, or model capability); writes a minimal fixture and contract that fail on the observed behaviour; proposes the smallest change to the skill; then re-runs the new case and the skill's other cases. Not for fixing a bug in application code, or for reviewing a skill with no correction to make; use peer-code-review to review code. Use when a skill did the wrong thing, skipped a step, was not loaded when it should have been, or when review feedback on a skill's output should change how it behaves next time.
 license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools. Running eval cases needs the repository's eval runner and a model; without one, the skill grades a recorded transcript instead and says so.
 metadata:
   author: gautampachnanda101
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Skill correction

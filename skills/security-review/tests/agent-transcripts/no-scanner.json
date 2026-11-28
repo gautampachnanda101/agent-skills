@@ -1,0 +1,75 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.3",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "security-review"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show HEAD"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show HEAD --stat --format=%B"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/routes/orders.js"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/auth.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "npm test"
+    }
+  ],
+  "reply": "I reviewed `7594ed1` \"Add order search\". It adds one route, `GET /orders/search`, and it should not be merged as written.\n\n**Verdict:** `request changes`\n\n**Findings**\n\n| Severity | Location | Evidence | Suggested direction |\n| --- | --- | --- | --- |\n| blocker | `src/routes/orders.js:13` | `\"SELECT * FROM orders WHERE note LIKE '%\" + req.query.q + \"%'\"` | **SQL injection.** The `q` value goes straight into the SQL text, so a request like `?q=' OR '1'='1` returns every order. The attacker could also add `UNION SELECT` to read other tables, and possibly change data depending on the database role. Pass it as a parameter like the route above does: `... WHERE note LIKE $1` with `['%' + q + '%']`. Also escape `%` and `_` inside `q` if they should match literally. |\n| blocker | `src/routes/orders.js:12` | `router.get('/orders/search', async (req, res) => {` | **No login or role check.** The neighbouring `/orders` route uses `requireRole('customer')`, but this one has no check at all, so anyone who can reach the API can call it. Add the same `requireRole('customer')` middleware. |\n| blocker | `src/routes/orders.js:13` | `SELECT * FROM orders WHERE note LIKE ...` | **No limit to the caller's own orders.** Even with the injection fixed and a role check added, the query searches all customers' orders, so any user can read other customers' orders and notes. Add `AND customer_id = $2` with `req.user.id`, as `/orders` does. |\n| minor | `src/routes/orders.js:13` | `SELECT *` | The route returns every column. Selecting only the fields the client needs limits what leaks if another check fails. |\n| minor | `src/routes/orders.js:12-15` | `req.query.q` used unchecked; no `LIMIT` | `q` isn't checked for being present, a string, or a sane length. If it's missing, the query becomes `LIKE '%undefined%'`, and an array value like `?q=a&q=b` behaves unexpectedly. With no `LIMIT`, a broad search can return the whole table. Check the input and add a `LIMIT`. |\n\n**Scanners**\n- The repository has no security scanners set up: `package.json` only defines `test`, and there are no linter or secret-scanner settings or CI files.\n- I ran `npm test`, but the repository has no tests, so nothing was checked (`# tests 0`). The new route has no tests either.\n- I didn't run `npm audit` because it isn't one of the commands this session allows. The dependencies (`express 4.21.2`, `pg 8.13.1`) are pinned and this commit doesn't change them.\n\n**Unevaluated**\n- **`src/db.js`:** it is imported but isn't in the repository, so I couldn't confirm that `db.query` is `pg`'s parameterised query, or what database permissions it has. Those decide how far the injection reaches.\n- **Where `req.user` comes from:** there is no app entry point or login middleware in the repository. If it is set by app-wide middleware that rejects anonymous requests, the second finding drops from \"anyone\" to \"any logged-in user\". The other two blockers stand either way.\n\nI couldn't save the report and run `check-review-report.mjs` because this session can't write files. I checked the format against the skill's rules by hand.\n\nThe fixed query would be `SELECT <columns> FROM orders WHERE customer_id = $1 AND note LIKE $2 LIMIT $3`, using `[req.user.id, '%' + escaped(q) + '%', limit]`, behind `requireRole('customer')`.",
+  "changed": [],
+  "files": {}
+}

@@ -241,3 +241,18 @@ test('--grade --save keeps a passing run as the recording, and refuses a failing
   assert.equal(bad.status, 1);
   assert.equal(JSON.parse(fs.readFileSync(target, 'utf8')).model, 'm', 'a failing run is not saved');
 });
+
+test('a usage limit stops the run instead of being graded as skill failures', async t => {
+  const { parse } = await loadAdapter('claude-code');
+  const limited = parse(JSON.stringify({ type: 'result', is_error: true, api_error_status: 429, result: "You've hit your 5-hour limit" }));
+  assert.match(limited.limit, /5-hour limit/);
+  assert.equal(parse(JSON.stringify({ type: 'result', result: 'Done.' })).limit, null);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'limit-'));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  const fake = path.join(dir, 'claude');
+  fs.writeFileSync(fake, `#!/bin/sh\ncat >/dev/null\necho '${JSON.stringify({ type: 'result', is_error: true, api_error_status: 429, result: 'limit reached' })}'\nexit 1\n`, { mode: 0o755 });
+  const result = require('node:child_process').spawnSync(process.execPath, [path.join(root, 'scripts', 'agent-evals.mjs'), '--agent', 'claude-code', '--skill', 'peer-code-review', '--runs', '2', '--out', path.join(dir, 'out')], { encoding: 'utf8', env: { ...process.env, CLAUDE_BIN: fake } });
+  assert.equal(result.status, 3, result.stdout + result.stderr);
+  assert.match(result.stderr, /stopped at peer-code-review#\S+ run 1\/2: usage limit: limit reached\. 0 run\(s\) finished/);
+  assert.doesNotMatch(result.stdout, /FAIL/);
+});

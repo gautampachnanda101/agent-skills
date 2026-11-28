@@ -17,6 +17,19 @@ skill's `metadata.version` field.
 
 ### Added
 
+- "Not for ..." clauses on the remaining overlaps: `backstage-catalog-builder`
+  1.2.5, `documentation-author` 2.2.2, `decision-record-author` 1.0.1, and
+  `skill-correction` 1.0.2. Every skill has a near-miss behaviour case, and
+  four new cases cover branches no case had run; all pass three runs in
+  three with Opus. The skills that only gained cases take a patch release:
+  `change-plan-author` 1.0.1, `documentation-review` 1.4.3,
+  `peer-code-review` 1.3.4, `release-notes-author` 1.0.1,
+  `specification-author` 1.0.2, and `test-plan-author` 1.0.2.
+- `specification-review` 1.0.2 and `security-review` 1.0.3 bundle
+  `scripts/check-review-report.mjs`, which checks the verdict, the findings
+  table, severities, order, and that a blocker or major changes the verdict.
+- Behaviour evals stop on a usage or rate limit, with exit code 3, instead of
+  grading the remaining runs as failures.
 - "Not for ..." clauses on the skills that overlap, so each says which
   sibling to use instead: `peer-code-review` 1.3.3 and `security-review`
   1.0.2, `documentation-author` 2.2.1 and `documentation-review` 1.4.2,

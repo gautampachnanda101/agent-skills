@@ -60,6 +60,25 @@
           ]
         }
       }
+    },
+    {
+      "id": "near-miss-build",
+      "fixture": "tests/fixtures/agent/plans-from-spec",
+      "prompt": "Implement the CSV export endpoint described in docs/specs/csv-export.md.",
+      "allow": {
+        "write": [
+          "src/**"
+        ],
+        "run": [
+          "npm test",
+          "node --test"
+        ]
+      },
+      "checks": {
+        "no_skill": [
+          "change-plan-author"
+        ]
+      }
     }
   ]
 }

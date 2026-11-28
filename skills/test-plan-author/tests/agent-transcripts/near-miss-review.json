@@ -1,0 +1,61 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.1",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "specification-review"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "docs/specs/merge-accounts.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/accounts/merge.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "test/merge.test.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    }
+  ],
+  "reply": "**Verdict:** `not ready`\n\nThe spec is short and readable, but it can't be built as written. Two developers would build undo differently, and the code that already exists (`src/accounts/merge.js`) doesn't record what it moves, so undo isn't possible yet. Most of the gaps are things the spec never decides.\n\n**Findings**\n\n| Severity | Location | Evidence | Suggested direction |\n| --- | --- | --- | --- |\n| major | R-4, AC-4; `src/accounts/merge.js:10-11` | The spec says \"both accounts are restored\", but the code adds the newer account's orders to the older one and empties the newer list (`newer.orders = []`). It doesn't record which orders came from where. Nothing says what happens to orders or notes added to the older account after the merge. | Require a record of what moved. Define what \"restored\" means when the older account changed after the merge. |\n| major | R-4, AC-4 | \"Within 30 days\". A merge made \"30 days ago\" can be undone and one made \"31 days ago\" can't, but 30 days and 5 hours isn't covered. Calendar days or 720 hours, and in which time zone? | State the limit exactly, for example \"within 720 hours of the merge timestamp, inclusive\". |\n| major | R-4 | Nothing says who can undo a merge, and no criterion tests it. | Add a permission rule for undo, probably support-lead only like R-1, and a criterion for refusal. |\n| major | Scope, R-2; `src/accounts/merge.js:2` | The spec never says how \"older\" is decided. The code trusts the order the caller passes the IDs in (`merge(store, olderId, newerId, actor)`) and never checks it. | Say what makes an account older, for example creation date. Say whether the system works it out or rejects reversed input. |\n| major | R-3, AC-3 | \"An account with an open dispute\": the older one, the newer one, or either? AC-3 says only \"refused\", while AC-1 gives 403. The test data has `disputes: []` (`test/merge.test.js:8`) but nothing defines when a dispute counts as open. | Make it \"either account\". Give the error code. Define \"open\". |\n| major | R-2, AC-2; `src/accounts/merge.js:10` | R-2 moves \"orders, addresses, and notes\", but AC-2 checks only orders, and the code only moves orders. | Add criteria for addresses and notes. |\n| minor | Failure cases | Some cases aren't covered: merging an account with itself, an ID that doesn't exist (the code would throw a TypeError at `merge.js:10`), an account that's already closed or merged (chains of merges), and two merges running at the same time. | Add a refusal rule and a criterion for each. |\n| minor | R-2 | \"Closes the newer account with a pointer\": the spec doesn't say what the customer sees if they log in with the closed account. That's the problem the spec exists to solve. | Say what happens when someone logs in to a closed account. |\n| minor | AC-4 | The second clause (\"given one made 31 days ago, then the undo is refused\") has no When. | Split it into its own criterion with Given, When and Then. |\n| minor | AC-1; `src/accounts/merge.js:4-6` | AC-1 expects an HTTP 403, but the repository has only a function that throws with `error.status = 403`. No route exists. | Say whether this is an API endpoint and where it lives. |\n| minor | Non-goals | The only non-goal is \"Bulk merges\". The spec doesn't say whether customers can merge their own accounts or whether the merge is logged. | Add non-goals, or add an audit requirement (who merged, when). |\n| nit | R-1, AC-1, AC-2 | \"Users with the support-lead role\", \"support agent\" and \"support lead\" are used for overlapping groups of people. | Define the role term once and use it throughout. |\n| question | Whole spec | `merge.js` already does part of R-1 and R-2. Is the spec meant to extend that code or replace it? | Say which in the spec. |\n\n**Strengths**\n\n- Every requirement has an ID and at least one acceptance criterion linked to it.\n- AC-3's \"nothing moves\" can pass or fail.\n- AC-4 tests both sides of the time limit.\n- The role name `support-lead` matches the code.\n\n**Questions for the author**\n\n1. If an order was placed on the older account after the merge, where does it go on undo?\n2. Can a customer log in with the closed account and get redirected, or is that login turned off?\n3. Must every merge and undo be written to an audit log?\n4. Is a merge always started by an agent through an API, or are there other ways in?\n\nI can't run commands in this session, so I didn't run the skill's report checker (`scripts/check-review-report.mjs`). I also didn't edit the spec. I can save this report under `docs/` if you want a copy next to the spec.",
+  "changed": [],
+  "files": {}
+}

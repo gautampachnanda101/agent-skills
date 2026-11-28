@@ -40,6 +40,23 @@
           "documentation-author"
         ]
       }
+    },
+    {
+      "id": "near-miss-write",
+      "fixture": "tests/fixtures/agent/claim-check",
+      "prompt": "Write a getting-started page for this project.",
+      "allow": {
+        "write": [
+          "README.md",
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "documentation-author",
+        "no_skill": [
+          "documentation-review"
+        ]
+      }
     }
   ]
 }

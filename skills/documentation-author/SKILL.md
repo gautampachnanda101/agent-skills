@@ -1,11 +1,11 @@
 ---
 name: documentation-author
-description: Author new documentation or rewrite existing pages following the practices of leading documentation engineers — identify the user need first, choose the Diátaxis page type, then apply GOV.UK content design (plain English, deliberate requirement wording, accessible link text) and the Google Developers and Microsoft Writing style guides. Structures pages with one canonical home per topic, contents lists on long pages, and fenced, tested code samples; verifies commands, links, and lint checks before finishing. Not for reviewing pages without changing them; use documentation-review for that. Use when asked to write, create, draft, expand, restructure, or rewrite documentation such as README files, tutorials, how-to guides, reference pages, or explanations.
+description: Author new documentation or rewrite existing pages following the practices of leading documentation engineers — identify the user need first, choose the Diátaxis page type, then apply GOV.UK content design (plain English, deliberate requirement wording, accessible link text) and the Google Developers and Microsoft Writing style guides. Structures pages with one canonical home per topic, contents lists on long pages, and fenced, tested code samples; verifies commands, links, and lint checks before finishing. Not for reviewing pages without changing them, release notes, or decision records; use documentation-review, release-notes-author, or decision-record-author for those. Use when asked to write, create, draft, expand, restructure, or rewrite documentation such as README files, tutorials, how-to guides, reference pages, or explanations.
 license: Apache-2.0
 compatibility: Host assistant with file-read and file-write tools; Bash or Node are optional for running commands, link checks, and Markdown linters. Network access requires permission.
 metadata:
   author: gautampachnanda101
-  version: "2.2.1"
+  version: "2.2.2"
 ---
 
 # Documentation author

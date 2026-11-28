@@ -52,7 +52,8 @@
  * contracts, and checks that breaking each clause fails, with no model.
  * Adapters: claude-code, openai (any OpenAI-compatible server: llama.cpp's
  * llama-server, Ollama, or a hosted endpoint). Exits 1 if any run fails or
- * nothing matched, 2 on bad arguments.
+ * nothing matched, 2 on bad arguments, 3 when the assistant hits a usage or
+ * rate limit, which stops the run because it says nothing about the skills.
  */
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
@@ -418,6 +419,14 @@ async function main() {
         const started = Date.now();
         const { prompt, allow } = resolveCase(evalCase, adapter.skillsDir, dir);
         const transcript = await adapter.run({ dir, prompt, allow, ...settings });
+        if (transcript.fatal) {
+          // Stop: every later run would fail the same way, and none of it
+          // would be evidence about the skills.
+          if (!keep) fs.rmSync(dir, { recursive: true, force: true });
+          fs.writeFileSync(path.join(out, 'summary.json'), JSON.stringify(summary, null, 2) + '\n');
+          console.error(`agent-evals: stopped at ${label}: ${transcript.failure}. ${summary.length} run(s) finished before it; nothing after it ran.`);
+          process.exit(3);
+        }
         const result = record(transcript, { dir, before, after: snapshot(dir, adapter.ownFiles), evalCase });
         const graded = grade(evalCase, result);
         if (transcript.failure) graded.failures.unshift(transcript.failure);

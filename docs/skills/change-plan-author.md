@@ -1,6 +1,6 @@
 # change-plan-author
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/change-plan-author/SKILL.md) · plugin name `agent-skills:change-plan-author`**
+**Version 1.0.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/change-plan-author/SKILL.md) · plugin name `agent-skills:change-plan-author`**
 
 Breaks an approved specification, design, or written request into a
 sequence of small changes that each fit one review. Every step names the

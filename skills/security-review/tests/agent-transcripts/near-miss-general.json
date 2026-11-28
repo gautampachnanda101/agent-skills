@@ -1,0 +1,82 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.0.3",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "peer-code-review"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show --stat HEAD"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": ".claude/skills/peer-code-review/checklists.md"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show HEAD"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/routes/orders.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/auth.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "scripts/scan.js"
+    }
+  ],
+  "reply": "**Verdict: request changes**\n\nYou asked about readability, naming and tests, and I cover those below. But two problems in this 5-line change are bigger than any of those: user input goes straight into the SQL string, and the new route has no access check. Either one should stop the merge.\n\n## Findings\n\n| Severity | Location | Evidence | Direction |\n|---|---|---|---|\n| blocker | `src/routes/orders.js:13` | `\"... LIKE '%\" + req.query.q + \"%'\"` | The query text comes straight from the request and is pasted into the SQL. A request like `?q=' OR '1'='1` returns every order, and worse inputs could change or delete data. The route just above already uses a placeholder (`$1`) with a values array. Do the same here: `db.query('SELECT * FROM orders WHERE note LIKE $1', ['%' + q + '%'])`. If users shouldn't be able to type `%` and `_` as wildcards, escape them too. |\n| blocker | `src/routes/orders.js:12` | `router.get('/orders/search', async (req, res) => {` | Unlike `/orders` (line 7), this route has no `requireRole('customer')`, and the query doesn't filter by `customer_id`. Anyone who can reach the API, even without logging in, can search every customer's orders. Add the role check and `AND customer_id = $2` with `req.user.id`, unless the search is meant to cover all customers. If it is, say so and put it behind a staff role. |\n| major | `src/routes/orders.js:12-15` | No test files in the repo; `\"test\": \"node --test\"` finds nothing | This new behaviour has no tests. At minimum, cover: a match on a note, no matches, `q` missing, a quote character in `q` (to catch the injection), an anonymous request getting 403, and one customer not seeing another customer's orders. |\n| major | `src/routes/orders.js:13` | `req.query.q` used without a check | When `q` is missing, the string becomes `'%undefined%'`, so the search quietly looks for the text \"undefined\". If `q` is repeated in the URL, Express gives an array. Check that `q` is a non-empty string and return 400 otherwise. |\n| minor | `src/routes/orders.js:13` | `const rows = ...(\"SELECT * FROM orders WHERE note LIKE ...\")` | Readability: the file uses single quotes elsewhere and switches to double quotes here just to fit the string building. A placeholder query fixes that too. `q` is also vague as a public parameter name. If the search only covers order notes, `note` or `noteContains` says what it searches. |\n| minor | `src/routes/orders.js:13` | `SELECT *` with no `LIMIT` | A broad term like `a` returns every matching row. Add a limit or paging, and choose the columns to return so new columns don't leak out automatically. |\n| nit | commit `d6f8fb9` | Message `Add order search`, no body | Add a line saying which fields are searched and who can search, so the intended scope is on record. |\n\n## Strengths\n\n- The change is small and focused. The new route follows the same layout as `/orders`, so it's easy to read.\n- The `/orders` route right above it already shows the right approach (placeholders plus `requireRole`). The fix is to copy that.\n\n## Deferred\n\n- Add a lint rule or test that catches SQL built by joining strings, so this can't come back silently.\n- `src/db.js`, which `orders.js:2` imports, isn't in the repository. This was already true before this commit, but it means nothing here can be run as it stands.\n\n## Unevaluated\n\n- **Tests:** this session only lets me use `git` commands, so I couldn't run `npm test`. There are no test files anyway.\n- **Linter:** none is set up in `package.json`.\n- **`npm run scan`:** I couldn't run it. Its advisory list only knows about `lodash@4.17.15`, which isn't a dependency, so it wouldn't find anything here.\n- **Report format check:** I couldn't save the report or run the skill's checker script, because file writes aren't allowed in this session.\n\nThis only touches on security. For a full security review, run the `security-review` skill on this commit.",
+  "changed": [],
+  "files": {}
+}

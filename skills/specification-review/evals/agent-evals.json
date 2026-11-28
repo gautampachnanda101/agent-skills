@@ -53,6 +53,22 @@
           "specification-author"
         ]
       }
+    },
+    {
+      "id": "near-miss-test-plan",
+      "fixture": "tests/fixtures/agent/clean-spec",
+      "prompt": "Write the test plan for the spec in docs/specs/csv-export.md.",
+      "allow": {
+        "write": [
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "test-plan-author",
+        "no_skill": [
+          "specification-review"
+        ]
+      }
     }
   ]
 }

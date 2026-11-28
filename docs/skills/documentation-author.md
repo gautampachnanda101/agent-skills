@@ -1,6 +1,6 @@
 # documentation-author
 
-**Version 2.2.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/SKILL.md) · plugin name `agent-skills:documentation-author`**
+**Version 2.2.2 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/documentation-author/SKILL.md) · plugin name `agent-skills:documentation-author`**
 
 Writes new documentation and rewrites existing pages to the standard a
 [documentation-review](documentation-review.md) pass will check. It states

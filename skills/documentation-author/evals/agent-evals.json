@@ -62,6 +62,24 @@
           "documentation-review"
         ]
       }
+    },
+    {
+      "id": "near-miss-review",
+      "fixture": "tests/fixtures/agent/suggest-first",
+      "prompt": "Check this repository's README for problems. Don't change anything.",
+      "allow": {
+        "write": [
+          "README.md",
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "documentation-review",
+        "no_skill": [
+          "documentation-author"
+        ],
+        "writes_only": []
+      }
     }
   ]
 }

@@ -20,7 +20,8 @@
         "ledger": "tests/ledger.json",
         "must_match": [
           "not ready"
-        ]
+        ],
+        "grader": "scripts/check-review-report.mjs"
       }
     },
     {
@@ -43,7 +44,8 @@
         ],
         "must_not_match": [
           "not ready"
-        ]
+        ],
+        "grader": "scripts/check-review-report.mjs"
       }
     }
   ]

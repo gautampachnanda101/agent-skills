@@ -1,6 +1,6 @@
 # decision-record-author
 
-**Version 1.0.0 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/decision-record-author/SKILL.md) · plugin name `agent-skills:decision-record-author`**
+**Version 1.0.1 · [`SKILL.md`](https://github.com/gautampachnanda101/agent-skills/blob/main/skills/decision-record-author/SKILL.md) · plugin name `agent-skills:decision-record-author`**
 
 Writes an architecture decision record that a newcomer can act on: the
 context in checkable facts, the options considered with their costs, the

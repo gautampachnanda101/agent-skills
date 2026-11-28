@@ -1,0 +1,47 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "1.3.3",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "security-review"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show HEAD"
+    },
+    {
+      "tool": "Bash",
+      "denied": false,
+      "error": false,
+      "kind": "run",
+      "command": "git show --stat HEAD~1"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    }
+  ],
+  "reply": "**Verdict: request changes**\n\nThe latest commit (`9664f86`, \"Retry deliveries until they succeed\") turns a three-try retry into an endless loop that ignores every error. I found no injection, authentication, secrets or dependency problems, because the change doesn't touch any of those. The problem is availability: one message that always fails can tie up delivery, or the whole process, for good.\n\n## Findings\n\n| Severity | Location | Evidence | Suggested direction |\n| --- | --- | --- | --- |\n| major | `src/queue.js:3` | `while (true) {` … `// ignore and try again` | Put back a limit on attempts, and wait longer between each try (with some randomness). After the last try, throw the error or move the message to a dead-letter queue. |\n| major | `src/queue.js:6-7` | `} catch (error) {` / `// ignore and try again` | Tell permanent failures (a bad recipient, a malformed message, a rejected request) from temporary ones, and only retry the temporary ones. Log each failure. |\n| minor | `src/queue.js:5` | `return await send(message);` | Make deliveries safe to repeat, for example by sending a message ID the receiver can use to drop duplicates. |\n\n**How an attacker would use them:**\n\n1. **The loop can freeze the whole process.** There is no pause between tries. If `send` fails at once, for example by checking the input and rejecting it straight away, each new try starts before Node handles anything else. Timers, network traffic and other requests all stop. Anyone who can get a message into the outbox that `send` rejects at once can hang the notifier for good. If `send` fails more slowly, the loop doesn't freeze the process, but it still blocks that delivery forever.\n2. **The loop floods the provider.** A message that can never succeed, such as one to a recipient address the attacker controls, is resent nonstop. That can hit rate limits, get the account suspended, or run up costs. All errors are hidden, so no logs or alerts would show it.\n3. **Repeat notifications.** If `send` times out after the provider has already accepted the message, the endless retry sends it again and again. Users get spammed, and anything that acts on the notification runs more than once.\n\n## Scanners\n\n- No scanners are set up in this repository. It contains only `README.md` and `src/queue.js`, with no package manifest, lint settings or CI jobs, so nothing ran.\n- I didn't run the skill's report checker (`node .claude/skills/security-review/scripts/check-review-report.mjs`) or save the report. This session doesn't allow running `node` or writing files.\n\n## Unevaluated\n\n- **Who calls `deliver`.** These files don't show whether messages are delivered one at a time (so one bad message blocks the rest) or in parallel. They also don't show whether outsiders can control what goes into the outbox. That decides whether the main problem can be triggered from outside or only by mistake.\n- **How `send` behaves.** I couldn't see whether it fails at once on bad input (which triggers the freeze), whether it has its own timeouts, or what errors it returns.",
+  "changed": [],
+  "files": {}
+}

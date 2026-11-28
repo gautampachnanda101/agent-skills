@@ -57,6 +57,39 @@
           "(not run|could not run|didn't run|did not run|no model)"
         ]
       }
+    },
+    {
+      "id": "near-miss-bug",
+      "fixture": "tests/fixtures/agent/near-miss-bug",
+      "prompt": "add(2, 3) returns -1 in src/math.js. Fix the bug.",
+      "allow": {
+        "write": [
+          "src/**"
+        ]
+      },
+      "checks": {
+        "no_skill": [
+          "skill-correction"
+        ]
+      }
+    },
+    {
+      "id": "vague-correction",
+      "fixture": "tests/fixtures/agent/vague-correction",
+      "prompt": "The greeter skill feels a bit off lately. Fix it.",
+      "allow": {
+        "write": [
+          "skills/**"
+        ]
+      },
+      "checks": {
+        "skill": "skill-correction",
+        "writes_only": [],
+        "must_match": [
+          "(example|what (did|was|happened)|which request|what you asked)",
+          "(what I need|send|share|tell me|describe|paste)"
+        ]
+      }
     }
   ]
 }

@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Host assistant with file-read tools and, for scanners and git history, a shell. Writes nothing; the review is the reply.
 metadata:
   author: gautampachnanda101
-  version: "1.0.2"
+  version: "1.0.3"
 ---
 
 # Security review
@@ -64,3 +64,8 @@ Report with these headings:
 
 Never quote a secret, password, or token value; name where it is so it can
 be rotated. Do not edit the code, and do not run exploits.
+
+When Node.js is available, save the report and run
+`node scripts/check-review-report.mjs <report.md>`. It checks the verdict,
+the findings table's columns and severities, their order, and that a
+blocker or major means `request changes`; it does not judge the findings.

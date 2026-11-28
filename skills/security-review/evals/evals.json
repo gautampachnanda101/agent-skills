@@ -18,7 +18,8 @@
         "ledger": "tests/ledger.json",
         "must_match": [
           "^[#*\\s]*verdict\\b[^\\n]*(?:\\n[ \\t]*)*[^\\n]*?request changes"
-        ]
+        ],
+        "grader": "scripts/check-review-report.mjs"
       }
     },
     {
@@ -39,7 +40,8 @@
         ],
         "must_not_match": [
           "^[#*\\s]*verdict\\b[^\\n]*(?:\\n[ \\t]*)*[^\\n]*?request changes"
-        ]
+        ],
+        "grader": "scripts/check-review-report.mjs"
       }
     }
   ]

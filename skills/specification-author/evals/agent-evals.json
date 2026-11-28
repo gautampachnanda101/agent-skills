@@ -68,6 +68,22 @@
           "specification-review"
         ]
       }
+    },
+    {
+      "id": "near-miss-plan",
+      "fixture": "tests/fixtures/agent/asks-first",
+      "prompt": "Plan the work for adding CSV export to the reports page as a sequence of small, reviewable changes.",
+      "allow": {
+        "write": [
+          "docs/**"
+        ]
+      },
+      "checks": {
+        "skill": "change-plan-author",
+        "no_skill": [
+          "specification-author"
+        ]
+      }
     }
   ]
 }

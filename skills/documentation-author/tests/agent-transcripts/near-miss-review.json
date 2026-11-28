@@ -1,0 +1,54 @@
+{
+  "agent": "claude-code",
+  "model": "claude-opus-5-5",
+  "skill_version": "2.2.2",
+  "recorded": "2026-11-27",
+  "events": [
+    {
+      "tool": "Skill",
+      "denied": false,
+      "error": false,
+      "kind": "skill",
+      "skill": "documentation-review"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "README.md"
+    },
+    {
+      "tool": "Glob",
+      "denied": false,
+      "error": false,
+      "kind": "search",
+      "path": "**/*",
+      "pattern": "**/*"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "package.json"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "src/sum.js"
+    },
+    {
+      "tool": "Read",
+      "denied": false,
+      "error": false,
+      "kind": "read",
+      "path": "test/sum.test.js"
+    }
+  ],
+  "reply": "I reviewed `README.md` against the code and changed nothing. The README is one sentence with no install, usage or requirements, so a developer can't use the package from it.\n\n**Who reads it:** JavaScript developers on Node.js 20 or later who want a small function that adds numbers and rejects bad input. I based this on `package.json:4-11` and `src/sum.js`.\n\n## Classification\n\n| Page | Intended form | Actual state |\n| --- | --- | --- |\n| `README.md` | Landing page with a short reference (what it is, install, API) | One sentence (`README.md:3`). It doesn't work as any form of documentation. |\n\n## Findings\n\n| Severity | Location | Evidence | Suggested fix |\n| --- | --- | --- | --- |\n| major | `README.md:1-3` | The page has only a title and \"Adds numbers safely.\" There's no install, import or example. The function is exported as `sum(...values)` (`src/sum.js:1`) but never named. | Add an install section, an import line and a short usage example. |\n| major | `README.md:3` | \"Safely\" is never defined. `package.json:4` says more: \"rejecting non-numeric input\". The code throws `TypeError` for anything that isn't a number, and for `NaN` (`src/sum.js:3`). The README never says it throws, which is how callers must handle bad input. | Say what \"safely\" means: it throws `TypeError` on non-numbers and `NaN`. Show the error case. |\n| minor | `README.md` (missing) / `package.json:5,10-11` | It needs Node.js 20 or later and ships only as an ES module (`\"type\": \"module\"`). Neither is stated. `require('tiny-sum')` fails on older Node 20.x and 22.x releases. | Add a Requirements line: Node.js 20 or later, ES modules only (`import`). |\n| minor | `README.md:3` / `src/sum.js:3` | \"Safely\" claims more than the code does. `Infinity` passes the check, so `sum(Infinity, -Infinity)` returns `NaN`. Floating-point rounding isn't handled either (`0.1 + 0.2`). | Narrow the claim to \"rejects non-numeric input\", or document these limits. (Whether `Infinity` should be rejected is a code question, not a docs one.) |\n| minor | `README.md` (missing) / `src/sum.js:5` | Calling `sum()` with no arguments returns `0`. This isn't documented. | Add it to a short API reference. |\n| minor | `README.md` (missing) / `package.json:8` | There are no instructions for running the tests (`npm test`, which runs `node --test`). | Add a Development section with `npm test`. |\n| minor | `README.md` (missing) | There's no licence, owner or support contact, and there's no `LICENSE` file or `CODEOWNERS` in the repository. With no git history (this isn't a git repository) and no `author` field in `package.json`, I can't suggest an owner from the evidence. | Add licence and maintainer sections, and a `LICENSE` file. |\n| question | `README.md` (missing) | Version 0.3.0 (`package.json:3`) suggests the package has been released, but I can't confirm it's on npm. That decides whether an install command would be `npm install tiny-sum` or a git or local install. | Confirm where it's published before writing the install command. |\n\n## Strengths\n\n- The title matches the package name (`package.json:2`), and there's a single H1.\n- The one sentence is short, in plain English, and has no filler words like \"simply\" or \"just\".\n\n## Suggested diffs\n\n```diff\n # tiny-sum\n\n-Adds numbers safely.\n+Adds numbers and throws a `TypeError` if any input is not a number (including `NaN`).\n+\n+## Requirements\n+\n+Node.js 20 or later. ES modules only — use `import`, not `require`.\n+\n+## Usage\n+\n+```js\n+import { sum } from 'tiny-sum';\n+\n+sum(1, 2, 3);   // 6\n+sum();          // 0\n+sum(1, 'two');  // throws TypeError: not a number: two\n+```\n+\n+## Development\n+\n+```sh\n+npm test\n+```\n```\n\nI left out the install command until the question about npm is answered.\n\n## Unevaluated\n\n- **Commands and examples:** not run, because I wasn't allowed to run commands. The example results above come from reading `src/sum.js`, not from running them.\n- **Linters:** the repository has no `markdownlint`, `vale` or link-checker setup, so there was nothing to run.\n- **History and freshness:** not checked, because this isn't a git repository.\n- **npm registry:** not checked, because I didn't contact any outside service.\n- **Report checker:** I didn't run the review skill's `check-review-report.mjs`, because I wasn't allowed to run commands.",
+  "changed": [],
+  "files": {}
+}
