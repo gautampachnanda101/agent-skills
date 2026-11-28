@@ -256,3 +256,20 @@ test('a usage limit stops the run instead of being graded as skill failures', as
   assert.match(result.stderr, /stopped at peer-code-review#\S+ run 1\/2: usage limit: limit reached\. 0 run\(s\) finished/);
   assert.doesNotMatch(result.stdout, /FAIL/);
 });
+
+test('a recording goes stale when the skill text changes, not its version or evals', async t => {
+  const { skillDigest, staleness } = await load();
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'digest-'));
+  t.after(() => fs.rmSync(base, { recursive: true, force: true }));
+  fs.cpSync(path.join(root, 'skills', 'peer-code-review'), path.join(base, 'peer-code-review'), { recursive: true });
+  const skillFile = path.join(base, 'peer-code-review', 'SKILL.md');
+  const before = skillDigest('peer-code-review', base);
+  fs.writeFileSync(skillFile, fs.readFileSync(skillFile, 'utf8').replace(/version: "[^"]+"/, 'version: "9.9.9"'));
+  fs.appendFileSync(path.join(base, 'peer-code-review', 'evals', 'agent-evals.json'), ' ');
+  assert.equal(skillDigest('peer-code-review', base), before, 'a version or eval change keeps the digest');
+  fs.appendFileSync(skillFile, '\nA new rule.\n');
+  const after = skillDigest('peer-code-review', base);
+  assert.notEqual(after, before);
+  assert.equal(staleness('1.0.0', '9.9.9', true, before, before), null);
+  assert.match(staleness('1.0.0', '9.9.9', true, before, after), /text changed/);
+});

@@ -83,9 +83,34 @@ export function skillVersion(skill) {
   return /^metadata:\n(?:[ \t]+.*\n)*?[ \t]+version:[ \t]*["']?([^"'\s]+)/m.exec(text)?.[1] ?? null;
 }
 
+/**
+ * A digest of what an assistant loads from a skill: every file outside
+ * tests/ and evals/, with the version line left out. A change to the evals
+ * or the version alone leaves it unchanged, so recordings stay current.
+ */
+export function skillDigest(skill, skillsRoot = path.join(root, 'skills')) {
+  const dir = path.join(skillsRoot, skill);
+  const hash = crypto.createHash('sha256');
+  const walk = rel => {
+    for (const entry of fs.readdirSync(path.join(dir, rel), { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (!rel && (entry.name === 'tests' || entry.name === 'evals')) continue;
+      const next = path.join(rel, entry.name);
+      if (entry.isDirectory()) walk(next);
+      else if (entry.isFile()) {
+        let text = fs.readFileSync(path.join(dir, next), 'utf8');
+        if (next === 'SKILL.md') text = text.replace(/^([ \t]+version:).*$/m, '$1');
+        hash.update(`${next}\0${text}\0`);
+      }
+    }
+  };
+  walk('');
+  return hash.digest('hex').slice(0, 16);
+}
+
 /** Why a recording needs re-recording, or null when it is current. */
-export function staleness(recordingVersion, currentVersion, exists = true) {
+export function staleness(recordingVersion, currentVersion, exists = true, recordingDigest = undefined, currentDigest = undefined) {
   if (!exists) return 'no recording';
+  if (recordingDigest && currentDigest) return recordingDigest === currentDigest ? null : `recorded before the skill's text changed (now ${currentVersion})`;
   if (!recordingVersion) return `recorded before versions were tracked; the skill is ${currentVersion}`;
   if (recordingVersion !== currentVersion) return `recorded with ${recordingVersion}; the skill is ${currentVersion}`;
   return null;
@@ -99,7 +124,7 @@ export function staleRecordings() {
     for (const evalCase of loadCases(skill).evals) {
       const file = path.join(root, 'skills', skill, 'tests', 'agent-transcripts', `${evalCase.id}.json`);
       const stored = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : null;
-      const why = staleness(stored?.skill_version, current, Boolean(stored));
+      const why = staleness(stored?.skill_version, current, Boolean(stored), stored?.skill_digest, skillDigest(skill));
       if (why) stale.push({ skill, eval: evalCase.id, why });
     }
   }
@@ -382,7 +407,7 @@ async function main() {
       const target = path.join(root, 'skills', skill, 'tests', 'agent-transcripts', `${id}.json`);
       fs.mkdirSync(path.dirname(target), { recursive: true });
       const { events, reply, changed, files } = run;
-      fs.writeFileSync(target, JSON.stringify({ agent: stored.agent, model: stored.model, skill_version: skillVersion(skill), recorded: new Date().toISOString().slice(0, 10), events, reply, changed, files }, null, 2) + '\n');
+      fs.writeFileSync(target, JSON.stringify({ agent: stored.agent, model: stored.model, skill_version: skillVersion(skill), skill_digest: skillDigest(skill), recorded: new Date().toISOString().slice(0, 10), events, reply, changed, files }, null, 2) + '\n');
       console.error(`agent-evals: saved ${path.relative(root, target)}`);
     }
     process.exit(result.passed ? 0 : 1);
@@ -437,7 +462,7 @@ async function main() {
         if (recordDir && graded.passed) {
           const file = path.join(root, 'skills', skill, 'tests', 'agent-transcripts', `${evalCase.id}.json`);
           fs.mkdirSync(path.dirname(file), { recursive: true });
-          fs.writeFileSync(file, JSON.stringify({ agent, model: settings.model, skill_version: skillVersion(skill), recorded: new Date().toISOString().slice(0, 10), ...result }, null, 2) + '\n');
+          fs.writeFileSync(file, JSON.stringify({ agent, model: settings.model, skill_version: skillVersion(skill), skill_digest: skillDigest(skill), recorded: new Date().toISOString().slice(0, 10), ...result }, null, 2) + '\n');
         }
         if (!keep) fs.rmSync(dir, { recursive: true, force: true });
         const seconds = Math.round((Date.now() - started) / 1000);

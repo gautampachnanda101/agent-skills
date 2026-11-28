@@ -17,6 +17,11 @@ skill's `metadata.version` field.
 
 ### Added
 
+- Recordings go stale when the skill text an assistant loads changes, not
+  when only the version or the evals change. Each recording stores a digest
+  of the skill outside `tests/` and `evals/`, without the version line; all
+  42 were stamped after git showed their skills' text unchanged since
+  recording.
 - "Not for ..." clauses on the remaining overlaps: `backstage-catalog-builder`
   1.2.5, `documentation-author` 2.2.2, `decision-record-author` 1.0.1, and
   `skill-correction` 1.0.2. Every skill has a near-miss behaviour case, and

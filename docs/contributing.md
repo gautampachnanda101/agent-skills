@@ -97,9 +97,10 @@ enumerates skills:
 8. If the skill bundles verification assets, extend `make skill-llm-verify`
    or add a task-specific check rather than assuming generic coverage.
 
-`make status` lists recordings made with an older version of their skill.
-Re-record them before a release. Recordings are evidence about a version,
-so changing one needs no version bump.
+`make status` lists recordings made before their skill's text last changed.
+Re-record those before a release. A change to a skill's evals or version
+alone keeps its recordings current, and changing a recording needs no
+version bump.
 
 `make install` copies every directory under `skills/` that contains a
 `SKILL.md`, so the installer needs no change. If the skill adds descriptor

@@ -2,6 +2,7 @@
   "agent": "claude-code",
   "model": "claude-opus-5-5",
   "skill_version": "1.2.5",
+  "skill_digest": "c47b0e37531be30e",
   "recorded": "2026-11-27",
   "events": [
     {
