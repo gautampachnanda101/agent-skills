@@ -1,13 +1,12 @@
-"""Restores the Material palette that mkdocs-techdocs-core resets.
+"""Restores the site theme that mkdocs-techdocs-core resets.
 
-mkdocs-techdocs-core sets ``config["theme"]["palette"] = {}`` unconditionally
-(see ``techdocs_core/core.py``), dropping any palette declared in mkdocs.yml.
-This plugin must be listed after ``techdocs-core`` so its ``on_config`` runs
-after the reset. The palette is defined here rather than in mkdocs.yml so both
-sources stay in one place and cannot drift.
+mkdocs-techdocs-core sets the theme palette to {} and appends its own
+features after reading mkdocs.yml. MkDocs runs hooks after plugins, so this
+hook puts the palette and features back. A hook is a plain file in the
+repository, so it needs no install: mkdocs serve, the GitHub Pages build, and
+Backstage TechDocs all run it. The colours come from
+docs/stylesheets/extra.css, kept identical to the Homebrew Tap site.
 """
-
-from mkdocs.plugins import BasePlugin
 
 PALETTE = [
     # The same palette as https://gautampachnanda101.github.io/homebrew-tap/;
@@ -38,10 +37,10 @@ FEATURES = [
 ]
 
 
-class PaletteRestorePlugin(BasePlugin):
-    def on_config(self, config):
-        theme = config["theme"]
-        if theme["name"] == "material":
-            theme["palette"] = PALETTE
-            theme["features"] = FEATURES
-        return config
+
+def on_config(config):
+    theme = config["theme"]
+    if theme["name"] == "material":
+        theme["palette"] = PALETTE
+        theme["features"] = FEATURES
+    return config

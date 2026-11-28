@@ -146,11 +146,12 @@ skill's `metadata.version` field.
 ### Fixed
 
 - The docs site matches the theme of the Homebrew Tap site again, with its
-  search, light and dark toggle, fonts, and colours. Version 1.2.0 had
-  dropped the `palette-restore` plugin from `mkdocs.yml`. GitHub Pages now
-  builds from `mkdocs.pages.yml`, which inherits `mkdocs.yml` and adds the
-  plugin, search, and `docs/stylesheets/extra.css`, while `mkdocs.yml` stays
-  as Backstage TechDocs needs it, with only `techdocs-core`.
+  search, light and dark toggle, fonts, and colours, both in `mkdocs serve`
+  and on GitHub Pages. Version 1.2.0 had dropped the `palette-restore`
+  plugin from `mkdocs.yml`, most likely because a plugin must be installed
+  wherever the site is built, including Backstage's TechDocs builder. The
+  plugin is now a hook, `docs/hooks/theme.py`, which needs no install, and
+  `mkdocs.yml` also lists search and `docs/stylesheets/extra.css`.
 - Lint findings: a code fence without blank lines in
   `backstage-catalog-builder`, bare example URLs in the usage
   guide, and shell warnings in `backstage-node.sh` and

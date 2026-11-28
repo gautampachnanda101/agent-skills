@@ -87,7 +87,7 @@ covers installation, prompts for each skill, roles, how the skills are
 tested, how to make their rules hold with any model, a local Backstage, and
 contributing. Its home page is the table of contents. To
 preview it locally, run `pip install -r docs/requirements.txt`, then
-`mkdocs serve --config-file mkdocs.pages.yml`.
+`mkdocs serve`.
 
 ## Contributing
 

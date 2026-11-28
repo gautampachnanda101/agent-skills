@@ -50,9 +50,8 @@ nav:
       - Template: decisions/template.md
 theme:
   name: material
-  # mkdocs-techdocs-core resets the palette and features; the GitHub Pages
-  # build (mkdocs.pages.yml) restores them with docs/plugins. Backstage
-  # TechDocs renders with its own theme and reads only this file.
+  # mkdocs-techdocs-core resets the palette and features; docs/hooks/theme.py
+  # restores them, matching the Homebrew Tap site.
   palette:
     - media: '(prefers-color-scheme: light)'
       scheme: default
@@ -64,6 +63,8 @@ theme:
       toggle:
         icon: fontawesome/solid/moon
         name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
   font:
     text: Space Grotesk
     code: IBM Plex Mono
@@ -76,3 +77,12 @@ theme:
     - content.code.copy
 plugins:
   - techdocs-core
+  - search
+
+# Runs after the plugins, so it can put back the palette and features that
+# techdocs-core resets. A hook needs no install, so Backstage runs it too.
+hooks:
+  - docs/hooks/theme.py
+
+extra_css:
+  - stylesheets/extra.css

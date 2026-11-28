@@ -1,7 +1,0 @@
-pyproject.toml
-mkdocs_palette_restore/__init__.py
-mkdocs_palette_restore.egg-info/PKG-INFO
-mkdocs_palette_restore.egg-info/SOURCES.txt
-mkdocs_palette_restore.egg-info/dependency_links.txt
-mkdocs_palette_restore.egg-info/entry_points.txt
-mkdocs_palette_restore.egg-info/top_level.txt
